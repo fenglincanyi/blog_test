@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Android Studio NDK开发环境搭建及Demo示例 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="JNI,NDK">
+    <meta name="description" content="说明：Android Studio 1.4后支持C/C++开发，1.3之前的版本坑点较多，所以使用1.4后的版本较为容易
+
+所用工具版本
+Android Studio 1.5
+android-ndk-r10e-windows-x86_64.exe
+
+配置NDK环境
+自行下载 ndk 工具，在你的要安装 ndk 的目录下，直接双击 此安装包，就会自动安装至此目录下，过程中会打开cmd窗口，命令行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Studio NDK开发环境搭建及Demo示例">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="说明：Android Studio 1.4后支持C/C++开发，1.3之前的版本坑点较多，所以使用1.4后的版本较为容易
+
+所用工具版本
+Android Studio 1.5
+android-ndk-r10e-windows-x86_64.exe
+
+配置NDK环境
+自行下载 ndk 工具，在你的要安装 ndk 的目录下，直接双击 此安装包，就会自动安装至此目录下，过程中会打开cmd窗口，命令行">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/1.jpg">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/2.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/3.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/4.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/5.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/6.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/8.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/10.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/11.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/12.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/13.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/9.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/14.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/16.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/17.png">
+<meta property="og:updated_time" content="2016-12-17T15:11:57.475Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Studio NDK开发环境搭建及Demo示例">
+<meta name="twitter:description" content="说明：Android Studio 1.4后支持C/C++开发，1.3之前的版本坑点较多，所以使用1.4后的版本较为容易
+
+所用工具版本
+Android Studio 1.5
+android-ndk-r10e-windows-x86_64.exe
+
+配置NDK环境
+自行下载 ndk 工具，在你的要安装 ndk 的目录下，直接双击 此安装包，就会自动安装至此目录下，过程中会打开cmd窗口，命令行">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/1.jpg">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:1154294696@qq.com" title="1154294696@qq.com" class="mail">1154294696@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Android Studio NDK开发环境搭建及Demo示例</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Android Studio NDK开发环境搭建及Demo示例</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-01-16T11:34:00.000Z" itemprop="datePublished" class="page-time">
+  2016-01-16
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#所用工具版本"><span class="post-toc-number">1.</span> <span class="post-toc-text">所用工具版本</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配置NDK环境"><span class="post-toc-number">2.</span> <span class="post-toc-text">配置NDK环境</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#第一个NDKDemo"><span class="post-toc-number">3.</span> <span class="post-toc-text">第一个NDKDemo</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#总结"><span class="post-toc-number">4.</span> <span class="post-toc-text">总结</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#补充"><span class="post-toc-number">5.</span> <span class="post-toc-text">补充</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Android Studio NDK开发环境搭建及Demo示例"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Android Studio NDK开发环境搭建及Demo示例</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-1-16 19:34" datetime="2016-01-16T11:34:00.000Z"  itemprop="datePublished">2016-01-16</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p> 说明：Android Studio 1.4后支持C/C++开发，1.3之前的版本坑点较多，所以使用1.4后的版本较为容易</p>
+</blockquote>
+<h3 id="所用工具版本"><a href="#所用工具版本" class="headerlink" title="所用工具版本"></a>所用工具版本</h3><ul>
+<li>Android Studio 1.5</li>
+<li>android-ndk-r10e-windows-x86_64.exe</li>
+</ul>
+<h3 id="配置NDK环境"><a href="#配置NDK环境" class="headerlink" title="配置NDK环境"></a>配置NDK环境</h3><ul>
+<li><p>自行下载 <strong>ndk</strong> 工具，在你的要安装 ndk 的目录下，直接双击 此安装包，就会自动安装至此目录下，过程中会打开cmd窗口，命令行不断执行命令，需等待一会即可</p>
+</li>
+<li><p>cmd窗口自动关闭后，会出现 <strong>ndk</strong> 的文件夹，如图： </p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/1.jpg" alt=""><img src="http://7xr1vo.com1.z0.glb.clouddn.com/2.png" alt=""></p>
+</li>
+<li><p>配置<strong>ndk</strong>环境变量，path 中添加即可，如我的路径如下：</p>
+<blockquote>
+<p><strong>PATH： D:\android-ndk-r10e</strong></p>
+</blockquote>
+</li>
+<li><p>保存后，打开cmd,输入命令:</p>
+<blockquote>
+<p><strong>ndk-build</strong> </p>
+</blockquote>
+<p>  出现如下显示，则安装成功：</p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/3.png" alt=""></p>
+</li>
+</ul>
+<h3 id="第一个NDKDemo"><a href="#第一个NDKDemo" class="headerlink" title="第一个NDKDemo"></a>第一个NDKDemo</h3><ul>
+<li>studio中，新建一个project，    name： NDKDemo</li>
+<li><p>在本项目中，配置 <strong>ndk</strong> 路径，如图：</p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4.png" alt=""></p>
+  <figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>  点击<strong>OK</strong>， 此时，等待gradle构建，构建完成后，观察 <strong>local.properties</strong> 文件，多出来了 <strong>ndk</strong> 的路径，如图所示：</p>
+  <figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li><p>打开 <strong>grade.properties</strong> 文件，在末尾添加：</p>
+<blockquote>
+<p><strong>android.useDeprecatedNdk=”true”</strong></p>
+</blockquote>
+</li>
+</ul>
+<pre><code>![](http://7xr1vo.com1.z0.glb.clouddn.com/7.png)
+
+    * 此步骤，为了防止下一步修改 app/build.gradle 文件后报错
+</code></pre><ul>
+<li><p>打开 <strong>app/build.gradle</strong> 文件，在 <strong>defaultConfig</strong> 下加入<strong>ndk</strong>相关配置参数：</p>
+<pre><code>ndk {
+    moduleName &quot;HelloNDK&quot;
+}
+</code></pre><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<pre><code>* 此处的 modleName 是 加载库文件的标识，必须和后面代码中的 System.loadLibrary(&quot;HelloNDK&quot;) 保持一致，否则会报错
+</code></pre></li>
+<li><p>书写 <strong>native</strong> 方法 和 加载类库，代码如下：</p>
+<pre><code>static {
+    // 加载类库
+    System.loadLibrary(&quot;HelloNDK&quot;);
+}
+
+// native方法 调用 C代码
+public native String javaCallC();
+</code></pre><p>如图，我这是后续的图片，过程中的未截：</p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/10.png" alt=""></p>
+</li>
+<li><p>打开左下角的 <strong>Terminal</strong>，<strong>cd</strong> 至 <strong>java</strong> 路径下，并执行命令：</p>
+<pre><code>javah -d jni [native方法所在类的全路径]
+</code></pre><p>  如图：</p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/11.png" alt=""></p>
+<pre><code>* 在studio中：类的全路径可 通过 右击该类 -&gt; Copy Reference获得
+</code></pre><p>  执行成功后，刷新下目录，可看到目录中多了一个 <strong>咖啡色的jni目录</strong>，和一个 <strong>.h文件</strong>，如图：</p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/12.png" alt=""></p>
+</li>
+<li><p>右击 <strong>Main目录的图标 -&gt; New -&gt; Floder -&gt; JNI Floder</strong>，之后会出现一个 <strong>蓝色的JNI</strong> 文件夹，如图：</p>
+<p>   <img src="http://7xr1vo.com1.z0.glb.clouddn.com/13.png" alt=""></p>
+<p>  此时，继续解决上面 <strong>native</strong> 方法名报错（红色）的问题，<strong>Alt + Enter</strong> 选择创建 <strong>.c</strong> 中的方法，这时，会在蓝色的JNI文件夹下自动生成一个 <strong>.c</strong> 文件，并且 含有 <strong>c代码</strong>，里面有复杂的方法头</p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/9.png" alt=""></p>
+  <figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/14.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<pre><code>* 可能 native 方法名仍然是红色的，这可能是 Studio 的一个bug，但其实是可以运行的。可能过一段时间红色会消失变为正常，我的就是这种情况
+</code></pre></li>
+<li><p>下面就可以书写真正的 <strong>C代码</strong>了，此处 只简单写下，关于更牛逼的用法，将更新在后面blog中，继续总结。</p>
+<p>  此处代码改为：</p>
+<pre><code>return (*env)-&gt;NewStringUTF(env, &quot;你好，NDK&quot;);
+</code></pre></li>
+<li><p>OK，第一个NDK Demo可以运行了，上图：</p>
+<p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/16.png" alt=""></p>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>相比以前在 <strong>eclipse</strong> 中进行 <strong>NDK</strong> 开发，<strong>studio</strong>中显得方便多了，并不用安装 <strong>CDT</strong> 和 <strong>cygwin</strong>，而且 <strong>.c</strong> 文件及其内容可以自动生成</li>
+<li>利用命令 <strong>javah -d jni [native方法所在类的全路径]</strong>  生成的  <strong>.h头文件</strong> 可以在 有了 <strong>.c</strong> 文件后删除，此 <strong>.h</strong> 文件主要是用来用于生成 <strong>.c</strong> 文件中相应比较长的方法头。如果之前没有 <strong>.h</strong> 文件，<strong>Alt + Enter</strong> 是无法自动生成 <strong>.c</strong>文件的</li>
+<li>必须在 有 <strong>/src/main/jni</strong> 的文件夹（蓝色的jni文件夹）下，才能自动生成<strong>.c</strong> 文件</li>
+<li><strong>.c</strong> 文件中要出现了中文，必须是 <strong>UTF-8</strong> 下，否则，运行时会崩溃报错</li>
+<li><p>注意观察 <strong>/app/build/intermediates/ndk</strong> 目录下，有相关的 所有平台的 .so 文件（默认情况下，生成所有平台的；若只想生成某几种平台的，可在 <strong>app/build.gradle（abi-Filters “armeabi”,”armeabi-v7a”,”x86”）</strong> 中  或者 <strong>Android.mk</strong>中 进行配置）</p>
+<p>   <img src="http://7xr1vo.com1.z0.glb.clouddn.com/17.png" alt=""></p>
+<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3></li>
+<li>so文件和native类与混淆无关，无需keep语句</li>
+<li>实现类一定要方法名正确否则会报java.lang.UnsatisfiedLinkError: dlopen failed异常</li>
+<li>studio工具的提示并不是很智能，所以有时要rebuild project</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2016-12-17T15:11:57.475Z" title="2016-12-17 23:11" itemprop="dateUpdated">2016年12月17日 23:11</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JNI/">JNI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NDK/">NDK</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/&title=《Android Studio NDK开发环境搭建及Demo示例》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/&title=《Android Studio NDK开发环境搭建及Demo示例》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android Studio NDK开发环境搭建及Demo示例》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/02/19/Git学习笔记（一）/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Git学习笔记（一）</h4>
+      </a>
+    </div>
+  
+
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Android Studio NDK开发环境搭建及Demo示例" data-title="Android Studio NDK开发环境搭建及Demo示例" data-url="https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/&title=《Android Studio NDK开发环境搭建及Demo示例》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/&title=《Android Studio NDK开发环境搭建及Demo示例》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android Studio NDK开发环境搭建及Demo示例》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADH0lEQVR42u3aQW7jQAwEQP//0841wEbaJjkBIrp0MuxYmpoc6Cbn9Yqv97fr6v1/r6vvJn/Zu8PhCxsbG/sh7OrSk+t+s75/mqwkwecWbGxs7K3s+2VdLfHq9aT83D83eXqyxdjY2NifzE7KQzUqRCUnCEjY2NjY2JMCdipanL0DNjY29uewkwcki6sWp14rqtf8wsbGxt7Kzqeif//1r8y3sbGxsf8wezK+jX7uD0LLvEBeKrCxsbEXsfMCkPygry69d7jn1CABGxsbewd7Phg4tVkTUr5ObGxs7K3sPFr0ykyOrG5NvnGXCQwbGxt7Ebs6Op20dfJFJ5uebG5zso2NjY39KHY+QO0Fld8ob/lGYGNjY+9m54/sRYJ8xDsJQoWGFzY2NvZS9uQ4zuSQzfwoT3nTsbGxsdexk2jRe8DZIz69KPLDa2xsbOxF7OpSqm2pUyWw1+pKCiQ2Njb2VvZkhJBv1qkWUnWjsbGxsTexk+M4vRbSvF3Vu08US7CxsbEXsfOW/bz9VK2lpzaxeWoJGxsb+4HsaiypDgmq3+1tRD4YxsbGxt7HfsdXHgnmseHUMDiq29jY2NgPZJcHooeKU/WJ1fL5n43DxsbGXsTu9Vh6RSgfBiS8fPycPx0bGxv7iey8bdRrNuVlbz60KBwtwsbGxl7H7v2Uz1vwvYM+1bFxYaiAjY2NvYjdyy7VwzR5gckb/fclLbonNjY29gp2tSVUjQd5B2vSCcuP8mBjY2PvZvcWVw0Sp4pi3oQqhBBsbGzsB7JP3SgPCUnxq4aNapsJGxsbex+7B6ge65mXljzkRCvHxsbG/hj2/JBNtZj1xsbY2NjY2MntksdMBgm9vNBrgWFjY2PvYL+LV07tbUoeOfKY9MoTEjY2NvYD2b0hQV6W7peSx5Vqocq3GBsbG3sHu9fuSUawk82KUlRrDdjY2Nhb2dWGznxUkEeLeasLGxsbG7vamk++dV9yqsmp/E/CxsbG/nh28k4SFfKRQK8rho2Njf057GoDaD6Urd5hHnuwsbGxt7KroWIyBq6Wq145zEcL2NjY2A9nfwGOLSsmfeCgcAAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

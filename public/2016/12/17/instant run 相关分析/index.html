@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>instant run 相关分析 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="instant run">
+    <meta name="description" content="Android Studio 2.0 引入了即时编译功能：instant run，一定程度上进行了增量编译、增量更新代码，节省了开发耗时（喝咖啡的时间）。下面具体分析下instant run相关工作流程和相关的源码
+instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 以上（设置21以上可获得最佳性能）Android 5.0以上的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="instant run 相关分析">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="Android Studio 2.0 引入了即时编译功能：instant run，一定程度上进行了增量编译、增量更新代码，节省了开发耗时（喝咖啡的时间）。下面具体分析下instant run相关工作流程和相关的源码
+instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 以上（设置21以上可获得最佳性能）Android 5.0以上的">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/Image.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/Image1.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/Image2.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/1-Y-gIucAGyqQscMdXuHaSiA.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/1-U2tXGUWaeDU7L3u9Z_U0fw.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20apk.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20zip%20class.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%97%A0%E6%A0%87%E9%A2%98.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E7%9B%B8%E5%85%B3jar.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20application.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E8%AE%BE%E7%BD%AE%E7%88%B6classloader%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E7%9B%B8%E5%85%B3classLoader%E5%AE%9A%E4%B9%89.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E6%9C%89%E4%BB%A3%E7%A0%81%E5%8F%98%E6%9B%B4%E6%97%B6%E6%96%B0%E7%94%9F%E6%88%90.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%A2%9E%E5%8A%A0%E7%9A%84%E4%BB%A3%E7%A0%81override%E7%B1%BB.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%8F%98%E5%8C%96%E7%9A%84%E7%B1%BB%E6%95%B0%E7%BB%84%E5%AD%98%E5%82%A8.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%20patch%E7%9B%B8%E5%85%B3.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%93%E5%8C%85%E7%BB%93%E6%9E%9C.png">
+<meta property="og:updated_time" content="2016-12-17T14:27:19.680Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="instant run 相关分析">
+<meta name="twitter:description" content="Android Studio 2.0 引入了即时编译功能：instant run，一定程度上进行了增量编译、增量更新代码，节省了开发耗时（喝咖啡的时间）。下面具体分析下instant run相关工作流程和相关的源码
+instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 以上（设置21以上可获得最佳性能）Android 5.0以上的">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/Image.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:1154294696@qq.com" title="1154294696@qq.com" class="mail">1154294696@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">instant run 相关分析</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">instant run 相关分析</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-12-17T05:00:00.000Z" itemprop="datePublished" class="page-time">
+  2016-12-17
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#instant-run-使用"><span class="post-toc-number">1.</span> <span class="post-toc-text">instant run 使用</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#版本要求"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">版本要求</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#使用"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">使用</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#更新方式"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">更新方式</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#过程分析"><span class="post-toc-number">2.</span> <span class="post-toc-text">过程分析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#第一次打包"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">第一次打包</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#instant-run-代码分析"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">instant run 代码分析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#attachBaseContext-中执行的三个步骤"><span class="post-toc-number">2.2.1.</span> <span class="post-toc-text">attachBaseContext() 中执行的三个步骤</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#onCreate-过程"><span class="post-toc-number">2.2.2.</span> <span class="post-toc-text">onCreate() 过程</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#Server-部署工作"><span class="post-toc-number">2.2.3.</span> <span class="post-toc-text">Server 部署工作</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#代码热更新流程"><span class="post-toc-number">3.</span> <span class="post-toc-text">代码热更新流程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#几个重要类"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">几个重要类</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-instant run 相关分析"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">instant run 相关分析</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-17 13:00" datetime="2016-12-17T05:00:00.000Z"  itemprop="datePublished">2016-12-17</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>Android Studio 2.0 引入了即时编译功能：instant run，一定程度上进行了增量编译、增量更新代码，节省了开发耗时（喝咖啡的时间）。<br>下面具体分析下instant run相关工作流程和相关的源码</p>
+<h3 id="instant-run-使用"><a href="#instant-run-使用" class="headerlink" title="instant run 使用"></a>instant run 使用</h3><h4 id="版本要求"><a href="#版本要求" class="headerlink" title="版本要求"></a>版本要求</h4><p>Gradle 2.0 以上<br>build.gradle：minSdkVersion 15 以上（设置21以上可获得最佳性能）<br>Android 5.0以上的手机或模拟器</p>
+<h4 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h4><p>首先确认开启instant run，在settings中搜索instant run，可看到相关设置，默认instant run功能是开启的<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>当第一次点击 run 按钮 <figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>，进行第一次编译打包。<br>apk成功安装之后，再观察工具栏，run按钮发生了变化：<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>然后我们随意修改一部分代码，点击运行，可看到手机屏幕上弹出toast，提示代码已经改变了，可看到最新的运行效果。使用起来也比较方便、快捷。</p>
+<h4 id="更新方式"><a href="#更新方式" class="headerlink" title="更新方式"></a>更新方式</h4><ul>
+<li>热交换 hot swap<br>更改现有方法的实现代码；不会重新初始化正在运行的app，不要做重启app，activity的操作，即可看到最新代码运行结果</li>
+<li>温交换 warm swap<br>更改或移除当前的资源；activity会自动重启（小闪烁），即可看到最新运行结果</li>
+<li>冷交换 cold swap<br>对代码有结构性的更改（字段更改、类继承关系、清单文件更改）；此时会重启app</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/1-Y-gIucAGyqQscMdXuHaSiA.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>参考：<br><a href="https://developer.android.com/studio/run/index.html?hl=zh-cn" target="_blank" rel="external">https://developer.android.com/studio/run/index.html?hl=zh-cn</a><br><a href="https://medium.com/google-developers/instant-run-how-does-it-work-294a1633367f#.go1u6yq2o" target="_blank" rel="external">https://medium.com/google-developers/instant-run-how-does-it-work-294a1633367f#.go1u6yq2o</a></p>
+<h3 id="过程分析"><a href="#过程分析" class="headerlink" title="过程分析"></a>过程分析</h3><h4 id="第一次打包"><a href="#第一次打包" class="headerlink" title="第一次打包"></a>第一次打包</h4><p>instant run 第一次编译打包流程，会执行下面的工作<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/1-U2tXGUWaeDU7L3u9Z_U0fw.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>先来看看生成的apk：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20apk.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p> 多出了 instant-run.zip文件，那它里面是什么内容呢？<br> <figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20zip%20class.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br> instant-run.zip里的dex文件，是我们真正的业务代码</p>
+<p> 那instant run 相关的类呢，反而跑到了外层的classes.dex和classes2.dex中。</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%97%A0%E6%A0%87%E9%A2%98.png" alt=""><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E7%9B%B8%E5%85%B3jar.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>实际上这2个dex中的内容是instant-run.jar和instant-run-bootstrap.jar 的内容（自己可反编译出来看看）：</p>
+<p><strong>就是说，第一次运行打包时候，是将 instant-run.jar 和 instant-run-bootstrap.jar 2个jar 变成 2个dex文件，真正的业务代码编译后整合到别的dex中，然后放在了instant-run.zip中</strong></p>
+<blockquote>
+<p>classes.dex  -&gt;   instant-run.jar &nbsp;&nbsp;&nbsp;&nbsp; instant run 相关api类<br>classes2.dex  -&gt;  instant-run-bootstrap.jar   &nbsp;&nbsp;  AppInfo.class</p>
+</blockquote>
+<p>再来看看清单文件，application 被替换成 BootstrapApplication：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20application.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h4 id="instant-run-代码分析"><a href="#instant-run-代码分析" class="headerlink" title="instant run 代码分析"></a>instant run 代码分析</h4><h5 id="attachBaseContext-中执行的三个步骤"><a href="#attachBaseContext-中执行的三个步骤" class="headerlink" title="attachBaseContext() 中执行的三个步骤"></a>attachBaseContext() 中执行的三个步骤</h5><p>首先来观察下该类下的 attachBaseContext()方法，其中做了3个比较重要的事情：<br>createResources() 、setupClassLoaders()、createRealApplication()</p>
+<ul>
+<li>createResources()<br>主要是判断资源resource.ap<em>是否改变，然后保存resource.ap</em>的路径到externalResourcePath中</li>
+<li>setupClassLoaders()<br>设置instant run 相关的classLoader，及其继承关系（PathClassLoader -&gt; BootClassLoader   变为  PathClassLoader -&gt; IncrementalClassLoader -&gt; BootClassLoader）</li>
+<li>createRealApplication()<br>进行application 的相关替换，当前app的application变为realApplication；<br>反射的方式拿到 真实的 Application，通过AppInfo相关字段进行获取</li>
+</ul>
+<p>下面我们分析一下setClassLoader详细过程：<br>主要经历了以下的方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E8%AE%BE%E7%BD%AE%E7%88%B6classloader%E8%BF%87%E7%A8%8B.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>这几个ClassLoader类定义的逻辑关系如下：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E7%9B%B8%E5%85%B3classLoader%E5%AE%9A%E4%B9%89.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>findClass过程依次委托给 父ClassLoader，最后是让PathClassLoader去加载类</p>
+<h5 id="onCreate-过程"><a href="#onCreate-过程" class="headerlink" title="onCreate() 过程"></a>onCreate() 过程</h5><ul>
+<li>通过MonkeyPatcher 替换当前的 application 为 realApplication<br>包含ActivityThread中相应的Application 都替换成 realApplication</li>
+<li>替换相应的资源resource<br>替换当前app的assetManager，资源相关的变量等等（期间都是用反射的方式）</li>
+<li>Server 创建，建立Socket连接，开启连接</li>
+</ul>
+<h5 id="Server-部署工作"><a href="#Server-部署工作" class="headerlink" title="Server 部署工作"></a>Server 部署工作</h5><p>在Server 建立起连接后，三种部署工作（hot swap、warm swap、cold swap），都是通过Server进行操作。具体在那种情形下进行哪种交换，源码中有具体实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">private int handlePatches(List&lt;ApplicationPatch&gt; paramList, boolean paramBoolean, int paramInt) &#123;</div><div class="line">    if (paramBoolean) &#123;</div><div class="line">        FileManager.startUpdate();</div><div class="line">    &#125;</div><div class="line">    Iterator localIterator = paramList.iterator();</div><div class="line">    while (localIterator.hasNext()) &#123;</div><div class="line">        Object localObject = (ApplicationPatch) localIterator.next();</div><div class="line">        String str = ((ApplicationPatch) localObject).getPath();</div><div class="line">        if (str.endsWith(&quot;.dex&quot;)) &#123;// 冷交换</div><div class="line">            handleColdSwapPatch((ApplicationPatch) localObject);</div><div class="line">            int j = 0;</div><div class="line">            localObject = paramList.iterator();</div><div class="line">            do &#123;</div><div class="line">                i = j;</div><div class="line">                if (!((Iterator) localObject).hasNext()) &#123;</div><div class="line">                    break;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            while (!((ApplicationPatch) ((Iterator) localObject).next()).getPath().equals(&quot;classes.dex.3&quot;));</div><div class="line">            int i = 1;</div><div class="line">            if (i == 0) &#123;</div><div class="line">                paramInt = 3;</div><div class="line">            &#125;</div><div class="line">        &#125; else if (str.equals(&quot;classes.dex.3&quot;)) &#123;// 热交换</div><div class="line">            paramInt = handleHotSwapPatch(paramInt, (ApplicationPatch) localObject);</div><div class="line">        &#125; else if (isResourcePath(str)) &#123;// 资源：温交换</div><div class="line">            paramInt = handleResourcePatch(paramInt, (ApplicationPatch) localObject, str);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    if (paramBoolean) &#123;</div><div class="line">        FileManager.finishUpdate(true);</div><div class="line">    &#125;</div><div class="line">    return paramInt;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="代码热更新流程"><a href="#代码热更新流程" class="headerlink" title="代码热更新流程"></a>代码热更新流程</h3><p>在我们增加一行代码后，点击运行，我们来观察生成的类的变化<br>在 build 目录下，transforms 中有生成相关的代码<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E6%9C%89%E4%BB%A3%E7%A0%81%E5%8F%98%E6%9B%B4%E6%97%B6%E6%96%B0%E7%94%9F%E6%88%90.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h4 id="几个重要类"><a href="#几个重要类" class="headerlink" title="几个重要类"></a>几个重要类</h4><p>我们来具体看看demo 中代码更改：MainActivity$override类内容的确是最新的代码内容<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%A2%9E%E5%8A%A0%E7%9A%84%E4%BB%A3%E7%A0%81override%E7%B1%BB.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>AppPatchesLoaderImpl类记录了更改的类，存储在一个数组中，供类加载时候，替换成最新的类的代码内容<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%8F%98%E5%8C%96%E7%9A%84%E7%B1%BB%E6%95%B0%E7%BB%84%E5%AD%98%E5%82%A8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%20patch%E7%9B%B8%E5%85%B3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>在此处，我反编译了slice_0-classes.dex：<br> <figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%93%E5%8C%85%E7%BB%93%E6%9E%9C.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>第一次运行打包生成的 “业务代码” 中，生成的类中的方法里都增加了 IncrementalChange 相关的判断，如果 $change 不为空，说明我们有更改的代码，有更改的代码，则执行最新更改的代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">public Object access$dispatch(String paramString, Object... paramVarArgs) &#123;</div><div class="line">        switch (paramString.hashCode()) &#123;</div><div class="line">            case -833446436:</div><div class="line">                initView((MainActivity) paramVarArgs[0]);</div><div class="line">                return null;</div><div class="line">            case -641568046:</div><div class="line">                onCreate((MainActivity) paramVarArgs[0], (Bundle) paramVarArgs[1]);</div><div class="line">                return null;</div><div class="line">            case -399296056:</div><div class="line">                return init$args((MainActivity[]) paramVarArgs[0], (Object[]) paramVarArgs[1]);</div><div class="line">            case 781336394:</div><div class="line">                init$body((MainActivity) paramVarArgs[0], (Object[]) paramVarArgs[1]);</div><div class="line">                return null;</div><div class="line">            case 2118315029:</div><div class="line">                testClick((MainActivity) paramVarArgs[0], (View) paramVarArgs[1]);</div><div class="line">                return null;</div><div class="line">        &#125;</div><div class="line">        throw new InstantReloadException(String.format(&quot;String switch could not find &apos;%s&apos; with hashcode %s in %s&quot;, new Object[]&#123;paramString, Integer.valueOf(paramString.hashCode()), &quot;com/geng/myapplication/MainActivity&quot;&#125;));</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>最后根据不同的类型，进行相关的重启（activity 或者 app），主要由 Restarter负责，同时也提供了相关的重启方法：</p>
+<ul>
+<li>restartActivity()</li>
+<li>restartApp()</li>
+</ul>
+<p><br><br>至此，整个 instant run 的分析告一段落，需要慢慢消化一下。。。</p>
+<p><br><br>源码及工具资源：<br><a href="https://github.com/fenglincanyi/Study/tree/master/instant%20run%E7%9B%B8%E5%85%B3" target="_blank" rel="external">https://github.com/fenglincanyi/Study/tree/master/instant%20run%E7%9B%B8%E5%85%B3</a><br>参考：<br><a href="https://github.com/nuptboyzhb/AndroidInstantRun" target="_blank" rel="external">https://github.com/nuptboyzhb/AndroidInstantRun</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2016-12-17T14:27:19.680Z" title="2016-12-17 22:27" itemprop="dateUpdated">2016年12月17日 22:27</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/12/17/instant run 相关分析/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/instant-run/">instant run</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/&title=《instant run 相关分析》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/&title=《instant run 相关分析》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《instant run 相关分析》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/12/15/Android 与 js 交互中url传参中也有url的问题/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android 与 js 交互中url传参中也有url的问题</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="instant run 相关分析" data-title="instant run 相关分析" data-url="https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/&title=《instant run 相关分析》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/&title=《instant run 相关分析》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《instant run 相关分析》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACr0lEQVR42u3awW7DIBAE0P7/T6fXSm3smQWSVHo+VQmOeT7Adpavr/h6/Liux/we//vzZMz1J5svPDw8vIWp54+8nu6zMevIfM54eHh4p3nJQj/bEq6X9XwDSOaDh4eH91940WNGY5JNAg8PD+8/8q5HtgV6HmTg4eHhvZeX/3QOvoblU09+Z0PWgoeHh9dlAkWJ/Al/H+nv4eHh4S131Wft/3z5Tpb1lV/Dw8PDO8FrI9eVYrcNEWblMh4eHt4reTPALJjIY47826d34eHh4R3jJQHErJV1PbIt0+uQAg8PD+8wb7YB5HfNprsSZ+Dh4eHt5bUL/Sy6nb3KldeBh4eH93peexgr5+XIlWf90d/Dw8PD28pbCU9fc4C1PRZWJL54eHh4Ja99cNv4z6fSji8OGeDh4eFt5c3a+UlDa3Z0oGXf3IWHh4d3gLer2F3fMNqmVzFDPDw8vAO8vHF1PbmVY1WzA2H10Ss8PDy8Zd6s9ZW0/Hexk9d9k7Lg4eHhHeDle8gjvvKWVR7R1hsGHh4e3mHe9TK93pHPQ4T1I1l4eHh453j5EYE8nrj+JJ/6tiNfeHh4eAd4e0OBlWh4pbzGw8PDeyUvKaPzNlVelM8OCtRPxMPDwzvA2zXF2dTzMnoYRuDh4eEd4LUN/iSeaBf3lTI9Kqnx8PDwjvHaTSKPGHJw++3NrPDw8PAO89p//mdtqjbAbcv3+pF4eHh4Me9RXrO2WRvC5iX7zbd4eHh4B3jrUWy+rLcHCNY3Kjw8PLxzvPX4tQhV44K47eAVYQQeHh7eJl57lCopqduYeHZY4aY5h4eHh/dhvNninkyrDUFuUmo8PDy8t/LyE035K8jTg7pwx8PDwzvGS8KIWWzRFsezzeDpvXh4eHgHeCsBa15et9vJG/p7eHh4ePe8b2Cgac6M2fjAAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

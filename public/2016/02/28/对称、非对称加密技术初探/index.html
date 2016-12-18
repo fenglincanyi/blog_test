@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>对称、非对称加密技术初探 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="加密,签名">
+    <meta name="description" content="一、对称加密
+对称加密简介
+ 对称加密算法所用到的基本的方法是：代换 和 置换。简单来说：（以早期的加密方式举例）
+
+代换：是将明文字母替换成其他字母、数字或符号的方法
+  对于明文中的每一个字母，用字母表中k个字母来代替（允许循环，即a可以在z的后面）
+
+例如：如果 k = 3，那么明文中的 a 在密文中就变 d ，b 就变成 e。这里 k 值充当密钥
+
+
+置换：可以说对代换的一种改进，通过并不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对称、非对称加密技术初探">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="一、对称加密
+对称加密简介
+ 对称加密算法所用到的基本的方法是：代换 和 置换。简单来说：（以早期的加密方式举例）
+
+代换：是将明文字母替换成其他字母、数字或符号的方法
+  对于明文中的每一个字母，用字母表中k个字母来代替（允许循环，即a可以在z的后面）
+
+例如：如果 k = 3，那么明文中的 a 在密文中就变 d ，b 就变成 e。这里 k 值充当密钥
+
+
+置换：可以说对代换的一种改进，通过并不">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.PNG">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D.png">
+<meta property="og:updated_time" content="2016-12-17T15:12:40.989Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对称、非对称加密技术初探">
+<meta name="twitter:description" content="一、对称加密
+对称加密简介
+ 对称加密算法所用到的基本的方法是：代换 和 置换。简单来说：（以早期的加密方式举例）
+
+代换：是将明文字母替换成其他字母、数字或符号的方法
+  对于明文中的每一个字母，用字母表中k个字母来代替（允许循环，即a可以在z的后面）
+
+例如：如果 k = 3，那么明文中的 a 在密文中就变 d ，b 就变成 e。这里 k 值充当密钥
+
+
+置换：可以说对代换的一种改进，通过并不">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.PNG">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:1154294696@qq.com" title="1154294696@qq.com" class="mail">1154294696@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">对称、非对称加密技术初探</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">对称、非对称加密技术初探</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-02-28T09:52:00.000Z" itemprop="datePublished" class="page-time">
+  2016-02-28
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/网络/">网络</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#一、对称加密"><span class="post-toc-number">1.</span> <span class="post-toc-text">一、对称加密</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#二、非对称加密"><span class="post-toc-number">2.</span> <span class="post-toc-text">二、非对称加密</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-对称、非对称加密技术初探"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">对称、非对称加密技术初探</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-2-28 17:52" datetime="2016-02-28T09:52:00.000Z"  itemprop="datePublished">2016-02-28</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/网络/">网络</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="一、对称加密"><a href="#一、对称加密" class="headerlink" title="一、对称加密"></a>一、对称加密</h3><ol>
+<li><p><strong>对称加密简介</strong></p>
+<p> 对称加密算法所用到的基本的方法是：代换 和 置换。简单来说：（以早期的加密方式举例）</p>
+<ul>
+<li><p>代换：是将明文字母替换成其他字母、数字或符号的方法</p>
+<p>  对于明文中的每一个字母，用字母表中k个字母来代替（允许循环，即a可以在z的后面）</p>
+<blockquote>
+<p>例如：如果 k = 3，那么明文中的 a 在密文中就变 d ，b 就变成 e。这里 k 值充当密钥</p>
+</blockquote>
+</li>
+<li><p>置换：可以说对代换的一种改进，通过并不是通过固定的规则来替换字母，任意字母都可以替换为别的其他字母，但是一一对应的。例如（单表置换加密）：</p>
+<blockquote>
+<p>明文：a b c d e f g</p>
+<p>密文：d c h n q i a</p>
+</blockquote>
+<p>以上是早期加密时用的简单的方法，其思想还是通过 替换 来进行加密的</p>
+</li>
+</ul>
+</li>
+<li><p><strong>对称加密过程</strong></p>
+<p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.PNG" alt=""></p>
+</li>
+<li><p><strong>常见对称加密算法</strong></p>
+<ul>
+<li><p><strong>DES</strong>   </p>
+<p>  采用64位的分组长度，和56位的密钥长度，将64位的输入经过一系列的变换得到64位的输出。加密解密使用了相同的密钥。</p>
+<pre><code>* 注： 此算法可以被暴力破解，穷举即可解密，所以不再单纯使用 
+</code></pre></li>
+<li><p><strong>3DES</strong></p>
+<p>  对DES的改进，使用多个密钥对DES进行三次加密，有些基于Internet的应用已经采纳了这种算法，如：PGP，S/MIME</p>
+</li>
+<li><p><strong>AES</strong>(高级加密标准)</p>
+<p>  对DES的再次改进，性能不低于3DES， 它的密钥长度为128、192或256位，分组长度为128位</p>
+</li>
+<li><p><strong>Blowfish算法</strong></p>
+<p>  一种可变密钥长度的分组加密算法，分组长度64位。迄今为止，该算法的安全性还没有受到挑战</p>
+</li>
+<li><p><strong>RC5算法</strong></p>
+<p>  参数可变的分组加密算法，此算法使用了三种运算：异或、加、循环</p>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="二、非对称加密"><a href="#二、非对称加密" class="headerlink" title="二、非对称加密"></a>二、非对称加密</h3><blockquote>
+<p>基于数学函数的算法，而不再是基于代换和置换技术，公钥加密算法是 非对称的</p>
+<p>根据加密算法 和 加密密钥 是推不出 解密密钥的</p>
+</blockquote>
+<ol>
+<li><p><strong>关于公钥、私钥</strong></p>
+<p> 正确理解：</p>
+<pre><code>公钥是用于 加密 和 认证 的
+私钥是用于 解密 和 签名 的
+
+* 这两个密钥，任意一个都可以用来加密，另一个用来解密
+* 公钥是公开的
+</code></pre></li>
+<li><p><strong>非对称加密过程</strong></p>
+<p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.png" alt=""></p>
+</li>
+<li><p><strong>RSA简介</strong></p>
+<p> 第一个能用于数据加密也能用于数字签名的算法，RSA是一种分组密码</p>
+<ul>
+<li>易于理解和操作，但安全性一直没有得到理论上的证明</li>
+<li><p>RSA的加密和解密时间是DES的上百倍，效率较低</p>
+<blockquote>
+<p>选取密钥的过程：</p>
+</blockquote>
+<p>  (1). 选取两个 大质数 p, q. 质数值越大，破解 RSA 就越困难，进行加密和解密的时间就越长<br>  (2). 计算 n = p <em> q,  z = (p-1) </em> (q-1)<br>  (3). 选取 e &lt; n, 且与 z 互质（e 和 z没有公约数）<br>  (4). 找到数 d, 满足 ed - 1 被 z 整除（ ((e * d) - 1) % n) == 0 ）<br>  (5). 公钥：（n, e）;  私钥：（n, d）</p>
+<blockquote>
+<p>加密、解密过程：</p>
+</blockquote>
+<p>  (1). 甲方（发送方）：发送 m (发送数)，m &lt; n,<br>  (2). 发送时，用乙方（接收方）的公钥加密：密文 c = m^e % n<br>  (3). 乙方：解密用自己的私钥，得到明文 m = c^d % n</p>
+</li>
+</ul>
+</li>
+<li><p><strong>其他非对称加密算法</strong></p>
+<ul>
+<li>ElGamal算法：基于公钥密码体制和椭圆曲线加密体系，既能用于数据加密，又能用于数字签名</li>
+<li>背包加密算法：基于背包算法，但是大多数一次背包体制均被破译了，因此很少有人使用它</li>
+</ul>
+</li>
+</ol>
+<ol>
+<li><p><strong>散列(哈希)函数</strong></p>
+<p> 是公开的函数，可以将任意长的串映射成一个固定长度的串，Hash值 由下面的函数 H 生成：</p>
+<pre><code>h = H (M)
+
+M: 变长的消息，H(M)是定长的 Hash值
+</code></pre><p> 常见的散列函数有： <strong>MD5</strong>，<strong>SHA-1</strong> </p>
+<ul>
+<li><p>MD5：</p>
+<p>  有广泛的应用，如在 Java API 中就有体现，但也不安全，有人专门将大量的明文和密文收集起来存至数据库中，用于暴力破解MD5。所以实际使用时，需 “加盐”</p>
+</li>
+<li><p>SHA-1:</p>
+<p>  在Linux系统、Git中都有广泛的使用，它的原理类似于 MD4(MD5的前身)。</p>
+<blockquote>
+<p>说明： MD5 和 SHA-1被好多人称为 加密算法，其实这两个散列函数，是用于散列获得消息摘要的，严格来说，应该叫做 <strong>消息摘要算法</strong></p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p><strong>数字签名</strong></p>
+<p> 签名是用来验证 发送方的身份 和 数据的完整性(数据是否被第三方篡改)的</p>
+<p> 签名分为：</p>
+<ul>
+<li>普通数字签名（如：RSA，DES）</li>
+<li><p>特殊数字签名（如：有盲签名，代理签名）</p>
+<p><strong>数字签名过程</strong>：</p>
+<p>  (1). 发送方 生成一对公钥和私钥，将自己的 公钥 发送给 接收方<br>  (2). 发送方 将 要发送的消息 msg, 进行散列(MD5或者SHA-1)，得到 消息摘要<br>  (3). 发送方 将 消息摘要 用自己的私钥加密，加密后的信息就是 数字签名<br>  (4). 发送方 将 数字签名 附在 要发送的消息 msg’ (是通过接收方的公钥加密后的) 的后面，再一起发送至 接收方<br><strong>数字签名的验证过程</strong>：</p>
+<p>  (1). 接收方 收到消息后，对消息 msg’ 使用自己的私钥进行解密得到 msg<br>  (2). 接收方 对 数字签名 使用 发送方的公钥解密，得到 消息摘要(之前是由消息经过散列得到)<br>  (3). 接收方 使用相同的 散列函数(散列函数也是公开的)对 msg 进行散列，再计算得到一个 消息摘要<br>  (4). 接收方 对比着两个 消息摘要 即可判断出 消息的完整性</p>
+<blockquote>
+<p>身份的正确性：可通过 使用公钥能否解开数字签名 来判断</p>
+<p>数据的完整性：可通过 对比两个消息摘要是否相同 来判断</p>
+</blockquote>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D.png" alt=""></p>
+</li>
+</ul>
+</li>
+</ol>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2016-12-17T15:12:40.989Z" title="2016-12-17 23:12" itemprop="dateUpdated">2016年12月17日 23:12</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/02/28/对称、非对称加密技术初探/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/加密/">加密</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/签名/">签名</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/&title=《对称、非对称加密技术初探》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/&title=《对称、非对称加密技术初探》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《对称、非对称加密技术初探》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/05/16/Android SingleTask 探究/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Android SingleTask 探究</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/02/19/Git学习笔记（二）/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Git学习笔记（二）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="对称、非对称加密技术初探" data-title="对称、非对称加密技术初探" data-url="https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/&title=《对称、非对称加密技术初探》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/&title=《对称、非对称加密技术初探》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《对称、非对称加密技术初探》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACpklEQVR42u3awXIqMQwEwPz/TyfX9yoFzMgW4dB7omDZdftgqSR9fcXX9/GVPCe/5/KFh4eHd3Xpv+/595v8199vfPRr+8YXW4CHh4e3xnv0ggQzu/9km5Kn4eHh4X0O79HRnOe3+XITNh4eHt7n8/IUPA8Az5/8Z3EPDw8P7ymvXW5eO80LwbeehoeHh7fNu5UKv/PzSn8PDw8Pb2EgIE+I8xLG82O9DS3/PQcPDw9vgZcfuG0TK+GdFCaKdeLh4eFd5eUBoC3pJmXi2ehAjsTDw8Pb47XN+1lxth0vaMu7Lzp7eHh4eAu82THdDki1ja6jTcTDw8Nb4OWp6qzccJJMJ98Ppxjw8PDwDnjnR/Cs/DorbdTlEjw8PLwFXnHTcTMsX2IbJF4EJDw8PLyrvPwPszR3I3gU5Q88PDy8Zd4wqozuaYe9ZiEEDw8Pb4OXDwe0RYRZSp1vVt6ow8PDw7vLa9ta+YhAe8Tn7y3abHh4eHgLvFkLKj/i2zGpWYofJdN4eHh4y7zZeFZ0TI+GvWYBAw8PD2+b117Jgk6KGicjWXh4eHjv4Z0MB7SLy8sTeejCw8PDew8vb0Tl5YZ2rKodJihSczw8PLw1Xp4ot6+5tWXDFB8PDw9vgZeAZ8GgHRpot37WNsPDw8O7xUsKrEkhoA05yb/agsjlyTI8PDy8Ms9syw15ubYlze7Ew8PD+yvehReUgwWzMi4eHh7ee3gnpdL2X3lQmaXpD0cH8PDw8K7yLrTn46LASWHiVtEEDw8P7xbv1rF+a9SgHfB6AcbDw8Nb4503xm4ttI1dUWDAw8PD+xheyz7ZlDYFx8PDw/tM3smB3g4T5Ek/Hh4e3nt4+ehVPkaQt6Pa7Su2Hg8PD2+B1x7fOWaWTJ+UMIYXHh4eXsr7AVyyiL2fAozbAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

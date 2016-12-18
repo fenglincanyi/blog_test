@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Android SingleTask 探究 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="SingleTask">
+    <meta name="description" content="Android 4种启动模式来说，用法说明此处不再提及主要介绍SingleTop，SingleTask相关的问题
+
+说明
+先分析 官方文档 中的一段话：
+
+As shown in the table above, standard is the default mode and is appropriate for most types of activities. SingleTop is a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android SingleTask 探究">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="Android 4种启动模式来说，用法说明此处不再提及主要介绍SingleTop，SingleTask相关的问题
+
+说明
+先分析 官方文档 中的一段话：
+
+As shown in the table above, standard is the default mode and is appropriate for most types of activities. SingleTop is a">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%20%E5%9B%BE1.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%E5%9B%BE2.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%E5%9B%BE3.png">
+<meta property="og:updated_time" content="2016-12-17T14:25:03.531Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android SingleTask 探究">
+<meta name="twitter:description" content="Android 4种启动模式来说，用法说明此处不再提及主要介绍SingleTop，SingleTask相关的问题
+
+说明
+先分析 官方文档 中的一段话：
+
+As shown in the table above, standard is the default mode and is appropriate for most types of activities. SingleTop is a">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%20%E5%9B%BE1.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:1154294696@qq.com" title="1154294696@qq.com" class="mail">1154294696@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Android SingleTask 探究</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Android SingleTask 探究</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-05-16T03:12:00.000Z" itemprop="datePublished" class="page-time">
+  2016-05-16
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#说明"><span class="post-toc-number">1.</span> <span class="post-toc-text">说明</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#场景复现"><span class="post-toc-number">2.</span> <span class="post-toc-text">场景复现</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#总结"><span class="post-toc-number">3.</span> <span class="post-toc-text">总结</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Android SingleTask 探究"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Android SingleTask 探究</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-5-16 11:12" datetime="2016-05-16T03:12:00.000Z"  itemprop="datePublished">2016-05-16</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>Android 4种启动模式来说，用法说明此处不再提及主要介绍SingleTop，SingleTask相关的问题</p>
+</blockquote>
+<h3 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h3><ul>
+<li><p>先分析 官方文档 中的一段话：</p>
+<blockquote>
+<p>As shown in the table above, standard is the default mode and is appropriate for most types of activities. SingleTop is also a common and useful launch mode for many types of activities. The other modes — singleTask and singleInstance — <font color="red">are not appropriate for most applications</font>, since they result in an interaction model that is likely to be unfamiliar to users and is very different from most other applications.</p>
+</blockquote>
+</li>
+</ul>
+<p>&emsp;&emsp;对于大多数应用来说，SingleTask 和 SingleInstance 并不适用，standrd 和 SingleTop对于普通的大部分Activity启动是适用的。<br>之所以使用singleTask，是存在这样一类问题，想要从后面的Activity 直接跳转到前面某一个Activity时，可能会采用的，如一个应用的MainActivity，LoginActivity等。</p>
+<p>&emsp;&emsp;对于SingleTask模式，官方文档的这么一句话，坑了不少人（我还比较幸运，没被坑惨）,也带给我对之前知识的迷惑。</p>
+<blockquote>
+<p>The system creates a new task and instantiates the activity at the root of the new task</p>
+</blockquote>
+<p>&emsp;&emsp;<strong>其实事实根本不是这样的</strong>！！！</p>
+<h3 id="场景复现"><a href="#场景复现" class="headerlink" title="场景复现"></a>场景复现</h3><ul>
+<li><p>下面用代码事实说话：建立3个Activity，分别为Main1Activity、Main2Activity、Main3Activity，前两个都设定单击事件，跳转逻辑为：main1 -&gt; main2 -&gt; main3，其中 Main2Activity 为 SingleTask（AndroidManifest.xml中设置）。打印相应的生命周期方法和所在的 <strong>taskId</strong></p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%20%E5%9B%BE1.png" alt=""></p>
+</li>
+</ul>
+<p>&emsp;&emsp;这些taskid都是一样的，所以它们都是同一个Task中的。事实胜于雄辩。然后搜了一下相关问题，老罗的博客还是给力，彻彻底底的分析了这个坑。致谢老罗的开源精神！<br>&emsp;&emsp;链接：<a href="http://blog.csdn.net/luoshengyang/article/details/6714543" target="_blank" rel="external">http://blog.csdn.net/luoshengyang/article/details/6714543</a></p>
+<ul>
+<li><p>同时为了解释项目中类似的一个页面跳转问题，对于上面的demo做了修改：</p>
+<p>  将 Main1Activity 设置为 SingleTask，其余2个为standrd</p>
+<p>  操作步骤：</p>
+<ol>
+<li>点击图标启动此应用</li>
+<li>依次点击进入 Main2，Main3，再点击Home键</li>
+<li><p>点击应用图标重新进入</p>
+<p>操作结果：结果再次显示的是Main1Activity，而不是Main3Activity。</p>
+<p>先看看打印的日志：</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%E5%9B%BE2.png" alt=""></p>
+<p>再次点击图标进入应用时，实际上是Main2Activity，Main3Activity 出栈了。<br>分析下这个过程：</p>
+<p>Main1，Main2，Main3 依次压入栈中，然后 Home 键，则整个Task处于stop状态，是一个background Task。当再次点击应用图标时，系统检测到此时已经存在一个该应用的Task的，此时就将此Background Task 移至前台，成为Foreground Task，而且由于Main1Activity是SingleTask，且位于task底部，所以，再次启动时，将前两个Activity移除，且按照启动顺序依次移除，所以打出的日志是：Main2 desotry，Main3 destory，Main1 onResume。</p>
+</li>
+</ol>
+<ul>
+<li><p><strong>看来，SingleTask这种特殊的模式引起的Task内Activity的变化是值得注意的</strong></p>
+<p>之前我在Stackoverflow上问相关的问题，和我猜想的原因比较类似，链接如下：</p>
+<p><a href="http://stackoverflow.com/questions/36933755/activity-is-singletask-and-is-root-in-task-restrart-activity-of-top-is-destorye" target="_blank" rel="external">http://stackoverflow.com/questions/36933755/activity-is-singletask-and-is-root-in-task-restrart-activity-of-top-is-destorye</a> （可供参考）</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>那么，如何才能在一个新的任务栈里创建新的Activity呢？</p>
+<ul>
+<li><p>只需要在AndroidManifest.xml中配置即可</p>
+<p>  在SingleTask的基础之上，再增加设置 <strong>taskAffinify</strong> 属性即可，默认情况下，taskAffinity属性值为 包名，所以可以自定义一个taskAffinity值，便可以实现一个新的Task,新的Activity处于这个新的Task的root。如，我的 Demo 代码如下：</p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%E5%9B%BE3.png" alt=""></p>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>SingleTask的启动模式并不会启动一个新的任务栈来承载Activity，而是在原来的Task中</li>
+<li>SingleTask的启动模式，在官方文档的说明中，日常开发中并不建议使用，SingleInstance更是如此。</li>
+<li>Activity的启动模式会带来的Task的变化和Activity的生命周期变化都会在ActivityRecord中体现的，通过源码分析可以发现。</li>
+<li><p>通过以下命令，可以查看Task内的Activity的变化：</p>
+<pre><code>adb shell dumpsys activity  获取所有应用的activity堆栈信息
+adb shell dumpsys activity | grep com.xxx.xxx.xxx   获取某个应用的activity 堆栈信息
+adb shell dumpsys activity | grep mFocusedActivity  获取处于栈顶的Activity
+</code></pre></li>
+<li><p><a href="http://blog.piasy.com/2016/03/19/Android-Task-And-Back-Stack/" target="_blank" rel="external">http://blog.piasy.com/2016/03/19/Android-Task-And-Back-Stack/</a> (写完此文后，发现有高人已经写得很全面很详尽了)</p>
+</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2016-12-17T14:25:03.531Z" title="2016-12-17 22:25" itemprop="dateUpdated">2016年12月17日 22:25</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/05/16/Android SingleTask 探究/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SingleTask/">SingleTask</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/&title=《Android SingleTask 探究》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/&title=《Android SingleTask 探究》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android SingleTask 探究》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/06/04/简单的页面置换算法分析/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">简单的页面置换算法分析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/02/28/对称、非对称加密技术初探/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">对称、非对称加密技术初探</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Android SingleTask 探究" data-title="Android SingleTask 探究" data-url="https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/&title=《Android SingleTask 探究》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/&title=《Android SingleTask 探究》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android SingleTask 探究》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACtUlEQVR42u3awW4bMQwEUP//T6fnol1nhpTcFHh7MuCNV0+HJTPU6xVfX8H15/2n/vbPz4cvPDw8vKNLf39P/u3TEhNku2V4eHh4n+E9vVGTe9oy8B6fbEGyZjw8PLyfxstLxb5dxsPDw/vfeY/N6wN7VgDa1hwPDw/v87z8p/MmexZYJNtxJWvBw8PDi3n5FOnnfL4y38PDw8M7dCAgeSnnj8+b6dkRhN9+AQ8PD+8Cb7OsvKmdbVbybbR9eHh4eEd5+T/8+9d9HmrkQ7VvygkeHh7eBV4ewuZNbRtntI118vtFPIGHh4c34iWkNhqYlZYWP5zv4eHh4R3iJc1xWx7yUtEepSrKBh4eHt5R3tkDUvtwtg1H6vkeHh4e3gXeLFzIy0wb0SZh8eN68PDw8C7w2oNQm4XuC097KhUPDw/vHm8/AGthr+DKi1OxHXh4eHhr3r79bUdcOTiPPB4/4+Hh4V3jtbHsbJD2+bKBh4eHd4OXD+aLsVN81CC5sw0gHrNqPDw8vEO89+3srPGdjcfaYVu0cjw8PLwLvFMD/lmpyIvQZiCHh4eHd5a3WURx7Gl0QOHA0/Hw8PAu8DbxaxKn5rFswshDZzw8PLx7vHbwP4sJ9huUBM1/eToeHh7eBV5+KGoW7LbN8anB2zdFAg8PD2/Na8dL+YLa5ngf5h6YnuHh4eHFvLwwtPh7xwKKM2V4eHh4H+G17W8b1+6HavXD8PDw8Na8r/LKR1az81/vn5h/i4eHh3ePt3nH5k3tqYNc9dALDw8P7xpv1lInxSCJd/MjBbNNxMPDw7vHm72U2zfwLKpoD4Th4eHh/TTe7HjBLOZo493HARgeHh7eP+XlzXEbVczC5W8KCR4eHt41Xj6y2oQRm2LQPhcPDw/vHq/9hz9/3bfj/3bk9jp14eHh4aW8XwZqX/RYXcn5AAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

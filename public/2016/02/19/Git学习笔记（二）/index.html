@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Git学习笔记（二） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Git">
+    <meta name="description" content="常用命令：
+1、初始
+
+git &amp;lt;verb&amp;gt; --help            查看命令用法(方法之一)
+git init                    初始化git仓库(在当前目录下会创建.git目录)
+
+2、 远程操作
+
+git clone URL                从远程clone git仓库
+git remote -v                查看远">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git学习笔记（二）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="常用命令：
+1、初始
+
+git &amp;lt;verb&amp;gt; --help            查看命令用法(方法之一)
+git init                    初始化git仓库(在当前目录下会创建.git目录)
+
+2、 远程操作
+
+git clone URL                从远程clone git仓库
+git remote -v                查看远">
+<meta property="og:updated_time" content="2016-12-17T14:17:11.736Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git学习笔记（二）">
+<meta name="twitter:description" content="常用命令：
+1、初始
+
+git &amp;lt;verb&amp;gt; --help            查看命令用法(方法之一)
+git init                    初始化git仓库(在当前目录下会创建.git目录)
+
+2、 远程操作
+
+git clone URL                从远程clone git仓库
+git remote -v                查看远">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:1154294696@qq.com" title="1154294696@qq.com" class="mail">1154294696@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Git学习笔记（二）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Git学习笔记（二）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-02-19T08:06:00.000Z" itemprop="datePublished" class="page-time">
+  2016-02-19
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/工具/">工具</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#常用命令："><span class="post-toc-number">1.</span> <span class="post-toc-text">常用命令：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#补充："><span class="post-toc-number">2.</span> <span class="post-toc-text">补充：</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Git学习笔记（二）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Git学习笔记（二）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-2-19 16:06" datetime="2016-02-19T08:06:00.000Z"  itemprop="datePublished">2016-02-19</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/工具/">工具</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="常用命令："><a href="#常用命令：" class="headerlink" title="常用命令："></a>常用命令：</h3><blockquote>
+<p>1、初始</p>
+</blockquote>
+<pre><code>git &lt;verb&gt; --help            查看命令用法(方法之一)
+git init                    初始化git仓库(在当前目录下会创建.git目录)
+</code></pre><blockquote>
+<p>2、 远程操作</p>
+</blockquote>
+<pre><code>git clone URL                从远程clone git仓库
+git remote -v                查看远程仓库使用的 Git 保存的简写与其对应的 URL    
+git pull URL                将数据拉取到你的本地仓库,并合并远程分支到当前分支
+git fetch URL                将数据拉取到你的本地仓库,并不会自动合并或修改你当前的工作
+git push URL                将本地git仓库推送到远程仓库(一次就记住URL了,之后不需要写URL)
+</code></pre><blockquote>
+<p>3、添加文件</p>
+</blockquote>
+<pre><code>git add filename            添加某个文件(该文件处于已跟踪(A)：tracked)
+git add --all , -A            添加所有文件
+</code></pre><blockquote>
+<p>4、提交文件</p>
+</blockquote>
+<pre><code>git commit -m &quot;提交信息&quot;         提交当下工作区的文件
+git commit -a -m &quot;提交信息&quot;         前两个命令的合并，直接跳过暂存区提交
+git commit                        启动文本编辑器写提交信息
+</code></pre><blockquote>
+<p>5、查看文件状态</p>
+</blockquote>
+<pre><code>git status                    查看当前文件状态
+git status -s                查看当前文件详细状态列表    
+</code></pre><blockquote>
+<p>6、查看日志</p>
+</blockquote>
+<pre><code>git log                        查看提交的日志
+git log    --oneline            查看提交的日志简略信息
+git log    -p -2                查看最近两次提交的日志
+</code></pre><blockquote>
+<p>7、查看修改</p>
+</blockquote>
+<pre><code>git diff                    查看未暂存文件(未add)的修改内容
+git diff --staged, --cached    查看已暂存文件(已add)的修改内容
+</code></pre><blockquote>
+<p>8、删除文件</p>
+</blockquote>
+<pre><code>git rm filename                移除文件
+git rm --cached filename    移除文件,但该文件还留在工作区，但之后不会被跟踪(untracked)
+git rm \*.txt                移除以 .txt 结尾的文件
+</code></pre><blockquote>
+<p>9、更改文件名</p>
+</blockquote>
+<pre><code>git mv oldName newName        更改文件名
+</code></pre><blockquote>
+<p>10、标签操作</p>
+</blockquote>
+<pre><code>git tag -a v1.0 -m &quot;info&quot;    打标签 v1.0:版本号，info:版本信息
+git tag                        查看已有标签
+</code></pre><blockquote>
+<p>11、分支操作</p>
+</blockquote>
+<pre><code>git branch branchName        创建分支
+git branch -d branchName    删除分支
+git checkout branchName        切换分支
+git merge branchName        合并分支到当前分支
+git mergetool                启动图形化工具解决冲突
+git branch                    查看所有分支
+git branch -v, -vv            查看所有分支的最后一次提交
+</code></pre><h3 id="补充："><a href="#补充：" class="headerlink" title="补充："></a>补充：</h3><ul>
+<li><strong>rebase</strong>: <strong>变基</strong>，另一种不同于merge的”整合”方式 (命令示例：git rebase master)</li>
+<li>变基是将一系列提交按照原有次序依次应用到另一分支上，而合并是把最终结果合在一起。</li>
+<li><p>请注意：</p>
+<blockquote>
+<p>无论是通过变基，还是通过三方合并，整合的最终结果所指向的快照始终是一样的，只不过提交历史不同罢了。</p>
+</blockquote>
+</li>
+<li><p>准则：</p>
+<ul>
+<li>不要对在你的仓库外有副本的分支执行变基</li>
+<li>只对尚未推送或分享给别人的本地修改执行变基操作清理历史，从不对已推送至别处的提交执行变基操作</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2016-12-17T14:17:11.736Z" title="2016-12-17 22:17" itemprop="dateUpdated">2016年12月17日 22:17</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/02/19/Git学习笔记（二）/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/&title=《Git学习笔记（二）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/&title=《Git学习笔记（二）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Git学习笔记（二）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/02/28/对称、非对称加密技术初探/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">对称、非对称加密技术初探</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/02/19/Git学习笔记（一）/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Git学习笔记（一）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Git学习笔记（二）" data-title="Git学习笔记（二）" data-url="https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/&title=《Git学习笔记（二）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/&title=《Git学习笔记（二）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Git学习笔记（二）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACu0lEQVR42u3aUU7kMBAEUO5/afYAs2Squm00SC9fCIU4z0h2p9pfX/H1HVzPf/vTz69PSO45fOHh4eEdffXXe15fInn+M7gdsZhoPDw8vGu8fEF/HuB5ZU5GeSbl74yHh4f3abzZncm4z5OIh4eH9xd5OfV5uc9L7V/dGPDw8PBiXhJGtAX3JrrNJ+hY1oKHh4c36VVF5e8n/Hylv4eHh4d36EDArPWVL+JtA6x4Dh4eHt4F3qk4NSmg2+BjVi7j4eHh3ea1McGsATaLOdrw9z/PxMPDw7vASxpX+cI9a3rl5XJNwsPDw7vGSz778yW+LbI3W0uxJeDh4eEd4iWD7cvo2YGDfNNqghc8PDy8La+NA/J2flJA54X7bAPDw8PDu8GbBabtOjwr04ulP/lWwMPDwzvKy9tL7UtsSuRk83izCeHh4eFd4M16ZacOUc3GqmNiPDw8vKO8TStrv9y3WWv+AYCHh4d3j9dGBsnwmyV+FgcX4QUeHh7empf/WRIW5BvMPuyIfo+Hh4d3gVeEoaMpyJ/Q3lMfWcDDw8M7xJsdacpbVrOwI4loo2fi4eHhXebNuu2zGKKNJ9qWW7054uHh4ZW8ZJFNYtw2Zk22gdU/Aw8PD+8ab3/0Kims22AiD3bfRLd4eHh4R3n7Nn/+m7bFlce49YTi4eHhrXl5nJoHAcnhrXYi2g0DDw8P7zZvc04peaG2xdVO1o8iPDw8vMu8zWf/PtjNV/Xifjw8PLyjvO/ymlHbAwRtmR7FEHh4eHiHeO2COzsylZfL+wkaXnh4eHglLw9P22V6Non5YYKkJYaHh4d3j5cM1r5cu8TPiuM3k4uHh4f3MbxT7a58Y5hFz3h4eHifwGtjiP3E1Qet8PDw8H6Flx8SbSdldmxrU77j4eHh3ebNPvjzsjhvhs0aYAcuPDw8vJT3D91KNcrtypthAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

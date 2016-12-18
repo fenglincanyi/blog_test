@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>RxJava 初探（一） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="RxJava">
+    <meta name="description" content="一、几个基本概念
+由来  Rx(Reactive Extensions)，最初是LINQ的一个扩展，后由微软团队开发，在2012年11月开源。ReactiveX.io给的定义是，Rx是一个使用可观察数据流进行异步编程的编程接口，ReactiveX结合了观察者模式、迭代器模式和函数式编程的精华。
+Rx 模式
+创建：Rx可以方便的创建事件流和数据流
+组合：Rx使用查询式的操作符组合和变换数据流
+监听：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxJava 初探（一）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="一、几个基本概念
+由来  Rx(Reactive Extensions)，最初是LINQ的一个扩展，后由微软团队开发，在2012年11月开源。ReactiveX.io给的定义是，Rx是一个使用可观察数据流进行异步编程的编程接口，ReactiveX结合了观察者模式、迭代器模式和函数式编程的精华。
+Rx 模式
+创建：Rx可以方便的创建事件流和数据流
+组合：Rx使用查询式的操作符组合和变换数据流
+监听：">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/rxjava%E7%AE%80%E5%8D%95%E5%9B%BE%E8%A7%A3.png">
+<meta property="og:updated_time" content="2016-12-17T14:27:11.748Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RxJava 初探（一）">
+<meta name="twitter:description" content="一、几个基本概念
+由来  Rx(Reactive Extensions)，最初是LINQ的一个扩展，后由微软团队开发，在2012年11月开源。ReactiveX.io给的定义是，Rx是一个使用可观察数据流进行异步编程的编程接口，ReactiveX结合了观察者模式、迭代器模式和函数式编程的精华。
+Rx 模式
+创建：Rx可以方便的创建事件流和数据流
+组合：Rx使用查询式的操作符组合和变换数据流
+监听：">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/rxjava%E7%AE%80%E5%8D%95%E5%9B%BE%E8%A7%A3.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:1154294696@qq.com" title="1154294696@qq.com" class="mail">1154294696@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">RxJava 初探（一）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">RxJava 初探（一）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-10-05T16:45:00.000Z" itemprop="datePublished" class="page-time">
+  2016-10-06
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/RxJava/">RxJava</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#一、几个基本概念"><span class="post-toc-number">1.</span> <span class="post-toc-text">一、几个基本概念</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#二、响应式编程模式"><span class="post-toc-number">2.</span> <span class="post-toc-text">二、响应式编程模式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#三、操作分类"><span class="post-toc-number">3.</span> <span class="post-toc-text">三、操作分类</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-RxJava 初探（一）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">RxJava 初探（一）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-10-6 0:45" datetime="2016-10-05T16:45:00.000Z"  itemprop="datePublished">2016-10-06</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/RxJava/">RxJava</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="一、几个基本概念"><a href="#一、几个基本概念" class="headerlink" title="一、几个基本概念"></a>一、几个基本概念</h3><ul>
+<li>由来<br>  Rx(Reactive Extensions)，最初是LINQ的一个扩展，后由微软团队开发，在2012年11月开源。ReactiveX.io给的定义是，Rx是一个使用可观察数据流进行异步编程的编程接口，ReactiveX结合了观察者模式、迭代器模式和函数式编程的精华。</li>
+<li>Rx 模式<ul>
+<li>创建：Rx可以方便的创建事件流和数据流</li>
+<li>组合：Rx使用查询式的操作符组合和变换数据流</li>
+<li>监听：Rx可以订阅任何可观察的数据流并执行操作</li>
+</ul>
+</li>
+<li>名词定义<ul>
+<li>Iterable： 可迭代对象，支持以迭代器的形式遍历</li>
+<li>Observable：可观察对象，在Rx中定义为更强大的Iterable，在观察者模式中是被观察的对象，一旦数据产生或发生变化，会通过某种方式通知观察者或订阅者</li>
+<li>Observer： 观察者对象，监听Observable发射的数据并做出响应，Subscriber是它的一个特殊实现</li>
+<li>emit：直译为发射，发布，发出，含义是Observable在数据产生或变化时发送通知给Observer，调用Observer对应的方法。文章统一翻译为发射</li>
+<li>items：直译为项目，条目，在Rx里是指Observable发射的数据项，文章统一译为数据，数据项</li>
+</ul>
+</li>
+</ul>
+<h3 id="二、响应式编程模式"><a href="#二、响应式编程模式" class="headerlink" title="二、响应式编程模式"></a>二、响应式编程模式</h3><ul>
+<li><p>下图采自官方文档，基本阐述了数据流和数据变换的过程：</p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/rxjava%E7%AE%80%E5%8D%95%E5%9B%BE%E8%A7%A3.png" alt="这里写图片描述"></p>
+</li>
+<li>冷热观察者<ul>
+<li>热 观察者：可能一创建完就开始发射数据，因此所有后续订阅它的观察者可能从序列中间的某个位置开始接受数据（有一些数据错过了）</li>
+<li>冷 观察者：一个”冷”的Observable会一直等待，直到有观察者订阅它才开始发射数据，因此这个观察者可以确保会收到整个数据序列</li>
+</ul>
+</li>
+</ul>
+<h3 id="三、操作分类"><a href="#三、操作分类" class="headerlink" title="三、操作分类"></a>三、操作分类</h3><ul>
+<li>创建操作： Create, Defer, Empty/Never/Throw, From, Interval, Just, Range, Repeat, Start, Timer</li>
+<li>变换操作：Buffer, FlatMap, GroupBy, Map, Scan和Window</li>
+<li>过滤操作：Debounce, Distinct, ElementAt, Filter, First, IgnoreElements, Last, Sample, Skip, SkipLast, Take, TakeLast</li>
+<li>组合操作：And/Then/When, CombineLatest, Join, Merge, StartWith, Switch, Zip</li>
+<li>错误处理：Catch和Retry</li>
+<li>辅助操作：Delay, Do, Materialize/Dematerialize, ObserveOn, Serialize, Subscribe, SubscribeOn, TimeInterval, Timeout, Timestamp, Using</li>
+<li>条件和布尔操作：All, Amb, Contains, DefaultIfEmpty, SequenceEqual, SkipUntil, SkipWhile, TakeUntil, TakeWhile</li>
+<li>算术和集合操作：Average, Concat, Count, Max, Min, Reduce, Sum</li>
+<li>转换操作：To</li>
+<li>连接操作：Connect, Publish, RefCount, Replay</li>
+<li>反压操作：用于增加特殊的流程控制策略的操作符</li>
+</ul>
+<blockquote>
+<p>官方文档翻译版：<a href="https://mcxiaoke.gitbooks.io/rxdocs/content/Intro.html" target="_blank" rel="external">https://mcxiaoke.gitbooks.io/rxdocs/content/Intro.html</a></p>
+</blockquote>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2016-12-17T14:27:11.748Z" title="2016-12-17 22:27" itemprop="dateUpdated">2016年12月17日 22:27</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/10/06/RxJava 初探（一）/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RxJava/">RxJava</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/&title=《RxJava 初探（一）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/&title=《RxJava 初探（一）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《RxJava 初探（一）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/10/25/RadioGroup、RadioButton动态创建并定制icon显示/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">RadioGroup、RadioButton动态创建并定制icon显示</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/09/09/Gradle相关配置/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Gradle相关配置</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="RxJava 初探（一）" data-title="RxJava 初探（一）" data-url="https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/&title=《RxJava 初探（一）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/&title=《RxJava 初探（一）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《RxJava 初探（一）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACsUlEQVR42u3aUZKrMAwEwL3/pfcdIJswY6EUr6r5SgUwbj5sIennJz5+X47PV77e9e7s57veXXPzgYeHhzee+ruh3z3g8/Wvd+WY9uwfM8TDw8Nb4yVLfLtwJ9tJO04+Zzw8PLxn8vJ/8vGTF4SHh4f3f/HmKYzPoXZCwsPDw3sCrx06CYLPwvE8pL4514KHh4cX8/Il/jm/V+p7eHh4eOOq+lkiIA+U25JbPQ4eHh7eAi9fcNuEwrxwdRYu4+Hh4X2H1zY/tUOftU8l+OQDAA8PD+9eXjKhNsCdNBO04IvR8PDw8NZ4bdmpbQvIkfnZaOvCw8PDW+C1Q7StA3lLwWSc27rA8PDw8AJeW+6alK/OGhEmYT0eHh7eHq9Nj+aLexuCJ8Fx8T8eHh7eAi9P3W7X39rgO/kMwMPDw9vgTVIMOSkP2fOnRKE8Hh4e3hovLynlgW+7YeSMIkGMh4eHt8Bry055Yvfsrkly5OJbAQ8PD+9WXhsQ50v8Xey2NwAPDw/vO7yzZqx6gY63n7PmrUMkHh4eXsw7K3pNrsmTHe22cZFrwcPDw1vgJQt6PtF8umdFsqKnDA8PD2+Bl0y9pd6LT8LrP56Fh4eHt8ybpHQn6Yazhq3opeDh4eEt8PLy/CQH/Bsc+cZTl8Hw8PDwlnmT1O1hsrV8BXWxDQ8PD2+NdzaJz4mDthh2xr6g4uHh4X2Fd7ZhbKQz2uOiyoeHh4c35k2W3fx1JJtNWwCLXigeHh7eAm+Sis2LWHnhP0mUREUvPDw8vGVeW55v753E+20LVx1Y4+Hh4Q14Z4tynhRuR8tf0EV4jYeHh/cAXpuAmITF+f9vNyQ8PDy8h/HOEqxtuvaG1gE8PDy8Bd5Zk2jeMjVPEx+mg/Hw8PAWeO0Hf/L4PPnbphhWGrbw8PDwUt4/u+JpzhBlzZYAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
