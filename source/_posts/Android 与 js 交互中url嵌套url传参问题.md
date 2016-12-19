@@ -1,5 +1,5 @@
 ---
-title: Android 与 js 交互中url传参中也有url的问题
+title: Android 与 js 交互中url嵌套url传参问题
 date: 2016-12-15 13:29
 categories: Hybird
 tags: JS
@@ -43,8 +43,22 @@ var photo = info.photo;
 var gender = info.gender;
 ```
 ### 踩坑
-第一次使用UrlEncoder编码，k可能会造成浏览器与js解析数据会存在不一致的问题
+* 第一次使用UrlEncoder编码，k可能会造成浏览器与js解析数据会存在不一致的问题
 解决：先使用base64进行编码，解决数据不一致的问题，再进行UrlEncoder编码（为了防止base64编码后的数据解析时："+" 会当做空格的问题 ） 
+* 加载本地 html 时：直接设置 cookie 在 本地url 上是无效的，也是没有必要的。自己遇到的问题是：加载本地 html，此html中使用的 jsonp 请求网络，此时需要的cookie，需要设置 WebView 的cookie，使之持久化，下次会自动带 cookie 访问网络的。
+* 对于 Android 5.0 以上的WebView，内核是基于Chrome的，Android SDK 提供了设置 cookie的接口，否则，加载本地 html 时，cookie 同步不过去。
+代码如下：
+
+```
+CookieManager cookieManager = CookieManager.getInstance();
+cookieManager.setAcceptCookie(true);
+cookieManager.setAcceptFileSchemeCookies(true);
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    cookieManager.setAcceptThirdPartyCookies(webView, true);
+}
+```
+
+
 ### 补充
 在线加解密、编码解析工具：
 http://tool.oschina.net/encrypt?type=3

@@ -13,7 +13,7 @@
     
     
     
-    <title>Android 与 js 交互中url传参中也有url的问题 | fenglincanyi | Blog</title>
+    <title>Android 与 js 交互中url嵌套url传参问题 | fenglincanyi | Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
     <meta name="theme-color" content="#2DBE60">
@@ -24,15 +24,15 @@
 “chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;amp;”+INTENT_URL+”=” + url
 其中：url：  file:///android_asset/hybird/cp/index.ht">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Android 与 js 交互中url传参中也有url的问题">
-<meta property="og:url" content="https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/index.html">
+<meta property="og:title" content="Android 与 js 交互中url嵌套url传参问题">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/index.html">
 <meta property="og:site_name" content="fenglincanyi">
 <meta property="og:description" content="问题场景get请求链接中： 传参中含有url
 “chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;amp;”+INTENT_URL+”=” + url
 其中：url：  file:///android_asset/hybird/cp/index.ht">
-<meta property="og:updated_time" content="2016-12-17T14:25:27.229Z">
+<meta property="og:updated_time" content="2016-12-19T09:02:22.009Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Android 与 js 交互中url传参中也有url的问题">
+<meta name="twitter:title" content="Android 与 js 交互中url嵌套url传参问题">
 <meta name="twitter:description" content="问题场景get请求链接中： 传参中含有url
 “chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;amp;”+INTENT_URL+”=” + url
 其中：url：  file:///android_asset/hybird/cp/index.ht">
@@ -112,7 +112,7 @@
         <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
           <i class="icon icon-lg icon-navicon"></i>
         </a>
-        <div class="flex-col header-title ellipsis">Android 与 js 交互中url传参中也有url的问题</div>
+        <div class="flex-col header-title ellipsis">Android 与 js 交互中url嵌套url传参问题</div>
         
         <div class="search-wrap" id="search-wrap">
             <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
@@ -134,7 +134,7 @@
 <header class="content-header post-header">
 
     <div class="container fade-scale">
-        <h1 class="title">Android 与 js 交互中url传参中也有url的问题</h1>
+        <h1 class="title">Android 与 js 交互中url嵌套url传参问题</h1>
         <h5 class="subtitle">
             
                 <time datetime="2016-12-15T05:29:00.000Z" itemprop="datePublished" class="page-time">
@@ -162,11 +162,11 @@
         </nav>
     </aside>
     
-<article id="post-Android 与 js 交互中url传参中也有url的问题"
+<article id="post-Android 与 js 交互中url嵌套url传参问题"
   class="post-article article-type-post fade" itemprop="blogPost">
 
     <div class="post-card">
-        <h1 class="post-card-title">Android 与 js 交互中url传参中也有url的问题</h1>
+        <h1 class="post-card-title">Android 与 js 交互中url嵌套url传参问题</h1>
         <div class="post-meta">
             <time class="post-time" title="2016-12-15 13:29" datetime="2016-12-15T05:29:00.000Z"  itemprop="datePublished">2016-12-15</time>
 
@@ -192,7 +192,12 @@
 <p>所以这个 url 中的 第二个及以后的参数第一次就会被router解析，并不会将 url 整体作为一个参数传到下一个页面中去再次解析识别。</p>
 <h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><h4 id="Android端"><a href="#Android端" class="headerlink" title="Android端"></a>Android端</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">JSONObject jsonObject = new JSONObject();</div><div class="line">try &#123;</div><div class="line">    jsonObject.put(&quot;uid&quot;, cUid);</div><div class="line">    jsonObject.put(&quot;gender&quot;, gender);</div><div class="line">    jsonObject.put(&quot;photo&quot;, potoPath);</div><div class="line">    paramsResult =  URLEncoder.encode(Base64.encodeToString(jsonObject.toString().getBytes(), Base64.DEFAULT));</div><div class="line">&#125; catch (JSONException e) &#123;</div><div class="line">    e.printStackTrace();</div><div class="line">&#125;</div><div class="line">// 此处为加载本地，也可以为网络url</div><div class="line">BaseH5Activity.startWebViewActivity(this, &quot;file:///android_asset/hybird/cp/index.html?params=&quot; + paramsResult, &quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;);</div></pre></td></tr></table></figure>
 <h4 id="前端js"><a href="#前端js" class="headerlink" title="前端js"></a>前端js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">var me = this;</div><div class="line">var href = window.location.url || window.location.href;</div><div class="line">var params = me.getParams(href, &apos;params&apos;);</div><div class="line">params = Base64.decode(decodeURIComponent(params));</div><div class="line">info = JSON.parse(params);</div><div class="line">var uid = info.uid;</div><div class="line">var photo = info.photo;</div><div class="line">var gender = info.gender;</div></pre></td></tr></table></figure>
-<h3 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h3><p>第一次使用UrlEncoder编码，k可能会造成浏览器与js解析数据会存在不一致的问题<br>解决：先使用base64进行编码，解决数据不一致的问题，再进行UrlEncoder编码（为了防止base64编码后的数据解析时：”+” 会当做空格的问题 ） </p>
+<h3 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h3><ul>
+<li>第一次使用UrlEncoder编码，k可能会造成浏览器与js解析数据会存在不一致的问题<br>解决：先使用base64进行编码，解决数据不一致的问题，再进行UrlEncoder编码（为了防止base64编码后的数据解析时：”+” 会当做空格的问题 ） </li>
+<li>加载本地 html 时：直接设置 cookie 在 本地url 上是无效的，也是没有必要的。自己遇到的问题是：加载本地 html，此html中使用的 jsonp 请求网络，此时需要的cookie，需要设置 WebView 的cookie，使之持久化，下次会自动带 cookie 访问网络的。</li>
+<li>对于 Android 5.0 以上的WebView，内核是基于Chrome的，Android SDK 提供了设置 cookie的接口，否则，加载本地 html 时，cookie 同步不过去。<br>代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">CookieManager cookieManager = CookieManager.getInstance();</div><div class="line">cookieManager.setAcceptCookie(true);</div><div class="line">cookieManager.setAcceptFileSchemeCookies(true);</div><div class="line">if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">    cookieManager.setAcceptThirdPartyCookies(webView, true);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p>在线加解密、编码解析工具：<br><a href="http://tool.oschina.net/encrypt?type=3" target="_blank" rel="external">http://tool.oschina.net/encrypt?type=3</a></p>
 
         </div>
@@ -201,11 +206,11 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2016-12-17T14:25:27.229Z" title="2016-12-17 22:25" itemprop="dateUpdated">2016年12月17日 22:25</time>
+    最后更新时间：<time datetime="2016-12-19T09:02:22.009Z" title="2016-12-19 17:02" itemprop="dateUpdated">2016年12月19日 17:02</time>
 </span><br>
 
 
-        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/12/15/Android 与 js 交互中url传参中也有url的问题/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/</a>
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/</a>
     </div>
     <footer>
         <a href="https://fenglincanyi.github.io">
@@ -234,7 +239,7 @@
 <div class="page-share" id="pageShare">
     <ul class="reset share-icons">
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/&title=《Android 与 js 交互中url传参中也有url的问题》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&title=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -244,22 +249,22 @@
         </a>
       </li>
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/&title=《Android 与 js 交互中url传参中也有url的问题》 — fenglincanyi&source=" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&title=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&source=" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
       <li>
-        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/" data-title=" Facebook">
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" data-title=" Facebook">
           <i class="icon icon-facebook"></i>
         </a>
       </li>
       <li>
-        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 与 js 交互中url传参中也有url的问题》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&via=https://fenglincanyi.github.io" data-title=" Twitter">
           <i class="icon icon-twitter"></i>
         </a>
       </li>
       <li>
-        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/" data-title=" Google+">
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" data-title=" Google+">
           <i class="icon icon-google-plus"></i>
         </a>
       </li>
@@ -291,9 +296,9 @@
 
   
     <div class="waves-block waves-effect next">
-      <a href="/2016/11/17/Android 类加载初探/" id="post-next" class="post-nav-link">
+      <a href="/2016/11/17/Android apk安装过程实例分析/" id="post-next" class="post-nav-link">
         <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
-        <h4 class="title">Android 类加载初探</h4>
+        <h4 class="title">Android apk安装过程实例分析</h4>
       </a>
     </div>
   
@@ -304,7 +309,7 @@
     
 
 <div class="comments" id="comments">
-    <div class="ds-thread" data-thread-key="Android 与 js 交互中url传参中也有url的问题" data-title="Android 与 js 交互中url传参中也有url的问题" data-url="https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/"></div>
+    <div class="ds-thread" data-thread-key="Android 与 js 交互中url嵌套url传参问题" data-title="Android 与 js 交互中url嵌套url传参问题" data-url="https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/"></div>
 </div>
 <script>
 lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
@@ -386,7 +391,7 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
 <div class="global-share" id="globalShare">
     <ul class="reset share-icons">
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/&title=《Android 与 js 交互中url传参中也有url的问题》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&title=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -396,22 +401,22 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
         </a>
       </li>
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/&title=《Android 与 js 交互中url传参中也有url的问题》 — fenglincanyi&source=" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&title=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&source=" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
       <li>
-        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/" data-title=" Facebook">
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" data-title=" Facebook">
           <i class="icon icon-facebook"></i>
         </a>
       </li>
       <li>
-        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 与 js 交互中url传参中也有url的问题》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&via=https://fenglincanyi.github.io" data-title=" Twitter">
           <i class="icon icon-twitter"></i>
         </a>
       </li>
       <li>
-        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/" data-title=" Google+">
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" data-title=" Google+">
           <i class="icon icon-google-plus"></i>
         </a>
       </li>
@@ -422,7 +427,7 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
 <div class="page-modal wx-share" id="wxShare">
     <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADI0lEQVR42u3ay3IaMRAFUP//T5NtUg7Dva1xCjpnVhSWkY5YNP34+oqfx2/Ps/e/r/m+/vv71+vbHW9+sLGxsT+E/bh8cnayMqcmmOvdX1wNNjY29jp2HmaebZAcOrmUk7CaWLCxsbGx21Bxfbg8jWk/GRsbGxs7Oej1+iSY5Z+AjY2NjX3NnhX6k8vKA1ibzPyjWho2Njb227NnmPd8/SP9bWxsbOw3Zj/KZ1ZgahvGbeu3VmBjY2MvYucBID9Wm3LksLzYFDWYsbGxsVewW0y+QYK5l5S3JbCxsbE3sU9+7rcN3fx/8wbw+dmwsbGxN7FPQteseDRLSE5KTtjY2Ni72SdjOrM7zq9ydunRXtjY2Ngfzs6bsvmlzBKPtkncnqqIz9jY2NgfxZ41evMkZFbun5WE8sITNjY29ib2rLmbl2/aJu55o/fZvn+8xsbGxv5v2CfN4DYEtqS2GYyNjY29m50UcWbI5Oj5X2df0lEtDRsbG/uj2Cft2/biZm3gdtwnCmDY2NjYK9htSJsd9K5GclLYerESGxsbezW7TSfydm8butrgl48TYWNjY29izxKMk3TlpGx0V0qDjY2NvY+dI9vjtqEuv9DzcUxsbGzsTexZyjELPG0Scj6+iY2Njb2bfR1m2uJ7e6C2wDRLTv7yGhsbG3sRu14aM9ogdzSCEych2NjY2FvZeUJyV5Aral3HJ4zaA9jY2Ngfzr7rx31bQvrpqyniNjY2NvbHso+GXeKWattgaFOOtlCFjY2NvYndJg/tEM/sCs7bCdHXho2Njb2U3aYESeg6X3lS2HrR6MXGxsZexG5btkUz9SBw5k2IOoxhY2Njr2OfHytPG2bjQV/l8+KTsbGxsVewH+Uza77OSD+R8GBjY2PvY7fB4K7xnXyM8iQcXg8eYWNjY29iz4JWO16TJDknAz11aoSNjY29jt2WftoxmjZhaHdJzo+NjY2NPQtUbfshv6a2zVBXubCxsbGXsvMNklbxSRHqJHBiY2Nj72PPEoa285A3bq/DVf7JT78GbGxs7EXskwJNPkzTHnG2+71lKWxsbOy3Z/8CjTcMN54EOlkAAAAASUVORK5CYII=" alt="微信分享二维码">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADIUlEQVR42u3aQZLiMAwF0L7/pZn11EzgfwmqiPtlRRHi+NkLIck/P/H1uLiSu8nI/36+urt5V31hY2Nj34SdDHf1gqtvnn//nDqbeb002NjY2Mex89CyDyTJYiWj5U9hY2NjY7dJQpvGPA9++8XCxsbGxs5DSx7Y9iUkbGxsbOz2BW2YmY2WjN82KrCxsbHPZm/asd/2+SP9bWxsbOwvZj/KK0khktCV/34T0i4V2NjY2AexZy3V/PhOXsrfpDezljA2Njb2eexNMyCZYp7kzEhJIKz3ARsbG/vr2cmf+7bQvynl75cyWgJsbGzsQ9kbWB729gnJrOT012dsbGzsQ9nJ0Jv28OzubIQX32NjY2MfxG5bs3mIShoMSZt29uzq+A42Njb2rdj7olJb6M93o9235ynNf04qYWNjYx/Bzh9ow97s923DIEmcLsfBxsbGPpS9mfQbgsoisCUjY2NjY5/HnpXg86M5eeN2dm40T43e0HnAxsbGvi17U+7ZH9bMN6A4xImNjY19HPu9QagtFbXvatvMl8d0sLGxsY9j50O3SUhb5WqXoH4KGxsb+yB2EgzyRGKWNuyTk+HmYWNjYx/H3peKEsym3dumRi+ewsbGxj6C/RhdmzXOG7ft4j4PXZf7jI2NjX1zdt7QnZX+8/LTJli27QpsbGzs89hJ2tA2X/MDN23SkpfDiloaNjY29kHsfSCZpQd5MGubDdjY2Ni/gT0D52WpWdrTpkPtomNjY2OfwV7VnOLyUxtsZilHvjTY2NjYJ7E3h2P2Aamd6CZdqWM1NjY29q3YeRrQlpk2beCkcbtqWmBjY2Mfx86L7LNkow02nwifL6I0NjY29s3Zs5e1h2zatOeDeGxsbOwj2I/y2hR92qnPAmq0hdjY2NgHsWeTmP2r3xy42Z9FGi4BNjY29k3Ys4J+26Ztl7U90NO2FrCxsbHPY2/K90kboE0t2rfUYRUbGxv7F7NnzYPkblvS2hwwwsbGxsaelXuSMfNFbzcAGxsb+2x2njC8NyV471HOfBuwsbGxT2LPpj5MAOIpJgvXlr2wsbGxj2P/ASvW2CRM211xAAAAAElFTkSuQmCC" alt="微信分享二维码">
 </div>
 
 

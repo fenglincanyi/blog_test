@@ -186,11 +186,11 @@
   </entry>
   
   <entry>
-    <title>Android 与 js 交互中url传参中也有url的问题</title>
-    <link href="https://fenglincanyi.github.io/2016/12/15/Android%20%E4%B8%8E%20js%20%E4%BA%A4%E4%BA%92%E4%B8%ADurl%E4%BC%A0%E5%8F%82%E4%B8%AD%E4%B9%9F%E6%9C%89url%E7%9A%84%E9%97%AE%E9%A2%98/"/>
-    <id>https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url传参中也有url的问题/</id>
+    <title>Android 与 js 交互中url嵌套url传参问题</title>
+    <link href="https://fenglincanyi.github.io/2016/12/15/Android%20%E4%B8%8E%20js%20%E4%BA%A4%E4%BA%92%E4%B8%ADurl%E5%B5%8C%E5%A5%97url%E4%BC%A0%E5%8F%82%E9%97%AE%E9%A2%98/"/>
+    <id>https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/</id>
     <published>2016-12-15T05:29:00.000Z</published>
-    <updated>2016-12-17T14:25:27.229Z</updated>
+    <updated>2016-12-19T09:02:22.009Z</updated>
     
     <content type="html"><![CDATA[<h3 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h3><p>get请求链接中： 传参中含有url</p>
 <p>“chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;”+INTENT_URL+”=” + <b><font color="red">url</font></b></p>
@@ -199,7 +199,12 @@
 <p>所以这个 url 中的 第二个及以后的参数第一次就会被router解析，并不会将 url 整体作为一个参数传到下一个页面中去再次解析识别。</p>
 <h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><h4 id="Android端"><a href="#Android端" class="headerlink" title="Android端"></a>Android端</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">JSONObject jsonObject = new JSONObject();</div><div class="line">try &#123;</div><div class="line">    jsonObject.put(&quot;uid&quot;, cUid);</div><div class="line">    jsonObject.put(&quot;gender&quot;, gender);</div><div class="line">    jsonObject.put(&quot;photo&quot;, potoPath);</div><div class="line">    paramsResult =  URLEncoder.encode(Base64.encodeToString(jsonObject.toString().getBytes(), Base64.DEFAULT));</div><div class="line">&#125; catch (JSONException e) &#123;</div><div class="line">    e.printStackTrace();</div><div class="line">&#125;</div><div class="line">// 此处为加载本地，也可以为网络url</div><div class="line">BaseH5Activity.startWebViewActivity(this, &quot;file:///android_asset/hybird/cp/index.html?params=&quot; + paramsResult, &quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;);</div></pre></td></tr></table></figure>
 <h4 id="前端js"><a href="#前端js" class="headerlink" title="前端js"></a>前端js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">var me = this;</div><div class="line">var href = window.location.url || window.location.href;</div><div class="line">var params = me.getParams(href, &apos;params&apos;);</div><div class="line">params = Base64.decode(decodeURIComponent(params));</div><div class="line">info = JSON.parse(params);</div><div class="line">var uid = info.uid;</div><div class="line">var photo = info.photo;</div><div class="line">var gender = info.gender;</div></pre></td></tr></table></figure>
-<h3 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h3><p>第一次使用UrlEncoder编码，k可能会造成浏览器与js解析数据会存在不一致的问题<br>解决：先使用base64进行编码，解决数据不一致的问题，再进行UrlEncoder编码（为了防止base64编码后的数据解析时：”+” 会当做空格的问题 ） </p>
+<h3 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h3><ul>
+<li>第一次使用UrlEncoder编码，k可能会造成浏览器与js解析数据会存在不一致的问题<br>解决：先使用base64进行编码，解决数据不一致的问题，再进行UrlEncoder编码（为了防止base64编码后的数据解析时：”+” 会当做空格的问题 ） </li>
+<li>加载本地 html 时：直接设置 cookie 在 本地url 上是无效的，也是没有必要的。自己遇到的问题是：加载本地 html，此html中使用的 jsonp 请求网络，此时需要的cookie，需要设置 WebView 的cookie，使之持久化，下次会自动带 cookie 访问网络的。</li>
+<li>对于 Android 5.0 以上的WebView，内核是基于Chrome的，Android SDK 提供了设置 cookie的接口，否则，加载本地 html 时，cookie 同步不过去。<br>代码如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">CookieManager cookieManager = CookieManager.getInstance();</div><div class="line">cookieManager.setAcceptCookie(true);</div><div class="line">cookieManager.setAcceptFileSchemeCookies(true);</div><div class="line">if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">    cookieManager.setAcceptThirdPartyCookies(webView, true);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p>在线加解密、编码解析工具：<br><a href="http://tool.oschina.net/encrypt?type=3" target="_blank" rel="external">http://tool.oschina.net/encrypt?type=3</a></p>
 ]]></content>
     
@@ -214,6 +219,130 @@
     
     
       <category term="JS" scheme="https://fenglincanyi.github.io/tags/JS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android apk安装过程实例分析</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2016-12-17T15:37:51.985Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>注：本文不对apk安装之前，系统所做的复杂工作做分析，只针对普通的apk安装过程进行简单的过程理解</p>
+</blockquote>
+<p>一般情况下，在apk安装时，系统一般会显示一个安装界面，获取用户同意之后进行安装，并且有一些apk预处理相关的操作，紧接着，会启动app界面，进入app。<br>在这一过程中，不同版本的Android系统在安装时，对包的处理是不太一样的，以下分Dalivk、ART两种虚拟机进行分析。这里主要采用原生模拟器，进行分析。</p>
+<h3 id="一、-Dalvik（JIT：just-in-time-即时编译）"><a href="#一、-Dalvik（JIT：just-in-time-即时编译）" class="headerlink" title="一、 Dalvik（JIT：just in time  即时编译）"></a>一、 Dalvik（JIT：just in time  即时编译）</h3><ul>
+<li>过程分析：<ul>
+<li>点击apk包后或apk下载后，安装之前，系统会启动安装界面PackageInstallerActivity，让用户进行授权选择，用户同意后，会调用ApplicationPackageManager 进行相关操作。</li>
+<li>调用ApplicationPackageManager，通过IPC来调用 PackageManagerService 中的 installPackage 方法，在这个方法中，又去调用 installPackageAsUser 方法，此时，要进行权限相关校验，完毕之后，会通过 handler 发送消息（类型：INIT_COPY，MCS_BOUND）</li>
+<li>然后 startCopy —&gt; handleStartCopy 依次调用，这里，对安装位置、存储空间进行处理，之后会 拷贝apk 相关文件放在相应的目录下。这些文件主要包括：<ul>
+<li>apk文件</li>
+<li>jar、so文件</li>
+<li>db文件（若有的话）</li>
+</ul>
+</li>
+<li>拷贝完成之后，进行预处理，对于Dalvik来说，dexopt要进行dex文件的优化，生成odex文件，在app运行时，能加快其启动速度。</li>
+<li>另外，对于资源处理，是 AssetMananger 来进行资源的解析、加载。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>实例考察：<ul>
+<li>安装时logcat日志：拷贝工作，然后进行dex优化，dexopt执行操作</li>
+</ul>
+</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>   拷贝后，目录如下：</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/copy%20lib%E7%BB%93%E6%9E%9C.png" alt=""></p>
+<p> dex位置：</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/dex%E4%BD%8D%E7%BD%AE.png" alt=""></p>
+<p>如果把此位置的 dex 删除后，且杀掉已经运行的进程后，再次点击app启动后奔溃，如图：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%88%A0%E6%8E%89dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84dex%E5%90%8E%EF%BC%8C%E4%B8%94%E6%9D%80%E6%8E%89%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84%E5%BA%94%E7%94%A8%E8%BF%9B%E7%A8%8B%EF%BC%8C%E5%86%8D%E6%AC%A1%E5%90%AF%E5%8A%A8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由此可知，要启动app时，需要加载 /data/dalik-cache 目录下的dex文件</p>
+<p>相关参考文献：<br><a href="http://www.woaitqs.cc/android/2016/07/28/android-plugin-get-apk-info" target="_blank" rel="external">http://www.woaitqs.cc/android/2016/07/28/android-plugin-get-apk-info</a><br><a href="http://blog.csdn.net/luoshengyang/article/details/8852432" target="_blank" rel="external">http://blog.csdn.net/luoshengyang/article/details/8852432</a></p>
+<h3 id="二、ART（AOT：Ahead-of-time-预编译）"><a href="#二、ART（AOT：Ahead-of-time-预编译）" class="headerlink" title="二、ART（AOT：Ahead of time  预编译）"></a>二、ART（AOT：Ahead of time  预编译）</h3><p>Android 4.4之后，对于Android虚拟机又继续做了优化，art 代替了 Dalvik，对于dex文件，优化工作做了改变。</p>
+<ul>
+<li><p>大致的处理过程：</p>
+</li>
+<li><p>编译时，通过调用 dex2oat 对dex 进行预编译，这个编译器参考了LLVM框架，默认情况下，是采用了quick模式，但在6.0之后，LLVM被彻底去除了。关于LLVM细节，自行Google。</p>
+</li>
+<li>编译后生成的文件 .oat 文件，实际上是Android 私有的ELF文件。在Linux系统中，ELF文件主要分为3类：目标文件（ .o）、共享文件（ .so）、可执行文件。此处Android的 .oat文件属于可执行文件。<br>  oat 文件含有ELF文件正常的结构形态，里面既包含有dex 文件，也包含编译好的本地指令代码。被包含的dex文件也可以是多个。</li>
+</ul>
+<ul>
+<li>实例考察<ul>
+<li>ART 安装apk时，日志记录：</li>
+</ul>
+</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/art%E5%AE%89%E8%A3%85apk%E7%9A%84log.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<pre><code>可以看到，有apk的拷贝，有dex2oat的dex优化过程。再追一下相关的目录：
+</code></pre><p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/local%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt=""></p>
+<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt=""></p>
+<p>里面有一部分是系统框架层的相关文件。</p>
+<p>安装后的目录结构也有变化：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/data_app%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>生成相应的平台下的文件，此处我使用的是x86的模拟器</p>
+<p>Android 在编译时用到的 dexopt、dex2oat、aapt 都在 /system/bin目录下：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4.4%E4%B8%8Bsystem_bin%E4%B8%8B%E7%9A%84aapt.png.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>当时对于 multidex 的包也进行了目录查找，如下，留下后续研究做参考。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/multidex.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>相关参考文献：<br><a href="https://mssun.me/blog/android-art-runtime-2-dex2oat.html" target="_blank" rel="external">https://mssun.me/blog/android-art-runtime-2-dex2oat.html</a><br><a href="http://blog.csdn.net/luoshengyang/article/details/39307813" target="_blank" rel="external">http://blog.csdn.net/luoshengyang/article/details/39307813</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;注：本文不对apk安装之前，系统所做的复杂工作做分析，只针对普通的apk安装过程进行简单的过程理解&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;一般情况下，在apk安装时，系统一般会显示一个安装界面，获取用户同意之后进行安装，并且有一些apk预处理相
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
+    
+      <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
     
   </entry>
   
@@ -337,130 +466,6 @@
     
     
       <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Android apk安装过程实例分析</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2016-12-17T15:10:00.171Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>注：本文不对apk安装之前，系统所做的复杂工作做分析，只针对普通的apk安装过程进行简单的过程理解</p>
-</blockquote>
-<p>一般情况下，在apk安装时，系统一般会显示一个安装界面，获取用户同意之后进行安装，并且有一些apk预处理相关的操作，紧接着，会启动app界面，进入app。<br>在这一过程中，不同版本的Android系统在安装时，对包的处理是不太一样的，以下分Dalivk、ART两种虚拟机进行分析。这里主要采用原生模拟器，进行分析。</p>
-<h3 id="一、-Dalvik（JIT：just-in-time-即时编译）"><a href="#一、-Dalvik（JIT：just-in-time-即时编译）" class="headerlink" title="一、 Dalvik（JIT：just in time  即时编译）"></a>一、 Dalvik（JIT：just in time  即时编译）</h3><ul>
-<li>过程分析：<ul>
-<li>点击apk包后或apk下载后，安装之前，系统会启动安装界面PackageInstallerActivity，让用户进行授权选择，用户同意后，会调用ApplicationPackageManager 进行相关操作。</li>
-<li>调用ApplicationPackageManager，通过IPC来调用 PackageManagerService 中的 installPackage 方法，在这个方法中，又去调用 installPackageAsUser 方法，此时，要进行权限相关校验，完毕之后，会通过 handler 发送消息（类型：INIT_COPY，MCS_BOUND）</li>
-<li>然后 startCopy —&gt; handleStartCopy 依次调用，这里，对安装位置、存储空间进行处理，之后会 拷贝apk 相关文件放在相应的目录下。这些文件主要包括：<ul>
-<li>apk文件</li>
-<li>jar、so文件</li>
-<li>db文件（若有的话）</li>
-</ul>
-</li>
-<li>拷贝完成之后，进行预处理，对于Dalvik来说，dexopt要进行dex文件的优化，生成odex文件，在app运行时，能加快其启动速度。</li>
-<li>另外，对于资源处理，是 AssetMananger 来进行资源的解析、加载。</li>
-</ul>
-</li>
-</ul>
-<ul>
-<li>实例考察：<ul>
-<li>安装时logcat日志：拷贝工作，然后进行dex优化，dexopt执行操作</li>
-</ul>
-</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>   拷贝后，目录如下：</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/copy%20lib%E7%BB%93%E6%9E%9C.png" alt=""></p>
-<p> dex位置：</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/dex%E4%BD%8D%E7%BD%AE.png" alt=""></p>
-<p>如果把此位置的 dex 删除后，且杀掉已经运行的进程后，再次点击app启动后奔溃，如图：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%88%A0%E6%8E%89dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84dex%E5%90%8E%EF%BC%8C%E4%B8%94%E6%9D%80%E6%8E%89%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84%E5%BA%94%E7%94%A8%E8%BF%9B%E7%A8%8B%EF%BC%8C%E5%86%8D%E6%AC%A1%E5%90%AF%E5%8A%A8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由此可知，要启动app时，需要加载 /data/dalik-cache 目录下的dex文件</p>
-<p>相关参考文献：<br><a href="http://www.woaitqs.cc/android/2016/07/28/android-plugin-get-apk-info" target="_blank" rel="external">http://www.woaitqs.cc/android/2016/07/28/android-plugin-get-apk-info</a><br><a href="http://blog.csdn.net/luoshengyang/article/details/8852432" target="_blank" rel="external">http://blog.csdn.net/luoshengyang/article/details/8852432</a></p>
-<h3 id="二、ART（AOT：Ahead-of-time-预编译）"><a href="#二、ART（AOT：Ahead-of-time-预编译）" class="headerlink" title="二、ART（AOT：Ahead of time  预编译）"></a>二、ART（AOT：Ahead of time  预编译）</h3><p>Android 4.4之后，对于Android虚拟机又继续做了优化，art 代替了 Dalvik，对于dex文件，优化工作做了改变。</p>
-<ul>
-<li><p>大致的处理过程：</p>
-</li>
-<li><p>编译时，通过调用 dex2oat 对dex 进行预编译，这个编译器参考了LLVM框架，默认情况下，是采用了quick模式，但在6.0之后，LLVM被彻底去除了。关于LLVM细节，自行Google。</p>
-</li>
-<li>编译后生成的文件 .oat 文件，实际上是Android 私有的ELF文件。在Linux系统中，ELF文件主要分为3类：目标文件（ .o）、共享文件（ .so）、可执行文件。此处Android的 .oat文件属于可执行文件。<br>  oat 文件含有ELF文件正常的结构形态，里面既包含有dex 文件，也包含编译好的本地指令代码。被包含的dex文件也可以是多个。</li>
-</ul>
-<ul>
-<li>实例考察<ul>
-<li>ART 安装apk时，日志记录：</li>
-</ul>
-</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/art%E5%AE%89%E8%A3%85apk%E7%9A%84log.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<pre><code>可以看到，有apk的拷贝，有dex2oat的dex优化过程。再追一下相关的目录：
-</code></pre><p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/local%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt=""></p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt=""></p>
-<p>里面有一部分是系统框架层的相关文件。</p>
-<p>安装后的目录结构也有变化：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/data_app%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>生成相应的平台下的文件，此处我使用的是x86的模拟器</p>
-<p>Android 在编译时用到的 dexopt、dex2oat、aapt 都在 /system/bin目录下：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4.4%E4%B8%8Bsystem_bin%E4%B8%8B%E7%9A%84aapt.png.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>当时对于 multidex 的包也进行了目录查找，如下，留下后续研究做参考。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/multidex.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>相关参考文献：<br><a href="https://mssun.me/blog/android-art-runtime-2-dex2oat.html" target="_blank" rel="external">https://mssun.me/blog/android-art-runtime-2-dex2oat.html</a><br><a href="http://blog.csdn.net/luoshengyang/article/details/39307813" target="_blank" rel="external">http://blog.csdn.net/luoshengyang/article/details/39307813</a></p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;注：本文不对apk安装之前，系统所做的复杂工作做分析，只针对普通的apk安装过程进行简单的过程理解&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;一般情况下，在apk安装时，系统一般会显示一个安装界面，获取用户同意之后进行安装，并且有一些apk预处理相
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
-    
-      <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
     
   </entry>
   
