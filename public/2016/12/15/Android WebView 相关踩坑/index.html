@@ -13,29 +13,29 @@
     
     
     
-    <title>Android 与 js 交互中url嵌套url传参问题 | fenglincanyi | Blog</title>
+    <title>Android WebView 相关踩坑 | fenglincanyi | Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
     <meta name="theme-color" content="#2DBE60">
     
     
-    <meta name="keywords" content="JS">
-    <meta name="description" content="问题场景get请求链接中： 传参中含有url
+    <meta name="keywords" content="h5">
+    <meta name="description" content="url 传参 url 嵌套的问题问题场景get请求链接中： 传参中含有url
 “chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;amp;”+INTENT_URL+”=” + url
-其中：url：  file:///android_asset/hybird/cp/index.ht">
+其中：url：  file:///android_asset/hy">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Android 与 js 交互中url嵌套url传参问题">
-<meta property="og:url" content="https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/index.html">
+<meta property="og:title" content="Android WebView 相关踩坑">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/index.html">
 <meta property="og:site_name" content="fenglincanyi">
-<meta property="og:description" content="问题场景get请求链接中： 传参中含有url
+<meta property="og:description" content="url 传参 url 嵌套的问题问题场景get请求链接中： 传参中含有url
 “chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;amp;”+INTENT_URL+”=” + url
-其中：url：  file:///android_asset/hybird/cp/index.ht">
-<meta property="og:updated_time" content="2016-12-19T09:02:22.009Z">
+其中：url：  file:///android_asset/hy">
+<meta property="og:updated_time" content="2016-12-23T05:01:28.454Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Android 与 js 交互中url嵌套url传参问题">
-<meta name="twitter:description" content="问题场景get请求链接中： 传参中含有url
+<meta name="twitter:title" content="Android WebView 相关踩坑">
+<meta name="twitter:description" content="url 传参 url 嵌套的问题问题场景get请求链接中： 传参中含有url
 “chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;amp;”+INTENT_URL+”=” + url
-其中：url：  file:///android_asset/hybird/cp/index.ht">
+其中：url：  file:///android_asset/hy">
     
         <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
     
@@ -112,7 +112,7 @@
         <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
           <i class="icon icon-lg icon-navicon"></i>
         </a>
-        <div class="flex-col header-title ellipsis">Android 与 js 交互中url嵌套url传参问题</div>
+        <div class="flex-col header-title ellipsis">Android WebView 相关踩坑</div>
         
         <div class="search-wrap" id="search-wrap">
             <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
@@ -134,7 +134,7 @@
 <header class="content-header post-header">
 
     <div class="container fade-scale">
-        <h1 class="title">Android 与 js 交互中url嵌套url传参问题</h1>
+        <h1 class="title">Android WebView 相关踩坑</h1>
         <h5 class="subtitle">
             
                 <time datetime="2016-12-15T05:29:00.000Z" itemprop="datePublished" class="page-time">
@@ -158,15 +158,15 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#问题场景"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题场景</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#解决方法"><span class="post-toc-number">2.</span> <span class="post-toc-text">解决方法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#Android端"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">Android端</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#前端js"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">前端js</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#踩坑"><span class="post-toc-number">3.</span> <span class="post-toc-text">踩坑</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#补充"><span class="post-toc-number">4.</span> <span class="post-toc-text">补充</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#url-传参-url-嵌套的问题"><span class="post-toc-number">1.</span> <span class="post-toc-text">url 传参 url 嵌套的问题</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#问题场景"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">问题场景</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#解决方法"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">解决方法</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#Android端"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">Android端</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#前端js"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">前端js</span></a></li><li class="post-toc-item post-toc-level-5"><a class="post-toc-link" href="#踩坑"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">踩坑</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Android-5-0-WebView-设置cookie问题"><span class="post-toc-number">2.</span> <span class="post-toc-text">Android 5.0 WebView 设置cookie问题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Android-WebView-加载本地-html"><span class="post-toc-number">3.</span> <span class="post-toc-text">Android WebView 加载本地 html</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#补充"><span class="post-toc-number">4.</span> <span class="post-toc-text">补充</span></a></li></ol>
         </nav>
     </aside>
     
-<article id="post-Android 与 js 交互中url嵌套url传参问题"
+<article id="post-Android WebView 相关踩坑"
   class="post-article article-type-post fade" itemprop="blogPost">
 
     <div class="post-card">
-        <h1 class="post-card-title">Android 与 js 交互中url嵌套url传参问题</h1>
+        <h1 class="post-card-title">Android WebView 相关踩坑</h1>
         <div class="post-meta">
             <time class="post-time" title="2016-12-15 13:29" datetime="2016-12-15T05:29:00.000Z"  itemprop="datePublished">2016-12-15</time>
 
@@ -185,19 +185,26 @@
 
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
-            <h3 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h3><p>get请求链接中： 传参中含有url</p>
+            <h3 id="url-传参-url-嵌套的问题"><a href="#url-传参-url-嵌套的问题" class="headerlink" title="url 传参 url 嵌套的问题"></a>url 传参 url 嵌套的问题</h3><h4 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h4><p>get请求链接中： 传参中含有url</p>
 <p>“chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;”+INTENT_URL+”=” + <b><font color="red">url</font></b></p>
 <p>其中：<br><b><font color="red">url：</font></b>  file:///android_asset/hybird/cp/index.html?uid=” + cuid +”&amp;gender=”+gender +”&amp;photo=”+photoPath;</p>
 <p>合并之后：<br>“chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;”+INTENT_URL+”=”+“file:///android_asset/hybird/cp/index.html?uid=” + cuid +”&amp;gender=”+gender +”&amp;photo=”+photoPath；</p>
 <p>所以这个 url 中的 第二个及以后的参数第一次就会被router解析，并不会将 url 整体作为一个参数传到下一个页面中去再次解析识别。</p>
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><h4 id="Android端"><a href="#Android端" class="headerlink" title="Android端"></a>Android端</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">JSONObject jsonObject = new JSONObject();</div><div class="line">try &#123;</div><div class="line">    jsonObject.put(&quot;uid&quot;, cUid);</div><div class="line">    jsonObject.put(&quot;gender&quot;, gender);</div><div class="line">    jsonObject.put(&quot;photo&quot;, potoPath);</div><div class="line">    paramsResult =  URLEncoder.encode(Base64.encodeToString(jsonObject.toString().getBytes(), Base64.DEFAULT));</div><div class="line">&#125; catch (JSONException e) &#123;</div><div class="line">    e.printStackTrace();</div><div class="line">&#125;</div><div class="line">// 此处为加载本地，也可以为网络url</div><div class="line">BaseH5Activity.startWebViewActivity(this, &quot;file:///android_asset/hybird/cp/index.html?params=&quot; + paramsResult, &quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;);</div></pre></td></tr></table></figure>
-<h4 id="前端js"><a href="#前端js" class="headerlink" title="前端js"></a>前端js</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">var me = this;</div><div class="line">var href = window.location.url || window.location.href;</div><div class="line">var params = me.getParams(href, &apos;params&apos;);</div><div class="line">params = Base64.decode(decodeURIComponent(params));</div><div class="line">info = JSON.parse(params);</div><div class="line">var uid = info.uid;</div><div class="line">var photo = info.photo;</div><div class="line">var gender = info.gender;</div></pre></td></tr></table></figure>
-<h3 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h3><ul>
+<h4 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h4><h5 id="Android端"><a href="#Android端" class="headerlink" title="Android端"></a>Android端</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">JSONObject jsonObject = new JSONObject();</div><div class="line">try &#123;</div><div class="line">    jsonObject.put(&quot;uid&quot;, cUid);</div><div class="line">    jsonObject.put(&quot;gender&quot;, gender);</div><div class="line">    jsonObject.put(&quot;photo&quot;, potoPath);</div><div class="line">    paramsResult =  URLEncoder.encode(Base64.encodeToString(jsonObject.toString().getBytes(), Base64.DEFAULT));</div><div class="line">&#125; catch (JSONException e) &#123;</div><div class="line">    e.printStackTrace();</div><div class="line">&#125;</div><div class="line">// 此处为加载本地，也可以为网络url</div><div class="line">BaseH5Activity.startWebViewActivity(this, &quot;file:///android_asset/hybird/cp/index.html?params=&quot; + paramsResult, &quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;&quot;);</div></pre></td></tr></table></figure>
+<h5 id="前端js"><a href="#前端js" class="headerlink" title="前端js"></a>前端js</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">var me = this;</div><div class="line">var href = window.location.url || window.location.href;</div><div class="line">var params = me.getParams(href, &apos;params&apos;);</div><div class="line">params = Base64.decode(decodeURIComponent(params));</div><div class="line">info = JSON.parse(params);</div><div class="line">var uid = info.uid;</div><div class="line">var photo = info.photo;</div><div class="line">var gender = info.gender;</div></pre></td></tr></table></figure>
+<h5 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h5><ul>
 <li>第一次使用UrlEncoder编码，k可能会造成浏览器与js解析数据会存在不一致的问题<br>解决：先使用base64进行编码，解决数据不一致的问题，再进行UrlEncoder编码（为了防止base64编码后的数据解析时：”+” 会当做空格的问题 ） </li>
-<li>加载本地 html 时：直接设置 cookie 在 本地url 上是无效的，也是没有必要的。自己遇到的问题是：加载本地 html，此html中使用的 jsonp 请求网络，此时需要的cookie，需要设置 WebView 的cookie，使之持久化，下次会自动带 cookie 访问网络的。</li>
-<li>对于 Android 5.0 以上的WebView，内核是基于Chrome的，Android SDK 提供了设置 cookie的接口，否则，加载本地 html 时，cookie 同步不过去。<br>代码如下：</li>
+<li><p>加载本地 html 时：直接设置 cookie 在 本地url 上是无效的，也是没有必要的。自己遇到的问题是：加载本地 html，此html中使用的 jsonp 请求网络，此时需要的cookie，需要设置 WebView 的cookie，使之持久化，下次会自动带 cookie 访问网络的。</p>
+<h3 id="Android-5-0-WebView-设置cookie问题"><a href="#Android-5-0-WebView-设置cookie问题" class="headerlink" title="Android 5.0 WebView 设置cookie问题"></a>Android 5.0 WebView 设置cookie问题</h3></li>
+<li><p>对于 Android 5.0 以上的WebView，默认关闭了接收三方cookie，但是提供了设置 cookie的接口，需要开发者去手动设置三方信任cookie。否则，加载本地 html 时，cookie 同步不过去。<br>代码如下：</p>
+</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">CookieManager cookieManager = CookieManager.getInstance();</div><div class="line">cookieManager.setAcceptCookie(true);</div><div class="line">cookieManager.setAcceptFileSchemeCookies(true);</div><div class="line">if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</div><div class="line">    cookieManager.setAcceptThirdPartyCookies(webView, true);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Android-WebView-加载本地-html"><a href="#Android-WebView-加载本地-html" class="headerlink" title="Android WebView 加载本地 html"></a>Android WebView 加载本地 html</h3><ul>
+<li>webview 加载 sd 卡下的 html 是不能访问的，权限问题。</li>
+<li>如果访问 /data/data/包名/files/index.html，需要开启文件访问权限（默认是开启的，不要动态设置关闭）<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">webSettings.setAllowFileAccess(false);// 关闭</div></pre></td></tr></table></figure>
+</li>
+</ul>
 <h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p>在线加解密、编码解析工具：<br><a href="http://tool.oschina.net/encrypt?type=3" target="_blank" rel="external">http://tool.oschina.net/encrypt?type=3</a></p>
 
         </div>
@@ -206,11 +213,11 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2016-12-19T09:02:22.009Z" title="2016-12-19 17:02" itemprop="dateUpdated">2016年12月19日 17:02</time>
+    最后更新时间：<time datetime="2016-12-23T05:01:28.454Z" title="2016-12-23 13:01" itemprop="dateUpdated">2016年12月23日 13:01</time>
 </span><br>
 
 
-        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/</a>
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/12/15/Android WebView 相关踩坑/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/</a>
     </div>
     <footer>
         <a href="https://fenglincanyi.github.io">
@@ -229,7 +236,7 @@
 
         <div class="post-footer">
             
-	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JS/">JS</a></li></ul>
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/h5/">h5</a></li></ul>
 
 
             
@@ -239,7 +246,7 @@
 <div class="page-share" id="pageShare">
     <ul class="reset share-icons">
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&title=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/&title=《Android WebView 相关踩坑》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -249,22 +256,22 @@
         </a>
       </li>
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&title=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&source=" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/&title=《Android WebView 相关踩坑》 — fenglincanyi&source=" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
       <li>
-        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" data-title=" Facebook">
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/" data-title=" Facebook">
           <i class="icon icon-facebook"></i>
         </a>
       </li>
       <li>
-        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android WebView 相关踩坑》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/&via=https://fenglincanyi.github.io" data-title=" Twitter">
           <i class="icon icon-twitter"></i>
         </a>
       </li>
       <li>
-        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" data-title=" Google+">
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/" data-title=" Google+">
           <i class="icon icon-google-plus"></i>
         </a>
       </li>
@@ -309,7 +316,7 @@
     
 
 <div class="comments" id="comments">
-    <div class="ds-thread" data-thread-key="Android 与 js 交互中url嵌套url传参问题" data-title="Android 与 js 交互中url嵌套url传参问题" data-url="https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/"></div>
+    <div class="ds-thread" data-thread-key="Android WebView 相关踩坑" data-title="Android WebView 相关踩坑" data-url="https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/"></div>
 </div>
 <script>
 lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
@@ -391,7 +398,7 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
 <div class="global-share" id="globalShare">
     <ul class="reset share-icons">
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&title=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/&title=《Android WebView 相关踩坑》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -401,22 +408,22 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
         </a>
       </li>
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&title=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&source=" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/&title=《Android WebView 相关踩坑》 — fenglincanyi&source=" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
       <li>
-        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" data-title=" Facebook">
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/" data-title=" Facebook">
           <i class="icon icon-facebook"></i>
         </a>
       </li>
       <li>
-        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 与 js 交互中url嵌套url传参问题》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android WebView 相关踩坑》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/&via=https://fenglincanyi.github.io" data-title=" Twitter">
           <i class="icon icon-twitter"></i>
         </a>
       </li>
       <li>
-        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/15/Android 与 js 交互中url嵌套url传参问题/" data-title=" Google+">
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/" data-title=" Google+">
           <i class="icon icon-google-plus"></i>
         </a>
       </li>
@@ -427,7 +434,7 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
 <div class="page-modal wx-share" id="wxShare">
     <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADIUlEQVR42u3aQZLiMAwF0L7/pZn11EzgfwmqiPtlRRHi+NkLIck/P/H1uLiSu8nI/36+urt5V31hY2Nj34SdDHf1gqtvnn//nDqbeb002NjY2Mex89CyDyTJYiWj5U9hY2NjY7dJQpvGPA9++8XCxsbGxs5DSx7Y9iUkbGxsbOz2BW2YmY2WjN82KrCxsbHPZm/asd/2+SP9bWxsbOwvZj/KK0khktCV/34T0i4V2NjY2AexZy3V/PhOXsrfpDezljA2Njb2eexNMyCZYp7kzEhJIKz3ARsbG/vr2cmf+7bQvynl75cyWgJsbGzsQ9kbWB729gnJrOT012dsbGzsQ9nJ0Jv28OzubIQX32NjY2MfxG5bs3mIShoMSZt29uzq+A42Njb2rdj7olJb6M93o9235ynNf04qYWNjYx/Bzh9ow97s923DIEmcLsfBxsbGPpS9mfQbgsoisCUjY2NjY5/HnpXg86M5eeN2dm40T43e0HnAxsbGvi17U+7ZH9bMN6A4xImNjY19HPu9QagtFbXvatvMl8d0sLGxsY9j50O3SUhb5WqXoH4KGxsb+yB2EgzyRGKWNuyTk+HmYWNjYx/H3peKEsym3dumRi+ewsbGxj6C/RhdmzXOG7ft4j4PXZf7jI2NjX1zdt7QnZX+8/LTJli27QpsbGzs89hJ2tA2X/MDN23SkpfDiloaNjY29kHsfSCZpQd5MGubDdjY2Ni/gT0D52WpWdrTpkPtomNjY2OfwV7VnOLyUxtsZilHvjTY2NjYJ7E3h2P2Aamd6CZdqWM1NjY29q3YeRrQlpk2beCkcbtqWmBjY2Mfx86L7LNkow02nwifL6I0NjY29s3Zs5e1h2zatOeDeGxsbOwj2I/y2hR92qnPAmq0hdjY2NgHsWeTmP2r3xy42Z9FGi4BNjY29k3Ys4J+26Ztl7U90NO2FrCxsbHPY2/K90kboE0t2rfUYRUbGxv7F7NnzYPkblvS2hwwwsbGxsaelXuSMfNFbzcAGxsb+2x2njC8NyV471HOfBuwsbGxT2LPpj5MAOIpJgvXlr2wsbGxj2P/ASvW2CRM211xAAAAAElFTkSuQmCC" alt="微信分享二维码">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvElEQVR42u3awU7DMBAE0P7/T8MVhJrMeO1SweupatrEz0j2MuvHI359BK/r73/9/Od3rp/y87ebX3h4eHhbh/5sKM+Ge/2+/VUynuuJxsPDwzvHe7aitg++XpmTq9fbTD5mPDw8vPfk1Q+Lr+Lh4eH9PV5SLq8NLg8y8PDw8H6X1956LX5NQo18Y9icteDh4eHFvLyofZ/3R/p7eHh4eJsOBOTNsMmBg7zBVowWDw8P7wAvX3CTw1XtoasT5TIeHh7eaV5yizaoTa7mjbH26NW3O+Dh4eEd4yWhQ/LJiUJ8LS4phouHh4dX8ubtq3nzrI1x8wnFw8PDew1vUka3BXp+gKC9Dx4eHt5reEktutaUmt95FPji4eHhHeCtNa7yTaWNeteOWEXfx8PDw9uac+bh7CRsXcMkV4t9Dw8PD2/ASwrW+W7Thrz59N1EHnh4eHjHePnGkFeqbVCbTF87NXh4eHineWshbFv4JsHEWlFe7Eh4eHh4Y14SEyTxa3s1b3S1fxg8PDy8c7ykZXW9uD8Gr3xjaI9nFScj8PDw8EpevnDP21FFiBAX4jcbGB4eHt4x3mQRb5f1pOyeFNl1dw4PDw9vidcuuHlg0ca1+UREpTkeHh7eAV60vJYRQL6g72q2FREJHh4e3ibe2uPXFu42pNgwoXh4eHjHeLvi2uTxeTDRPndbjoKHh4dX8uYhQtu4yrecdhLx8PDwXslro4p5bDF5Yr0x4OHh4Y1heWQwWcQnDbP8Kh4eHt453is3jzyYmLz/tb0RDw/vn/Ha1tSGaDUuxNtt4yaMwMPDw9vKS8LZyQaQL/HtBN2MDQ8PD+8NeG0jan6sqi3c66/i4eHhHeYVi3J81GAtVo42Ejw8PLxjvPb4aVsit13+doKe/hYPDw/vAK/9h7+Nd9faaYvbwKS/h4eHh3fP+wROPDXKMBbfWQAAAABJRU5ErkJggg==" alt="微信分享二维码">
 </div>
 
 
