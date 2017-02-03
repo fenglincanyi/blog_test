@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-01-19T08:20:55.000Z</updated>
+  <updated>2017-02-03T08:11:09.000Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -14,6 +14,62 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Gradle实现自动拉取git及压缩文件</title>
+    <link href="https://fenglincanyi.github.io/2017/02/01/Gradle%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E6%8B%89%E5%8F%96git%E5%8F%8A%E5%8E%8B%E7%BC%A9%E6%96%87%E4%BB%B6/"/>
+    <id>https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/</id>
+    <published>2017-02-01T07:00:00.000Z</published>
+    <updated>2017-02-03T08:11:09.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>在实现 hybird 相关开发时，h5文件需要不断重新拉取，并解压文件，拷贝至项目的相关目录下。手工完成比较繁琐且耗时。自己查阅 gradle 相关文档，将其过程实现脚本自动化。<br>可实现：自动拉取相关 git 服务器上最新文件，并压缩至 src/main/assets/hybird目录下，打包时就会自动带上最新的h5文件了。</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>上代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">afterEvaluate &#123;</div><div class="line">    tasks.matching &#123;</div><div class="line">        it.name.startsWith(&apos;process&apos;) &amp;&amp; (it.name.endsWith(&apos;ReleaseJavaRes&apos;) || it.name.endsWith</div><div class="line">                (&apos;DebugJavaRes&apos;))</div><div class="line">    &#125;.each &#123; tk -&gt;</div><div class="line">        tk.dependsOn(deletehybird)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// clone hybird 文件</div><div class="line">task cloneHybird(type: Exec)&#123;</div><div class="line">    delete file(&quot;src/main/assets/hybird&quot;)</div><div class="line"></div><div class="line">    def osName = System.getProperty(&quot;os.name&quot;)</div><div class="line">    if (osName.contains(&quot;Windows&quot;)) &#123;</div><div class="line">        commandLine &apos;cmd&apos;, &apos;/c&apos;, &apos;git clone  https://github.com/fenglincanyi/…… .git src/main/assets/hybird&apos;</div><div class="line">    &#125; else if (osName.contains(&quot;Mac OS&quot;)) &#123;</div><div class="line">        commandLine &apos;git&apos;, &apos;clone&apos;, &apos; https://github.com/fenglincanyi/…… .git&apos;, &apos;src/main/assets/hybird&apos;</div><div class="line">    &#125; else if (osName.contains(&quot;LINUX&quot;))&#123;</div><div class="line">        commandLine &apos;git&apos;, &apos;clone&apos;, &apos; https://github.com/fenglincanyi/…… .git&apos;, &apos;src/main/assets/hybird&apos;</div><div class="line">    &#125;</div><div class="line">    println(&quot;============== task cloneHybird ==============&quot;)</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 压缩 hybird文件</div><div class="line">task zipHybird(type: Zip) &#123;</div><div class="line">    dependsOn cloneHybird</div><div class="line"></div><div class="line">    if (file(&apos;src/main/assets/hybird.zip&apos;).lastModified() &gt;= file(&apos;src/main/assets/hybird&apos;).lastModified()) &#123;// 保证zip包最新</div><div class="line">        delete file(&quot;src/main/assets/hybird.zip&quot;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    archiveName = &apos;hybird.zip&apos;</div><div class="line">    destinationDir = file(&apos;src/main/assets&apos;)</div><div class="line">    from &apos;src/main/assets/hybird/0.1&apos;</div><div class="line">    println(&quot;============== task hybirdZip ==============&quot;)</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 删除 hybird 目录及文件，只留 hybird.zip</div><div class="line">task deletehybird(type: Delete) &#123;</div><div class="line">    dependsOn zipHybird</div><div class="line"></div><div class="line">    delete &quot;src/main/assets/hybird&quot;</div><div class="line">    println(&quot;============== deletehybird ==============&quot;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><br><br>此处，单独运行 task，演示效果：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5FAACC49-BCE0-44ED-A60C-30378795BF74.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>build 结果：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/22.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>在 assets 目录下生成：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/33.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h3><p>Mac系统执行 commandLine 去 clone 时，每次都报错：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Caused by: org.gradle.process.internal.ExecException: A problem occurred starting process &apos;command &apos;git clone https://github.com/fenglincanyi/…… .git&apos;&apos;</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.DefaultExecHandle.setEndStateInfo(DefaultExecHandle.java:197)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.DefaultExecHandle.failed(DefaultExecHandle.java:327)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.ExecHandleRunner.run(ExecHandleRunner.java:86)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      ... 2 more</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter] Caused by: net.rubygrapefruit.platform.NativeException: Could not start &apos;git clone https://github.com/fenglincanyi/…… .git&apos;</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at net.rubygrapefruit.platform.internal.DefaultProcessLauncher.start(DefaultProcessLauncher.java:27)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at net.rubygrapefruit.platform.internal.WrapperProcessLauncher.start(WrapperProcessLauncher.java:36)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.ExecHandleRunner.run(ExecHandleRunner.java:68)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      ... 2 more</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter] Caused by: java.io.IOException: Cannot run program &quot;git clone https://github.com/fenglincanyi/…… .git&quot; (in directory &quot;/Users/geng/AndroidStudioProjects/GradleTest/app&quot;): error=2, No such file or directory</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at net.rubygrapefruit.platform.internal.DefaultProcessLauncher.start(DefaultProcessLauncher.java:25)</div><div class="line">11:38:32.044 [ERROR] [org.gradle.BuildExceptionReporter]      ... 4 more</div><div class="line">11:38:32.044 [ERROR] [org.gradle.BuildExceptionReporter] Caused by: java.io.IOException: error=2, No such file or directory</div><div class="line">11:38:32.044 [ERROR] [org.gradle.BuildExceptionReporter]      ... 5 more</div><div class="line">11:38:32.044 [ERROR] [org.gradle.BuildExceptionReporter]</div></pre></td></tr></table></figure>
+<p>最后Google半天，在 Mac 或 Linux 系统下，需要将命令中的字符串 逐个分割：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">commandLine &apos;git&apos;, &apos;clone&apos;, &apos; https://github.com/fenglincanyi/…… .git&apos;, &apos;src/main/assets/hybird&apos;</div></pre></td></tr></table></figure>
+<p>Gradle 官网的文档，说明的并不是很详细，这里要吐槽下。。。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>Gradle 基于Groovy实现，内置了许多好用的API，如：copy，zip等等，这些都可以将传统开发中的手动执行实现自动化</li>
+<li>Gradle 的确方便了开发者，使用脚本来实现繁琐和重复的工作，也将开发过程中配置工作变得更加灵活</li>
+</ul>
+<p><br><br>参考：<br><a href="https://www.jeeboot.com/archives/1563.html" target="_blank" rel="external">https://www.jeeboot.com/archives/1563.html</a><br><a href="http://stackoverflow.com/questions/15776431/in-gradle-tasks-of-type-exec-why-do-commandline-and-executable-behave-different" target="_blank" rel="external">http://stackoverflow.com/questions/15776431/in-gradle-tasks-of-type-exec-why-do-commandline-and-executable-behave-different</a><br><a href="https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Exec.html#org.gradle.api.tasks.Exec:commandLine(java.lang.Object%5B%5D" target="_blank" rel="external">https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Exec.html#org.gradle.api.tasks.Exec:commandLine(java.lang.Object%5B%5D</a><br><a href="https://segmentfault.com/q/1010000004503896" target="_blank" rel="external">https://segmentfault.com/q/1010000004503896</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;问题&quot;&gt;&lt;a href=&quot;#问题&quot; class=&quot;headerlink&quot; title=&quot;问题&quot;&gt;&lt;/a&gt;问题&lt;/h3&gt;&lt;p&gt;在实现 hybird 相关开发时，h5文件需要不断重新拉取，并解压文件，拷贝至项目的相关目录下。手工完成比较繁琐且耗时。自己查阅 gradl
+    
+    </summary>
+    
+      <category term="Gradle" scheme="https://fenglincanyi.github.io/categories/Gradle/"/>
+    
+    
+      <category term="Gradle" scheme="https://fenglincanyi.github.io/tags/Gradle/"/>
+    
+  </entry>
   
   <entry>
     <title>instant run 相关分析</title>
@@ -229,6 +285,129 @@
   </entry>
   
   <entry>
+    <title>Android 类加载初探</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2016-12-17T14:23:04.669Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
+</blockquote>
+<p>需要关注的类有：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
+<ul>
+<li>BaseDexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>DexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>PathClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
+<p><strong>ClassLoader 相关说明：</strong></p>
+<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
+<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
+<p>DexPathList 构造函数：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>makeDexElements过程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
+<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Android apk安装过程实例分析</title>
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
@@ -349,129 +528,6 @@
       <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
     
       <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Android 类加载初探</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2016-12-17T14:23:04.669Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
-</blockquote>
-<p>需要关注的类有：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
-<ul>
-<li>BaseDexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>DexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>PathClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
-<p><strong>ClassLoader 相关说明：</strong></p>
-<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
-<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
-<p>DexPathList 构造函数：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>makeDexElements过程：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
-<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
     
   </entry>
   

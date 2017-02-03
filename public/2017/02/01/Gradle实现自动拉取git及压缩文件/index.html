@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Gradle实现自动拉取git及压缩文件 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Gradle">
+    <meta name="description" content="问题在实现 hybird 相关开发时，h5文件需要不断重新拉取，并解压文件，拷贝至项目的相关目录下。手工完成比较繁琐且耗时。自己查阅 gradle 相关文档，将其过程实现脚本自动化。可实现：自动拉取相关 git 服务器上最新文件，并压缩至 src/main/assets/hybird目录下，打包时就会自动带上最新的h5文件了。
+解决上代码：
+1234567891011121314151617181">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gradle实现自动拉取git及压缩文件">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="问题在实现 hybird 相关开发时，h5文件需要不断重新拉取，并解压文件，拷贝至项目的相关目录下。手工完成比较繁琐且耗时。自己查阅 gradle 相关文档，将其过程实现脚本自动化。可实现：自动拉取相关 git 服务器上最新文件，并压缩至 src/main/assets/hybird目录下，打包时就会自动带上最新的h5文件了。
+解决上代码：
+1234567891011121314151617181">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/5FAACC49-BCE0-44ED-A60C-30378795BF74.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/22.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/33.png">
+<meta property="og:updated_time" content="2017-02-03T08:11:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gradle实现自动拉取git及压缩文件">
+<meta name="twitter:description" content="问题在实现 hybird 相关开发时，h5文件需要不断重新拉取，并解压文件，拷贝至项目的相关目录下。手工完成比较繁琐且耗时。自己查阅 gradle 相关文档，将其过程实现脚本自动化。可实现：自动拉取相关 git 服务器上最新文件，并压缩至 src/main/assets/hybird目录下，打包时就会自动带上最新的h5文件了。
+解决上代码：
+1234567891011121314151617181">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/5FAACC49-BCE0-44ED-A60C-30378795BF74.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Gradle实现自动拉取git及压缩文件</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Gradle实现自动拉取git及压缩文件</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-02-01T07:00:00.000Z" itemprop="datePublished" class="page-time">
+  2017-02-01
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Gradle/">Gradle</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#问题"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#解决"><span class="post-toc-number">2.</span> <span class="post-toc-text">解决</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#遇到的问题"><span class="post-toc-number">3.</span> <span class="post-toc-text">遇到的问题</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#总结"><span class="post-toc-number">4.</span> <span class="post-toc-text">总结</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Gradle实现自动拉取git及压缩文件"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Gradle实现自动拉取git及压缩文件</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-2-1 15:00" datetime="2017-02-01T07:00:00.000Z"  itemprop="datePublished">2017-02-01</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Gradle/">Gradle</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>在实现 hybird 相关开发时，h5文件需要不断重新拉取，并解压文件，拷贝至项目的相关目录下。手工完成比较繁琐且耗时。自己查阅 gradle 相关文档，将其过程实现脚本自动化。<br>可实现：自动拉取相关 git 服务器上最新文件，并压缩至 src/main/assets/hybird目录下，打包时就会自动带上最新的h5文件了。</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>上代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">afterEvaluate &#123;</div><div class="line">    tasks.matching &#123;</div><div class="line">        it.name.startsWith(&apos;process&apos;) &amp;&amp; (it.name.endsWith(&apos;ReleaseJavaRes&apos;) || it.name.endsWith</div><div class="line">                (&apos;DebugJavaRes&apos;))</div><div class="line">    &#125;.each &#123; tk -&gt;</div><div class="line">        tk.dependsOn(deletehybird)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// clone hybird 文件</div><div class="line">task cloneHybird(type: Exec)&#123;</div><div class="line">    delete file(&quot;src/main/assets/hybird&quot;)</div><div class="line"></div><div class="line">    def osName = System.getProperty(&quot;os.name&quot;)</div><div class="line">    if (osName.contains(&quot;Windows&quot;)) &#123;</div><div class="line">        commandLine &apos;cmd&apos;, &apos;/c&apos;, &apos;git clone  https://github.com/fenglincanyi/…… .git src/main/assets/hybird&apos;</div><div class="line">    &#125; else if (osName.contains(&quot;Mac OS&quot;)) &#123;</div><div class="line">        commandLine &apos;git&apos;, &apos;clone&apos;, &apos; https://github.com/fenglincanyi/…… .git&apos;, &apos;src/main/assets/hybird&apos;</div><div class="line">    &#125; else if (osName.contains(&quot;LINUX&quot;))&#123;</div><div class="line">        commandLine &apos;git&apos;, &apos;clone&apos;, &apos; https://github.com/fenglincanyi/…… .git&apos;, &apos;src/main/assets/hybird&apos;</div><div class="line">    &#125;</div><div class="line">    println(&quot;============== task cloneHybird ==============&quot;)</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 压缩 hybird文件</div><div class="line">task zipHybird(type: Zip) &#123;</div><div class="line">    dependsOn cloneHybird</div><div class="line"></div><div class="line">    if (file(&apos;src/main/assets/hybird.zip&apos;).lastModified() &gt;= file(&apos;src/main/assets/hybird&apos;).lastModified()) &#123;// 保证zip包最新</div><div class="line">        delete file(&quot;src/main/assets/hybird.zip&quot;)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    archiveName = &apos;hybird.zip&apos;</div><div class="line">    destinationDir = file(&apos;src/main/assets&apos;)</div><div class="line">    from &apos;src/main/assets/hybird/0.1&apos;</div><div class="line">    println(&quot;============== task hybirdZip ==============&quot;)</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 删除 hybird 目录及文件，只留 hybird.zip</div><div class="line">task deletehybird(type: Delete) &#123;</div><div class="line">    dependsOn zipHybird</div><div class="line"></div><div class="line">    delete &quot;src/main/assets/hybird&quot;</div><div class="line">    println(&quot;============== deletehybird ==============&quot;)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><br><br>此处，单独运行 task，演示效果：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5FAACC49-BCE0-44ED-A60C-30378795BF74.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>build 结果：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/22.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>在 assets 目录下生成：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/33.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h3><p>Mac系统执行 commandLine 去 clone 时，每次都报错：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Caused by: org.gradle.process.internal.ExecException: A problem occurred starting process &apos;command &apos;git clone https://github.com/fenglincanyi/…… .git&apos;&apos;</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.DefaultExecHandle.setEndStateInfo(DefaultExecHandle.java:197)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.DefaultExecHandle.failed(DefaultExecHandle.java:327)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.ExecHandleRunner.run(ExecHandleRunner.java:86)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      ... 2 more</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter] Caused by: net.rubygrapefruit.platform.NativeException: Could not start &apos;git clone https://github.com/fenglincanyi/…… .git&apos;</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at net.rubygrapefruit.platform.internal.DefaultProcessLauncher.start(DefaultProcessLauncher.java:27)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at net.rubygrapefruit.platform.internal.WrapperProcessLauncher.start(WrapperProcessLauncher.java:36)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.ExecHandleRunner.run(ExecHandleRunner.java:68)</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      ... 2 more</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter] Caused by: java.io.IOException: Cannot run program &quot;git clone https://github.com/fenglincanyi/…… .git&quot; (in directory &quot;/Users/geng/AndroidStudioProjects/GradleTest/app&quot;): error=2, No such file or directory</div><div class="line">11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at net.rubygrapefruit.platform.internal.DefaultProcessLauncher.start(DefaultProcessLauncher.java:25)</div><div class="line">11:38:32.044 [ERROR] [org.gradle.BuildExceptionReporter]      ... 4 more</div><div class="line">11:38:32.044 [ERROR] [org.gradle.BuildExceptionReporter] Caused by: java.io.IOException: error=2, No such file or directory</div><div class="line">11:38:32.044 [ERROR] [org.gradle.BuildExceptionReporter]      ... 5 more</div><div class="line">11:38:32.044 [ERROR] [org.gradle.BuildExceptionReporter]</div></pre></td></tr></table></figure>
+<p>最后Google半天，在 Mac 或 Linux 系统下，需要将命令中的字符串 逐个分割：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">commandLine &apos;git&apos;, &apos;clone&apos;, &apos; https://github.com/fenglincanyi/…… .git&apos;, &apos;src/main/assets/hybird&apos;</div></pre></td></tr></table></figure>
+<p>Gradle 官网的文档，说明的并不是很详细，这里要吐槽下。。。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
+<li>Gradle 基于Groovy实现，内置了许多好用的API，如：copy，zip等等，这些都可以将传统开发中的手动执行实现自动化</li>
+<li>Gradle 的确方便了开发者，使用脚本来实现繁琐和重复的工作，也将开发过程中配置工作变得更加灵活</li>
+</ul>
+<p><br><br>参考：<br><a href="https://www.jeeboot.com/archives/1563.html" target="_blank" rel="external">https://www.jeeboot.com/archives/1563.html</a><br><a href="http://stackoverflow.com/questions/15776431/in-gradle-tasks-of-type-exec-why-do-commandline-and-executable-behave-different" target="_blank" rel="external">http://stackoverflow.com/questions/15776431/in-gradle-tasks-of-type-exec-why-do-commandline-and-executable-behave-different</a><br><a href="https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Exec.html#org.gradle.api.tasks.Exec:commandLine(java.lang.Object%5B%5D" target="_blank" rel="external">https://docs.gradle.org/current/dsl/org.gradle.api.tasks.Exec.html#org.gradle.api.tasks.Exec:commandLine(java.lang.Object%5B%5D</a><br><a href="https://segmentfault.com/q/1010000004503896" target="_blank" rel="external">https://segmentfault.com/q/1010000004503896</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-02-03T08:11:09.000Z" title="2017-2-3 16:11" itemprop="dateUpdated">2017年2月3日 16:11</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/02/01/Gradle实现自动拉取git及压缩文件/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/&title=《Gradle实现自动拉取git及压缩文件》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/&title=《Gradle实现自动拉取git及压缩文件》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Gradle实现自动拉取git及压缩文件》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/12/17/instant run 相关分析/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">instant run 相关分析</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Gradle实现自动拉取git及压缩文件" data-title="Gradle实现自动拉取git及压缩文件" data-url="https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/&title=《Gradle实现自动拉取git及压缩文件》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/&title=《Gradle实现自动拉取git及压缩文件》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Gradle实现自动拉取git及压缩文件》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADG0lEQVR42u3au3LjMBAEQP//T+tSJ0fP7FJVItSMXH6QbCgYYxY/P/H1+nXtf/P3T6+/Tn6avNXwwsbGxn4I+3V5XT/m+sE5L3/P5CnXFmxsbOxT2flL52Fz/VdtEObfiZYMGxsb+4vZSWDkG4Z8af73m9jY2NjYswDLNzP5QrSbCmxsbGzs9gH5wzZF/+bpb+nSsLGxsT+e3Vbzn/z1W+bb2NjY2B/MfpVXUiRtDvrk5dFKgY2NjX0QOw+A2aLkY4D26E+7zcDGxsY+lX1XfZPEUh5dszKo+FtsbGzsg9j5K+43HrOImg0n8nfGxsbGPondgvPDN5vITBYu/8CwsbGxz2NvCpqE136n/ZTy0W80FcHGxsZ+IHs2Rs3HBnmAJcGWxFiRz9jY2NhHsNv4eV/gzbYcw+IJGxsb+yB2HglthTQ7spncf78c2NjY2CexZ7ebbRhm5X7+6RXPwsbGxj6I3f5bP6uf8mhsxw/5MaDhimJjY2M/hL2p+NtxbFtdbUIratSwsbGxH87eHKxJFqutkKJafz+KwMbGxj6I3f7r3x67yeue2QR29jFgY2Njn8SejWM34bSvn/KnFId1sLGxsQ9ltzHWbmbySGtHAn+EGTY2NvZB7P0wtS2qNrzNWAIbGxv7bPasM58tx2aoPNucYGNjY38DO691NlX+pniaDaH/0GFjY2Mfwc5LpTZy2vJotrVIBg+r8QA2Njb2Q9h3gdshbh5js0Lqj0EvNjY29qHszWg2Gf3m1X87Ki7eDRsbG/sg9ix4kg1McrdkCfIozYMQGxsb+zz2jHFXjM2O6czqJ2xsbOyz2W1JlMTb/s6z+2NjY2N/J7stlWZBmNdAd40K6q0INjY29qPYr/JqQ2hzlKctjIrRAjY2NvZB7PzaFP0J+3pjs7lDEpPY2NjYT2cnoZWvU7tJmI0o2hE1NjY29jewZ4VOvoXIwy/fZrSlEjY2NjZ28qKz12qjtI0rbGxsbOy8rL8rYIpNxagUw8bGxj6PfVdszEIrCZ78KGfyLGxsbOyT2JuwmR3E2Rz33NwBGxsb+zj2Pxq9XclA93Y5AAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
