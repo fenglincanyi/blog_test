@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Spring 学习（一） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Spring">
+    <meta name="description" content="Spring的2个基本概念
+aop面向切面编程在原有的基础上进行扩展，而不是进行修改。符合 开闭原则
+ioc控制反转不通过手动 new 方式，来创建对象，而是交给Spring 容器根据配置，进行创建。从而将类的对象交给Spring 进行控制管理
+
+ioc 的2种方式来创建对象：（1）通过配置文件（2）通过注解
+ioc 实现原理
+通过dom4j 解析 xml 文件，拿到类的全路径，然后通过反射的技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring 学习（一）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="Spring的2个基本概念
+aop面向切面编程在原有的基础上进行扩展，而不是进行修改。符合 开闭原则
+ioc控制反转不通过手动 new 方式，来创建对象，而是交给Spring 容器根据配置，进行创建。从而将类的对象交给Spring 进行控制管理
+
+ioc 的2种方式来创建对象：（1）通过配置文件（2）通过注解
+ioc 实现原理
+通过dom4j 解析 xml 文件，拿到类的全路径，然后通过反射的技术">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/spring-overview.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/A5CEBFD6-CFE5-404A-A42F-CF521BAB4B47.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/9FEC554D-7DDC-48C7-BA89-3FAAAC181312.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/979F1DF8-ADF4-499F-8119-62CDDE033AD4.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/0815D096-5833-4AA4-9BD8-EE493BE15F32.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/23395798-F73A-4EBB-95E2-1641C5EF8A24.png">
+<meta property="og:updated_time" content="2017-02-06T15:48:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring 学习（一）">
+<meta name="twitter:description" content="Spring的2个基本概念
+aop面向切面编程在原有的基础上进行扩展，而不是进行修改。符合 开闭原则
+ioc控制反转不通过手动 new 方式，来创建对象，而是交给Spring 容器根据配置，进行创建。从而将类的对象交给Spring 进行控制管理
+
+ioc 的2种方式来创建对象：（1）通过配置文件（2）通过注解
+ioc 实现原理
+通过dom4j 解析 xml 文件，拿到类的全路径，然后通过反射的技术">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/spring-overview.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Spring 学习（一）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Spring 学习（一）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-12-26T06:06:00.000Z" itemprop="datePublished" class="page-time">
+  2016-12-26
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Spring的2个基本概念"><span class="post-toc-number">1.</span> <span class="post-toc-text">Spring的2个基本概念</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Spring-运行时"><span class="post-toc-number">2.</span> <span class="post-toc-text">Spring 运行时</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Spring-第一个Demo-开发"><span class="post-toc-number">3.</span> <span class="post-toc-text">Spring 第一个Demo 开发</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#bean-的管理"><span class="post-toc-number">4.</span> <span class="post-toc-text">bean 的管理</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Spring配置文件中的几个重要属性"><span class="post-toc-number">5.</span> <span class="post-toc-text">Spring配置文件中的几个重要属性</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#附录：IDEA-Resource-目录下，存放的文件类型"><span class="post-toc-number">6.</span> <span class="post-toc-text">附录：IDEA Resource 目录下，存放的文件类型</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Spring 学习（一）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Spring 学习（一）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-26 14:06" datetime="2016-12-26T06:06:00.000Z"  itemprop="datePublished">2016-12-26</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="Spring的2个基本概念"><a href="#Spring的2个基本概念" class="headerlink" title="Spring的2个基本概念"></a>Spring的2个基本概念</h2><ul>
+<li>aop<br>面向切面编程<br>在原有的基础上进行扩展，而不是进行修改。符合 开闭原则</li>
+<li><p>ioc<br>控制反转<br>不通过手动 new 方式，来创建对象，而是交给Spring 容器根据配置，进行创建。从而将类的对象交给Spring 进行控制管理</p>
+<ul>
+<li>ioc 的2种方式来创建对象：<br>（1）通过配置文件<br>（2）通过注解<br><br></li>
+<li><p>ioc 实现原理</p>
+<p>通过dom4j 解析 xml 文件，拿到类的全路径，然后通过反射的技术创建该类的对象，结合工厂模式返给调用方<br>伪代码实现说明：</p>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=“userService” class=“com.geng.UserService” /&gt;</div><div class="line">public class Factory &#123;</div><div class="line">    public static UserService getUserService() &#123;</div><div class="line">        String classValue = dom4j.getValue(“userService”);</div><div class="line">        Class clazz = Class.forName(“classValue”);</div><div class="line">        return clazz.newInstance();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="Spring-运行时"><a href="#Spring-运行时" class="headerlink" title="Spring 运行时"></a>Spring 运行时</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/spring-overview.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>Spring 提供了全面的Java web 服务框架，从web层到业务层，再到持久层，都有着相关模块的实现。<br>对于Spring 最基本使用，必须尹若 Core Container中的4个重要的部分，方可使用。<br>若只引用某部分的库，maven也会自动引用最核心的jar包到你的应用中。</p>
+<h2 id="Spring-第一个Demo-开发"><a href="#Spring-第一个Demo-开发" class="headerlink" title="Spring 第一个Demo 开发"></a>Spring 第一个Demo 开发</h2><p>在 idea 中，创建 maven 项目，然后，编辑 pom.xml 文件。<br>引入：Spring 主要的几个库，log4j，junit</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">&lt;dependencies&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;org.springframework&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;spring-context&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;4.3.5.RELEASE&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;log4j&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;log4j&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;1.2.17&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">    &lt;dependency&gt;</div><div class="line">        &lt;groupId&gt;junit&lt;/groupId&gt;</div><div class="line">        &lt;artifactId&gt;junit&lt;/artifactId&gt;</div><div class="line">        &lt;version&gt;4.12&lt;/version&gt;</div><div class="line">    &lt;/dependency&gt;</div><div class="line">&lt;/dependencies&gt;</div></pre></td></tr></table></figure>
+<p>在resource 目录下，创建 xml 配置文件，如图：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/A5CEBFD6-CFE5-404A-A42F-CF521BAB4B47.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>Idea 在你编辑时候，会提示相关的属性，方便书写配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</div><div class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</div><div class="line">       xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</div><div class="line">       xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd”&gt;</div><div class="line"></div><div class="line">    &lt;bean id=&quot;user&quot; class=&quot;com.geng.ioc.User&quot;/&gt;</div><div class="line"></div><div class="line">&lt;/beans&gt;</div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/9FEC554D-7DDC-48C7-BA89-3FAAAC181312.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>创建测试用例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class UserTest &#123;</div><div class="line"></div><div class="line">    private ApplicationContext context;</div><div class="line"></div><div class="line">    @Before</div><div class="line">    public void setUp() throws Exception &#123;</div><div class="line">        context = new ClassPathXmlApplicationContext(&quot;beans1.xml&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Test</div><div class="line">    public void add() throws Exception &#123;</div><div class="line">        User user = (User) context.getBean(&quot;user&quot;);</div><div class="line">        user.add();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/979F1DF8-ADF4-499F-8119-62CDDE033AD4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>至此，我们完成了第一个 Spring demo</p>
+<h2 id="bean-的管理"><a href="#bean-的管理" class="headerlink" title="bean 的管理"></a>bean 的管理</h2><ul>
+<li>通过无参构造创建（前面第一个demo）</li>
+<li>通过静态工厂实现对象创建<br>代码示例：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class BeanFactory &#123;</div><div class="line"></div><div class="line">    public static User2 createUser2() &#123;</div><div class="line">        return new User2();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class User2 &#123;</div><div class="line"></div><div class="line">    public void add() &#123;</div><div class="line">        System.out.println(&quot;user2.....”);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>xml中配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&lt;!--用静态工厂创建--&gt;</div><div class="line">&lt;bean id=&quot;user2&quot; class=&quot;com.geng.ioc.BeanFactory&quot; factory-method=&quot;createUser2”/&gt;</div></pre></td></tr></table></figure>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public class User2Test &#123;</div><div class="line"></div><div class="line">    private ApplicationContext context;</div><div class="line"></div><div class="line">    @Before</div><div class="line">    public void setUp() throws Exception &#123;</div><div class="line">        context = new ClassPathXmlApplicationContext(&quot;beans1.xml&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Test</div><div class="line">    public void add() throws Exception &#123;</div><div class="line">        User2 user2 = (User2) context.getBean(&quot;user2&quot;);</div><div class="line">        System.out.println(user2);</div><div class="line">        user2.add();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/0815D096-5833-4AA4-9BD8-EE493BE15F32.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>通过实例工厂创建对象</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;!--用实例工厂创建—&gt;</div><div class="line">&lt;bean id=&quot;bean2Factory&quot; class=&quot;com.geng.ioc.Bean2Factory&quot; /&gt;</div><div class="line">&lt;bean id=&quot;user2&quot; factory-bean=&quot;bean2Factory&quot; factory-method=&quot;getBean&quot;/&gt;</div></pre></td></tr></table></figure>
+<p>这里不再验证。。。</p>
+<h2 id="Spring配置文件中的几个重要属性"><a href="#Spring配置文件中的几个重要属性" class="headerlink" title="Spring配置文件中的几个重要属性"></a>Spring配置文件中的几个重要属性</h2><p>id：不能还有特殊符号，“_”是可以的<br>name：可以含有特殊符号，如：#，历史版本中使用的，后期不推荐使用。context.getBean() 方法可以获取这两种属性的值<br>class：类的全路径<br>scope：作用域  </p>
+<pre><code>singleton(默认)  
+prototype(多例)
+request 创建对象放在request域
+session 创建对象放在session域
+globalSession 一次登陆，任何地方都保存有登录状态
+</code></pre><h2 id="附录：IDEA-Resource-目录下，存放的文件类型"><a href="#附录：IDEA-Resource-目录下，存放的文件类型" class="headerlink" title="附录：IDEA Resource 目录下，存放的文件类型"></a>附录：IDEA Resource 目录下，存放的文件类型</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/23395798-F73A-4EBB-95E2-1641C5EF8A24.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>（IDEA 官网：<a href="https://www.jetbrains.com/help/idea/2016.3/resource-files.html" target="_blank" rel="external">https://www.jetbrains.com/help/idea/2016.3/resource-files.html</a> ）</p>
+<p>所以，在此目录下，我们一般存放配置文件，或一些必要的资源文件。</p>
+<p>Demo 地址：<br><a href="https://github.com/fenglincanyi/springdemo1" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo1</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-02-06T15:48:37.000Z" title="2017-2-6 23:48" itemprop="dateUpdated">2017年2月6日 23:48</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/12/26/Spring 学习（一）/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/&title=《Spring 学习（一）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/&title=《Spring 学习（一）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Spring 学习（一）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/02/01/Gradle实现自动拉取git及压缩文件/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Gradle实现自动拉取git及压缩文件</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/12/17/instant run 相关分析/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">instant run 相关分析</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Spring 学习（一）" data-title="Spring 学习（一）" data-url="https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/&title=《Spring 学习（一）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/&title=《Spring 学习（一）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Spring 学习（一）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACvUlEQVR42u3a0W4iMQwFUP7/p9vXXbXAvXayQtozT6gMg0+QEtf24xFfX39cz/7+855nf0lev/7s4QsPDw9vEXoeaPu0n/ckmPbdXyLEw8PDu8Z7FmiyKb/Gt+++Pn7ymPHw8PA+jZcEnRwhSQx4eHh4/wMvT5fb0gYeHh7e5/DaR+elgbZEm6fUh2steHh4eDEv7yJ9zusr/T08PDy8dVd908L/Wlyb4+evT+Hh4eFd4G3Cbb+yLSLM0mU8PDy827x8KCpvbs2Ks8mQVjvIhYeHh3eDtymtzgrBm3R8NqCAh4eHd5s3K6RummftIFdybODh4eHd4506DPK1bJP15DkHjgQ8PDy8Ba84T8pxq9kgQtsSi2oteHh4eGtecki05drX4eYttNlY2CNfLTw8PLwF71RASXB5Mp2n6dFMBB4eHt6alx8JG1I7hpVjogIKHh4e3lFeO+SUJ9ztwNZsQd98Lx4eHt4/4bWFgFnxIg86b8IVJx4eHh7egpe38/Pm06yFliTfbbKOh4eHd483a4AlLbTNTNRs6GpVzMXDw8OLecnW3xYakkJGPlbVloPx8PDw7vHOtv/bPHYWej10hYeHh3eUNxsOODWG1c445Gn08JfEw8PDi3n5Rjy7Z7Ott0MMqyoLHh4eXslLgmtb+5vEPS/gvllQPDw8vGu8ZEPfJ9NtMWI2sjCcLMPDw8MreZtEdrYE7fEzLDrj4eHhXeblieyp4sLj6BUVI/Dw8PAWvFm7Kx+cypPpvAFW/AB4eHh4F3jthrvZ0PMCR969OgDDw8PDG/HOll83K5o3t5I78fDw8G7z2k05/4J6TKpcoDfpNR4eHt4H8NqiwyYtzmN7mprj4eHhfQBvn0afGhSIiiN4eHh413jtaFQb6L5MnDfk8PDw8G7zNv/wv35cPtLaFiMOD2zh4eHhpbxvHyMDJ12r28cAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
