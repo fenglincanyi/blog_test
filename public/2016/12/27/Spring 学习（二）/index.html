@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Spring 学习（二） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Spring">
+    <meta name="description" content="本次学习内容：Spring 依赖注入相关，本次通过xml配置实现
+
+setXXX() 方法注入123&amp;lt;bean id=&amp;quot;book&amp;quot; class=&amp;quot;com.geng.attr.Book&amp;quot;&amp;gt;    &amp;lt;property name=&amp;quot;bookName&amp;quot; value=&amp;quot;西游记&amp;quot;/&amp;gt;&amp;lt;/bean&amp;g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring 学习（二）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="本次学习内容：Spring 依赖注入相关，本次通过xml配置实现
+
+setXXX() 方法注入123&amp;lt;bean id=&amp;quot;book&amp;quot; class=&amp;quot;com.geng.attr.Book&amp;quot;&amp;gt;    &amp;lt;property name=&amp;quot;bookName&amp;quot; value=&amp;quot;西游记&amp;quot;/&amp;gt;&amp;lt;/bean&amp;g">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/EA20EBAD-5360-4197-BA0C-4059ABF7636F.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/76FF4DDF-95DD-4F5A-B43F-30946D328A30.png">
+<meta property="og:updated_time" content="2017-02-07T06:17:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring 学习（二）">
+<meta name="twitter:description" content="本次学习内容：Spring 依赖注入相关，本次通过xml配置实现
+
+setXXX() 方法注入123&amp;lt;bean id=&amp;quot;book&amp;quot; class=&amp;quot;com.geng.attr.Book&amp;quot;&amp;gt;    &amp;lt;property name=&amp;quot;bookName&amp;quot; value=&amp;quot;西游记&amp;quot;/&amp;gt;&amp;lt;/bean&amp;g">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Spring 学习（二）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Spring 学习（二）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-12-27T09:01:00.000Z" itemprop="datePublished" class="page-time">
+  2016-12-27
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#setXXX-方法注入"><span class="post-toc-number">1.</span> <span class="post-toc-text">setXXX() 方法注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#构造方法注入"><span class="post-toc-number">2.</span> <span class="post-toc-text">构造方法注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#对象注入"><span class="post-toc-number">3.</span> <span class="post-toc-text">对象注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#p命名空间注入"><span class="post-toc-number">4.</span> <span class="post-toc-text">p命名空间注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#复杂类型注入"><span class="post-toc-number">5.</span> <span class="post-toc-text">复杂类型注入</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Spring 学习（二）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Spring 学习（二）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-27 17:01" datetime="2016-12-27T09:01:00.000Z"  itemprop="datePublished">2016-12-27</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本次学习内容：Spring 依赖注入相关，本次通过xml配置实现</p>
+</blockquote>
+<h2 id="setXXX-方法注入"><a href="#setXXX-方法注入" class="headerlink" title="setXXX() 方法注入"></a>setXXX() 方法注入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=&quot;book&quot; class=&quot;com.geng.attr.Book&quot;&gt;</div><div class="line">    &lt;property name=&quot;bookName&quot; value=&quot;西游记&quot;/&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
+<h2 id="构造方法注入"><a href="#构造方法注入" class="headerlink" title="构造方法注入"></a>构造方法注入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// 这里通过有参构造注入</div><div class="line">&lt;bean id=&quot;people&quot; class=&quot;com.geng.attr.People&quot;&gt;</div><div class="line">    &lt;constructor-arg name=&quot;name&quot; value=&quot;小明&quot;/&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
+<h2 id="对象注入"><a href="#对象注入" class="headerlink" title="对象注入"></a>对象注入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=&quot;userDao&quot; class=&quot;com.geng.obj.UserDao&quot;/&gt;</div><div class="line">&lt;bean id=&quot;userService&quot; class=&quot;com.geng.obj.UserService&quot;&gt;</div><div class="line">    &lt;property name=&quot;userDao&quot; ref=&quot;userDao&quot;/&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">public class UserDao &#123;</div><div class="line"></div><div class="line">    public void showUserDao() &#123;</div><div class="line">        System.out.println(&quot;show user dao...&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class UserService &#123;</div><div class="line"></div><div class="line">    private UserDao userDao;</div><div class="line"></div><div class="line">    public void setUserDao(UserDao userDao) &#123;</div><div class="line">        this.userDao = userDao;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void showService() &#123;</div><div class="line">        System.out.println(&quot;show Service....&quot;);</div><div class="line"></div><div class="line">        userDao.showUserDao();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">public class UserServiceTest &#123;</div><div class="line"></div><div class="line">    private ApplicationContext context;</div><div class="line"></div><div class="line">    @Before</div><div class="line">    public void setUp() throws Exception &#123;</div><div class="line">        context = new ClassPathXmlApplicationContext(&quot;beans1.xml&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Test</div><div class="line">    public void showService() throws Exception &#123;</div><div class="line">        UserService userService = (UserService) context.getBean(&quot;userService&quot;);</div><div class="line">        userService.showService();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="p命名空间注入"><a href="#p命名空间注入" class="headerlink" title="p命名空间注入"></a>p命名空间注入</h2><p>xml 头部加入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">xmlns:p=&quot;http://www.springframework.org/schema/p&quot;</div></pre></td></tr></table></figure>
+<p>配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=&quot;person&quot; class=&quot;com.geng.attr.Person&quot; p:pName=&quot;呵呵哒”/&gt;</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">public class Person &#123;</div><div class="line"></div><div class="line">    private String pName;</div><div class="line"></div><div class="line">    public void setpName(String pName) &#123;</div><div class="line">        this.pName = pName;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void test() &#123;</div><div class="line">        System.out.println(&quot;result: &quot; + pName);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/EA20EBAD-5360-4197-BA0C-4059ABF7636F.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="复杂类型注入"><a href="#复杂类型注入" class="headerlink" title="复杂类型注入"></a>复杂类型注入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">public class MulitDemo &#123;</div><div class="line"></div><div class="line">    private String[] arrs;</div><div class="line">    private List&lt;String&gt; list;</div><div class="line">    private Map&lt;String, String&gt; map;</div><div class="line">    private Properties properties;</div><div class="line"></div><div class="line">    public void setArrs(String[] arrs) &#123;</div><div class="line">        this.arrs = arrs;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void setList(List&lt;String&gt; list) &#123;</div><div class="line">        this.list = list;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void setMap(Map&lt;String, String&gt; map) &#123;</div><div class="line">        this.map = map;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void setProperties(Properties properties) &#123;</div><div class="line">        this.properties = properties;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void showAll() &#123;</div><div class="line">        System.out.println(arrs);</div><div class="line">        System.out.println(list);</div><div class="line">        System.out.println(map);</div><div class="line">        System.out.println(properties);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>xml 分别配置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">&lt;bean id=&quot;mulitDemo&quot; class=&quot;com.geng.collection.MulitDemo&quot;&gt;</div><div class="line">    &lt;property name=&quot;arrs&quot;&gt;</div><div class="line">        &lt;array&gt;</div><div class="line">            &lt;value&gt;小红&lt;/value&gt;</div><div class="line">            &lt;value&gt;小白&lt;/value&gt;</div><div class="line">            &lt;value&gt;小绿&lt;/value&gt;</div><div class="line">        &lt;/array&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line"></div><div class="line">    &lt;property name=&quot;list&quot;&gt;</div><div class="line">        &lt;list&gt;</div><div class="line">            &lt;value&gt;大白&lt;/value&gt;</div><div class="line">            &lt;value&gt;大春&lt;/value&gt;</div><div class="line">            &lt;value&gt;大花&lt;/value&gt;</div><div class="line">        &lt;/list&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line"></div><div class="line">    &lt;property name=&quot;map&quot;&gt;</div><div class="line">        &lt;map&gt;</div><div class="line">            &lt;entry key=&quot;001&quot; value=&quot;小白&quot; /&gt;</div><div class="line">            &lt;entry key=&quot;002&quot; value=&quot;小刘&quot; /&gt;</div><div class="line">            &lt;entry key=&quot;003&quot; value=&quot;小东&quot; /&gt;</div><div class="line">        &lt;/map&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line"></div><div class="line">    &lt;property name=&quot;properties&quot;&gt;</div><div class="line">        &lt;props&gt;</div><div class="line">            &lt;prop key=&quot;driveClass&quot;&gt;com.mysql.jdbc.Driver&lt;/prop&gt;</div><div class="line">            &lt;prop key=&quot;userName&quot;&gt;root&lt;/prop&gt;</div><div class="line">            &lt;prop key=&quot;userPwd&quot;&gt;root&lt;/prop&gt;</div><div class="line">        &lt;/props&gt;</div><div class="line">    &lt;/property&gt;</div><div class="line">&lt;/bean&gt;</div></pre></td></tr></table></figure></p>
+<p>测试：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/76FF4DDF-95DD-4F5A-B43F-30946D328A30.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p><br><br>附录：<br>demo地址：<br><a href="https://github.com/fenglincanyi/springdemo1" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo1</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-02-07T06:17:11.000Z" title="2017-2-7 14:17" itemprop="dateUpdated">2017年2月7日 14:17</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/12/27/Spring 学习（二）/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/&title=《Spring 学习（二）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/&title=《Spring 学习（二）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Spring 学习（二）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/02/01/Gradle实现自动拉取git及压缩文件/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Gradle实现自动拉取git及压缩文件</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/12/26/Spring 学习（一）/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Spring 学习（一）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Spring 学习（二）" data-title="Spring 学习（二）" data-url="https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/&title=《Spring 学习（二）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/&title=《Spring 学习（二）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Spring 学习（二）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuUlEQVR42u3aS3KDQAwFwNz/0s46FYOfPpOw6Fm5CAEaV41kSV9f8Xr9WlfnXP3X73PuP9//7/LCw8PDGz/61aXvkffHr4707pg8Mx4eHt5p3v1Gn2/6OTsJHvk5l8fx8PDwHsCbhIT89fXSazw8PLxn8nqpcDWE5IUMPDw8vP/i5ZeubvTVEm01fV+rteDh4eHFvLyL9JzPR/p7eHh4eOOuetLuyksS1btUg8Gb6+Dh4eEd4FXT5SRR3mpc9dJlPDw8vP/iVX/qVwu+k3GuJFDh4eHhneNVW/vVGyTBI68hRO2uyeQCHh4e3mrls/cK8uR78tdC2o2Hh4c35lUfvddjqibfOanQtcPDw8Nb4u2mtvPiRTUpn4yI4eHh4fV4k7Z9L8wsfwP3d8fDw8M7xsuPVINE/iiT+xaKEXh4eHhLvF7SnG/fyehAXnVOysR4eHh4f8PLiwW99lhSDp4UiN9cDQ8PD+8PedVm1XzIoNfo+gDGw8PDO8BLMs98TYoXk8DT/A7x8PDwWrzoJ33cduq1rHJAnpr/SKnx8PDwjvHyZHdyTrUoXL3mm2IEHh4e3iqvV5hIBrOqzapJSSI6Bw8PD+8Ar7cR98JGeQggT6PvqXh4eHhLvHmyO2mM5Y8+Sqbx8PDwDvCqG3QvAOQtrjy9/vBC8fDw8I7xej/+8w29WoyopvKFmIOHh4e3ypskxPNm2CQUFeoreHh4eEu8askgByQBY2uVhwbw8PDwirxXcfWGrpJX0yuCFL43PDw8vCVedcPdamX1hr0KTS88PDy8w7xqez7py/feaN7cSs7Ew8PDO83LN+XkzF563UuRP6TXeHh4eA/gzcPGHFkYJsDDw8N7AK9XjMiv/GqtZnUEDw8Pb8DbHY3qFX8nYwcfAgMeHh7eKq+63Z9ItasBZnlgCw8PDy/lfQPFHZxxk2UNhAAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
