@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Dalvik中PreVerify问题 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Dalvik">
+    <meta name="description" content="PreVerify（预校验）的由来Dalvik 虚拟机在启动的时候，会有许多的启动参数，其中有一项就是verify，当verify被打开的时候，doVerify变量为true，则进行类的校验（dvmVerifyClass方法调用）。若校验成功，则这个类会被打上标记：CLASS_ISPREVERIFIED。上面描述的过程是dex -&amp;gt; odex (dexopt 过程)时，做的一个优化。当从cl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dalvik中PreVerify问题">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="PreVerify（预校验）的由来Dalvik 虚拟机在启动的时候，会有许多的启动参数，其中有一项就是verify，当verify被打开的时候，doVerify变量为true，则进行类的校验（dvmVerifyClass方法调用）。若校验成功，则这个类会被打上标记：CLASS_ISPREVERIFIED。上面描述的过程是dex -&amp;gt; odex (dexopt 过程)时，做的一个优化。当从cl">
+<meta property="og:updated_time" content="2017-02-08T06:41:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dalvik中PreVerify问题">
+<meta name="twitter:description" content="PreVerify（预校验）的由来Dalvik 虚拟机在启动的时候，会有许多的启动参数，其中有一项就是verify，当verify被打开的时候，doVerify变量为true，则进行类的校验（dvmVerifyClass方法调用）。若校验成功，则这个类会被打上标记：CLASS_ISPREVERIFIED。上面描述的过程是dex -&amp;gt; odex (dexopt 过程)时，做的一个优化。当从cl">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Dalvik中PreVerify问题</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Dalvik中PreVerify问题</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-11-24T05:01:00.000Z" itemprop="datePublished" class="page-time">
+  2016-11-24
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#PreVerify（预校验）的由来"><span class="post-toc-number">1.</span> <span class="post-toc-text">PreVerify（预校验）的由来</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Class-被-Preverify-的过程"><span class="post-toc-number">2.</span> <span class="post-toc-text">Class 被 Preverify 的过程</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#PreVerify-缘由"><span class="post-toc-number">3.</span> <span class="post-toc-text">PreVerify 缘由</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Dalvik中PreVerify问题"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Dalvik中PreVerify问题</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-11-24 13:01" datetime="2016-11-24T05:01:00.000Z"  itemprop="datePublished">2016-11-24</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="PreVerify（预校验）的由来"><a href="#PreVerify（预校验）的由来" class="headerlink" title="PreVerify（预校验）的由来"></a>PreVerify（预校验）的由来</h2><p>Dalvik 虚拟机在启动的时候，会有许多的启动参数，其中有一项就是verify，当verify被打开的时候，doVerify变量为true，则进行类的校验（dvmVerifyClass方法调用）。若校验成功，则这个类会被打上标记：CLASS_ISPREVERIFIED。<br>上面描述的过程是dex -&gt; odex (dexopt 过程)时，做的一个优化。当从classes.dex 变为 odex 后，才会被拿去执行。</p>
+<h2 id="Class-被-Preverify-的过程"><a href="#Class-被-Preverify-的过程" class="headerlink" title="Class 被 Preverify 的过程"></a>Class 被 Preverify 的过程</h2><p>在dex 被 dexopt 的过程中，源码中有校验和优化 Class 相关的操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">/*</div><div class="line"> * Verify and/or optimize a specific class.</div><div class="line"> */</div><div class="line">static void verifyAndOptimizeClass(DexFile* pDexFile, ClassObject* clazz,</div><div class="line">    const DexClassDef* pClassDef, bool doVerify, bool doOpt)</div><div class="line">&#123;</div><div class="line">    const char* classDescriptor;</div><div class="line">    bool verified = false;</div><div class="line"></div><div class="line">    if (clazz-&gt;pDvmDex-&gt;pDexFile != pDexFile) &#123;</div><div class="line">        /*</div><div class="line">         * The current DEX file defined a class that is also present in the</div><div class="line">         * bootstrap class path.  The class loader favored the bootstrap</div><div class="line">         * version, which means that we have a pointer to a class that is</div><div class="line">         * (a) not the one we want to examine, and (b) mapped read-only,</div><div class="line">         * so we will seg fault if we try to rewrite instructions inside it.</div><div class="line">         */</div><div class="line">        ALOGD(&quot;DexOpt: not verifying/optimizing &apos;%s&apos;: multiple definitions&quot;,</div><div class="line">            clazz-&gt;descriptor);</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    classDescriptor = dexStringByTypeIdx(pDexFile, pClassDef-&gt;classIdx);</div><div class="line"></div><div class="line">    /*</div><div class="line">     * First, try to verify it.</div><div class="line">     */</div><div class="line">    if (doVerify) &#123;</div><div class="line">        if (dvmVerifyClass(clazz)) &#123;</div><div class="line">            /*</div><div class="line">             * Set the &quot;is preverified&quot; flag in the DexClassDef.  We</div><div class="line">             * do it here, rather than in the ClassObject structure,</div><div class="line">             * because the DexClassDef is part of the odex file.</div><div class="line">             */</div><div class="line">            assert((clazz-&gt;accessFlags &amp; JAVA_FLAGS_MASK) ==</div><div class="line">                pClassDef-&gt;accessFlags);</div><div class="line">            ((DexClassDef*)pClassDef)-&gt;accessFlags |= CLASS_ISPREVERIFIED;</div><div class="line">            verified = true;</div><div class="line">        &#125; else &#123;</div><div class="line">            // TODO: log when in verbose mode</div><div class="line">            ALOGV(&quot;DexOpt: &apos;%s&apos; failed verification&quot;, classDescriptor);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    if (doOpt) &#123;</div><div class="line">        bool needVerify = (gDvm.dexOptMode == OPTIMIZE_MODE_VERIFIED ||</div><div class="line">                           gDvm.dexOptMode == OPTIMIZE_MODE_FULL);</div><div class="line">        if (!verified &amp;&amp; needVerify) &#123;</div><div class="line">            ALOGV(&quot;DexOpt: not optimizing &apos;%s&apos;: not verified&quot;,</div><div class="line">                classDescriptor);</div><div class="line">        &#125; else &#123;</div><div class="line">            dvmOptimizeClass(clazz, false);// 优化 Class 操作</div><div class="line"></div><div class="line">            /* set the flag whether or not we actually changed anything */</div><div class="line">            ((DexClassDef*)pClassDef)-&gt;accessFlags |= CLASS_ISOPTIMIZED;// Class被优化过后，也会打上被优化过的标记 CLASS_ISOPTIMIZED</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>dvmVerifyClass 的具体过程，源码中是这样描述的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">/*</div><div class="line"> * Verify a class.</div><div class="line"> *</div><div class="line"> * By the time we get here, the value of gDvm.classVerifyMode should already</div><div class="line"> * have been factored in.  If you want to call into the verifier even</div><div class="line"> * though verification is disabled, that&apos;s your business.</div><div class="line"> *</div><div class="line"> * Returns &quot;true&quot; on success.</div><div class="line"> */</div><div class="line">bool dvmVerifyClass(ClassObject*clazz) &#123;</div><div class="line">    int i;</div><div class="line">    if (dvmIsClassVerified(clazz)) &#123;</div><div class="line">        ALOGD(&quot;Ignoring duplicate verify attempt on %s&quot;, clazz -&gt; descriptor);</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line">    for (i = 0; i &lt; clazz -&gt; directMethodCount; i++) &#123;</div><div class="line">        if (!verifyMethod( &amp; clazz -&gt; directMethods[i]))&#123;</div><div class="line">            LOG_VFY(&quot;Verifier rejected class %s&quot;, clazz -&gt; descriptor);</div><div class="line">            return false;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    for (i = 0; i &lt; clazz -&gt; virtualMethodCount; i++) &#123;</div><div class="line">        if (!verifyMethod( &amp; clazz -&gt; virtualMethods[i]))&#123;</div><div class="line">            LOG_VFY(&quot;Verifier rejected class %s&quot;, clazz -&gt; descriptor);</div><div class="line">            return false;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    return true;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中，dvmVerifyClass中又去调用了 方法的校验 verifyMethod, 再去追源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div></pre></td><td class="code"><pre><div class="line">/*</div><div class="line"> * Perform verification on a single method.</div><div class="line"> */</div><div class="line">static bool verifyMethod(Method* meth)</div><div class="line">&#123;</div><div class="line">    bool result = false;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Verifier state blob.  Various values will be cached here so we</div><div class="line">     * can avoid expensive lookups and pass fewer arguments around.</div><div class="line">     */</div><div class="line">    VerifierData vdata;</div><div class="line">#if 1   // ndef NDEBUG</div><div class="line">    memset(&amp;vdata, 0x99, sizeof(vdata));</div><div class="line">#endif</div><div class="line"></div><div class="line">    vdata.method = meth;</div><div class="line">    vdata.insnsSize = dvmGetMethodInsnsSize(meth);</div><div class="line">    vdata.insnRegCount = meth-&gt;registersSize;</div><div class="line">    vdata.insnFlags = NULL;</div><div class="line">    vdata.uninitMap = NULL;</div><div class="line">    vdata.basicBlocks = NULL;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * If there aren&apos;t any instructions, make sure that&apos;s expected, then</div><div class="line">     * exit successfully.  Note: for native methods, meth-&gt;insns gets set</div><div class="line">     * to a native function pointer on first call, so don&apos;t use that as</div><div class="line">     * an indicator.</div><div class="line">     */</div><div class="line">    if (vdata.insnsSize == 0) &#123;</div><div class="line">        if (!dvmIsNativeMethod(meth) &amp;&amp; !dvmIsAbstractMethod(meth)) &#123;</div><div class="line">            LOG_VFY_METH(meth,</div><div class="line">                &quot;VFY: zero-length code in concrete non-native method&quot;);</div><div class="line">            goto bail;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        goto success;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Sanity-check the register counts.  ins + locals = registers, so make</div><div class="line">     * sure that ins &lt;= registers.</div><div class="line">     */</div><div class="line">    if (meth-&gt;insSize &gt; meth-&gt;registersSize) &#123;</div><div class="line">        LOG_VFY_METH(meth, &quot;VFY: bad register counts (ins=%d regs=%d)&quot;,</div><div class="line">            meth-&gt;insSize, meth-&gt;registersSize);</div><div class="line">        goto bail;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Allocate and populate an array to hold instruction data.</div><div class="line">     *</div><div class="line">     * TODO: Consider keeping a reusable pre-allocated array sitting</div><div class="line">     * around for smaller methods.</div><div class="line">     */</div><div class="line">    vdata.insnFlags = (InsnFlags*) calloc(vdata.insnsSize, sizeof(InsnFlags));</div><div class="line">    if (vdata.insnFlags == NULL)</div><div class="line">        goto bail;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Compute the width of each instruction and store the result in insnFlags.</div><div class="line">     * Count up the #of occurrences of certain opcodes while we&apos;re at it.</div><div class="line">     */</div><div class="line">    if (!computeWidthsAndCountOps(&amp;vdata))</div><div class="line">        goto bail;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Allocate a map to hold the classes of uninitialized instances.</div><div class="line">     */</div><div class="line">    vdata.uninitMap = dvmCreateUninitInstanceMap(meth, vdata.insnFlags,</div><div class="line">        vdata.newInstanceCount);</div><div class="line">    if (vdata.uninitMap == NULL)</div><div class="line">        goto bail;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Set the &quot;in try&quot; flags for all instructions guarded by a &quot;try&quot; block.</div><div class="line">     * Also sets the &quot;branch target&quot; flag on exception handlers.</div><div class="line">     */</div><div class="line">    if (!scanTryCatchBlocks(meth, vdata.insnFlags))</div><div class="line">        goto bail;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Perform static instruction verification.  Also sets the &quot;branch</div><div class="line">     * target&quot; flags.</div><div class="line">     */</div><div class="line">    if (!verifyInstructions(&amp;vdata))</div><div class="line">        goto bail;</div><div class="line"></div><div class="line">    /*</div><div class="line">     * Do code-flow analysis.</div><div class="line">     *</div><div class="line">     * We could probably skip this for a method with no registers, but</div><div class="line">     * that&apos;s so rare that there&apos;s little point in checking.</div><div class="line">     */</div><div class="line">    if (!dvmVerifyCodeFlow(&amp;vdata)) &#123;</div><div class="line">        //ALOGD(&quot;+++ %s failed code flow&quot;, meth-&gt;name);</div><div class="line">        goto bail;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">success:</div><div class="line">    result = true;</div><div class="line"></div><div class="line">bail:</div><div class="line">    dvmFreeVfyBasicBlocks(&amp;vdata);</div><div class="line">    dvmFreeUninitInstanceMap(vdata.uninitMap);</div><div class="line">    free(vdata.insnFlags);</div><div class="line">    return result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>dvmVerifyClass 具体过程中，会去校验 这个 Class中的所有的 directMethod 方法，和 virtualMethod 方法。具体这些方法包含哪些呢？ 其中时包含了：</p>
+<ul>
+<li>static 方法</li>
+<li>private 方法</li>
+<li>构造方法</li>
+<li>… …</li>
+</ul>
+<p>由此可知：  如果这些方法中直接引用到的类（第一层级关系，不会进行递归搜索） 和 class (源码中的clazz) 在同一个 dex 中的话，这个类就会被打上  CLASS_ISPREVERIFY 标记</p>
+<h2 id="PreVerify-缘由"><a href="#PreVerify-缘由" class="headerlink" title="PreVerify 缘由"></a>PreVerify 缘由</h2><ul>
+<li>一方面，Dalvik 虚拟机在安装期间，为Class 打上 CLASS_ISPREVERIFIED 是为了提高性能，下次使用时，则会省去校验操作，提高访问效率。</li>
+<li>另一方面，被标上“CLASS_ISPREVERIFIED”的类，dvm在运行期载入Class时候，会对其内存中对应的直接引用类进行校验，如果该类存在与直接引用类所在的dex不是同一个，则直接报“pre-verification” 错误，该类无法加载。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div></pre></td><td class="code"><pre><div class="line">ClassObject* dvmResolveClass(const ClassObject* referrer, u4 classIdx,</div><div class="line">    bool fromUnverifiedConstant)</div><div class="line">&#123;</div><div class="line">    DvmDex* pDvmDex = referrer-&gt;pDvmDex;</div><div class="line">    ClassObject* resClass;</div><div class="line">    const char* className;</div><div class="line">    /*</div><div class="line">     * Check the table first -- this gets called from the other &quot;resolve&quot;</div><div class="line">     * methods.</div><div class="line">     */</div><div class="line">    resClass = dvmDexGetResolvedClass(pDvmDex, classIdx); // 预先在dex的缓存表里查</div><div class="line">    if (resClass != NULL)</div><div class="line">        return resClass;</div><div class="line">    LOGVV(&quot;--- resolving class %u (referrer=%s cl=%p)&quot;,</div><div class="line">        classIdx, referrer-&gt;descriptor, referrer-&gt;classLoader);</div><div class="line">    /*</div><div class="line">     * Class hasn&apos;t been loaded yet, or is in the process of being loaded</div><div class="line">     * and initialized now.  Try to get a copy.  If we find one, put the</div><div class="line">     * pointer in the DexTypeId.  There isn&apos;t a race condition here --</div><div class="line">     * 32-bit writes are guaranteed atomic on all target platforms.  Worst</div><div class="line">     * case we have two threads storing the same value.</div><div class="line">     *</div><div class="line">     * If this is an array class, we&apos;ll generate it here.</div><div class="line">     */</div><div class="line">    className = dexStringByTypeIdx(pDvmDex-&gt;pDexFile, classIdx);</div><div class="line">    if (className[0] != &apos;\0&apos; &amp;&amp; className[1] == &apos;\0&apos;) &#123;</div><div class="line">        /* primitive type */</div><div class="line">        resClass = dvmFindPrimitiveClass(className[0]);</div><div class="line">    &#125; else &#123;</div><div class="line">        resClass = dvmFindClassNoInit(className, referrer-&gt;classLoader);</div><div class="line">    &#125;</div><div class="line">    if (resClass != NULL) &#123;</div><div class="line">        /*</div><div class="line">         * If the referrer was pre-verified, the resolved class must come</div><div class="line">         * from the same DEX or from a bootstrap class.  The pre-verifier</div><div class="line">         * makes assumptions that could be invalidated by a wacky class</div><div class="line">         * loader.  (See the notes at the top of oo/Class.c.)</div><div class="line">         *</div><div class="line">         * The verifier does *not* fail a class for using a const-class</div><div class="line">         * or instance-of instruction referring to an unresolveable class,</div><div class="line">         * because the result of the instruction is simply a Class object</div><div class="line">         * or boolean -- there&apos;s no need to resolve the class object during</div><div class="line">         * verification.  Instance field and virtual method accesses can</div><div class="line">         * break dangerously if we get the wrong class, but const-class and</div><div class="line">         * instance-of are only interesting at execution time.  So, if we</div><div class="line">         * we got here as part of executing one of the &quot;unverified class&quot;</div><div class="line">         * instructions, we skip the additional check.</div><div class="line">         *</div><div class="line">         * Ditto for class references from annotations and exception</div><div class="line">         * handler lists.</div><div class="line">         */</div><div class="line">        if (!fromUnverifiedConstant &amp;&amp;</div><div class="line">            IS_CLASS_FLAG_SET(referrer, CLASS_ISPREVERIFIED))</div><div class="line">        &#123;</div><div class="line">            ClassObject* resClassCheck = resClass;</div><div class="line">            if (dvmIsArrayClass(resClassCheck))</div><div class="line">                resClassCheck = resClassCheck-&gt;elementClass;</div><div class="line">            if (referrer-&gt;pDvmDex != resClassCheck-&gt;pDvmDex &amp;&amp;</div><div class="line">                resClassCheck-&gt;classLoader != NULL)  // 校验dex是否是安装时的同一个dex</div><div class="line">            &#123;</div><div class="line">                ALOGW(&quot;Class resolved by unexpected DEX:&quot;</div><div class="line">                     &quot; %s(%p):%p ref [%s] %s(%p):%p&quot;,</div><div class="line">                    referrer-&gt;descriptor, referrer-&gt;classLoader,</div><div class="line">                    referrer-&gt;pDvmDex,</div><div class="line">                    resClass-&gt;descriptor, resClassCheck-&gt;descriptor,</div><div class="line">                    resClassCheck-&gt;classLoader, resClassCheck-&gt;pDvmDex);</div><div class="line">                ALOGW(&quot;(%s had used a different %s during pre-verification)&quot;,</div><div class="line">                    referrer-&gt;descriptor, resClass-&gt;descriptor);</div><div class="line">                dvmThrowIllegalAccessError(</div><div class="line">                    &quot;Class ref in pre-verified class resolved to unexpected &quot;</div><div class="line">                    &quot;implementation&quot;);</div><div class="line">                return NULL;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        LOGVV(&quot;##### +ResolveClass(%s): referrer=%s dex=%p ldr=%p ref=%d&quot;,</div><div class="line">            resClass-&gt;descriptor, referrer-&gt;descriptor, referrer-&gt;pDvmDex,</div><div class="line">            referrer-&gt;classLoader, classIdx);</div><div class="line">        /*</div><div class="line">         * Add what we found to the list so we can skip the class search</div><div class="line">         * next time through.</div><div class="line">         *</div><div class="line">         * TODO: should we be doing this when fromUnverifiedConstant==true?</div><div class="line">         * (see comments at top of oo/Class.c)</div><div class="line">         */</div><div class="line">        dvmDexSetResolvedClass(pDvmDex, classIdx, resClass);</div><div class="line">    &#125; else &#123;</div><div class="line">        /* not found, exception should be raised */</div><div class="line">        LOGVV(&quot;Class not found: %s&quot;,</div><div class="line">            dexStringByTypeIdx(pDvmDex-&gt;pDexFile, classIdx));</div><div class="line">        assert(dvmCheckException(dvmThreadSelf()));</div><div class="line">    &#125;</div><div class="line">    return resClass;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>实际上，这一步dex的一致性判断，也是google为了防止外部DEX注入的一个安全方案，即保证运行期的Class与其直接引用类之间所在的DEX关系要与安装时候一致</p>
+<p><br><br>源码链接:<br><a href="http://osxr.org:8080/android/source/dalvik/vm/analysis/DexPrepare.cpp" target="_blank" rel="external">http://osxr.org:8080/android/source/dalvik/vm/analysis/DexPrepare.cpp</a><br><a href="http://osxr.org:8080/android/source/dalvik/vm/analysis/DexVerify.cpp" target="_blank" rel="external">http://osxr.org:8080/android/source/dalvik/vm/analysis/DexVerify.cpp</a><br><a href="http://osxr.org:8080/android/source/dalvik/vm/oo/Resolve.cpp" target="_blank" rel="external">http://osxr.org:8080/android/source/dalvik/vm/oo/Resolve.cpp</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-02-08T06:41:10.000Z" title="2017-2-8 14:41" itemprop="dateUpdated">2017年2月8日 14:41</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/11/24/Dalvik中PreVerify问题/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dalvik/">Dalvik</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/&title=《Dalvik中PreVerify问题》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/&title=《Dalvik中PreVerify问题》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Dalvik中PreVerify问题》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/12/15/Android WebView 相关踩坑/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Android WebView 相关踩坑</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/11/17/Android apk安装过程实例分析/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android apk安装过程实例分析</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Dalvik中PreVerify问题" data-title="Dalvik中PreVerify问题" data-url="https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/&title=《Dalvik中PreVerify问题》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/&title=《Dalvik中PreVerify问题》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Dalvik中PreVerify问题》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuklEQVR42u3awW5jIQwF0Pz/T2e2I1Uh9xpo3+KwipIGOC8SuLZfr3i8/xufPv35ev3p+8dI3n/dGHh4eHgbW0+WXG80eSgzzPpbH38APDw8vGu8/LhfT1csvPGYktnw8PDwns9rg+AkRG7Dazw8PLxn8vJDPH8Q6+8m+8HDw8P7fV47dZ4+2E/RJvMcyLXg4eHhdTmBqIr0nNdX6nt4eHh421X1nWLYbP583ehbeHh4eBd4t9OpW+nXoNgWNYfh4eHhHeXlh3579M+Ss20YvV4RDw8P7x6vLe3PqOvDfdaC8OVv8PDw8C7w8ql3Yva8aeDUxYOHh4f3t7wkuZAX8vNgev1+URjDw8PDu8CbNTYlS86C8jYtkuwNDw8P7xQv30R+PSTg2S9Qp07w8PDwLvNOHfd5wqLder0uHh4e3gXeLJk7K+QnrQOz9MThMhgeHh7eKKWbF71ubDd/WG2rAR4eHt4+L99KXrxvY9qofHUqjMbDw8Pb5rUT7Vwb+1fClYeFh4eHV/Lasv0MsIOfheZfQmo8PDy8Q7zZlTBr0kpSuskF8GVOPDw8vAu8PDxNNtHmj2dbzy8PPDw8vN/hzdoI8ushL57ttCbg4eHh3ea1rVHtYZ0kKfJLorgS8PDw8K7x2japPPl7qoTWltOiMhgeHh7eNm+/6JUncGdJjTZkx8PDw7vN2w9nW/ZOqrf4YfDw8PCu8WbJiJ2mqChHUo6PWWo8PDy8Q7x3OfIcaXvcJ/i2nIaHh4d3g9ceuG243Bb+28dX1Pfw8PDwjvJOpV/rboUg3m+vjQPJCDw8PLyY13Yr5Y1W7cOarfglJYGHh4f3AF5+QM8umDzUjrLUeHh4eA/j5cHu/sxtcwMeHh7ePV7eGjVrqEpC5CQcr1O6eHh4eBd4O//wr6dri2Fto8Dr1MDDw8NLef8AxspK39JeYhUAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
