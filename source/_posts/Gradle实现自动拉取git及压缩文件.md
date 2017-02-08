@@ -11,7 +11,7 @@ tags: Gradle
 ### 解决
 上代码：
 
-```
+``` gradle
 afterEvaluate {
     tasks.matching {
         it.name.startsWith('process') && (it.name.endsWith('ReleaseJavaRes') || it.name.endsWith
@@ -72,7 +72,7 @@ build 结果：
 ### 遇到的问题
 Mac系统执行 commandLine 去 clone 时，每次都报错：
 
-```
+``` java
 Caused by: org.gradle.process.internal.ExecException: A problem occurred starting process 'command 'git clone https://github.com/fenglincanyi/…… .git''
 11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.DefaultExecHandle.setEndStateInfo(DefaultExecHandle.java:197)
 11:38:32.043 [ERROR] [org.gradle.BuildExceptionReporter]      at org.gradle.process.internal.DefaultExecHandle.failed(DefaultExecHandle.java:327)
@@ -92,7 +92,7 @@ Caused by: org.gradle.process.internal.ExecException: A problem occurred startin
 ```
 最后Google半天，在 Mac 或 Linux 系统下，需要将命令中的字符串 逐个分割：
 
-```
+``` gradle
 commandLine 'git', 'clone', ' https://github.com/fenglincanyi/…… .git', 'src/main/assets/hybird'
 ```
 Gradle 官网的文档，说明的并不是很详细，这里要吐槽下。。。

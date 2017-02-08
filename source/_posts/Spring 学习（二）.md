@@ -8,14 +8,14 @@ tags: Spring
 
 ## setXXX() 方法注入
 
-```
+``` xml
 <bean id="book" class="com.geng.attr.Book">
     <property name="bookName" value="西游记"/>
 </bean>
 ```
 ## 构造方法注入
 
-```
+``` xml
 // 这里通过有参构造注入
 <bean id="people" class="com.geng.attr.People">
     <constructor-arg name="name" value="小明"/>
@@ -23,14 +23,14 @@ tags: Spring
 ```
 ## 对象注入
 
-```
+``` xml
 <bean id="userDao" class="com.geng.obj.UserDao"/>
 <bean id="userService" class="com.geng.obj.UserService">
     <property name="userDao" ref="userDao"/>
 </bean>
 ```
 
-```
+``` java
 public class UserDao {
 
     public void showUserDao() {
@@ -39,7 +39,7 @@ public class UserDao {
 }
 ```
 
-```
+``` java
 public class UserService {
 
     private UserDao userDao;
@@ -57,7 +57,7 @@ public class UserService {
 ```
 测试：
 
-```
+``` java
 public class UserServiceTest {
 
     private ApplicationContext context;
@@ -80,16 +80,16 @@ public class UserServiceTest {
 ## p命名空间注入
 xml 头部加入：
 
-```
+``` xml
 xmlns:p="http://www.springframework.org/schema/p"
 ```
 配置：
 
-```
+``` xml
 <bean id="person" class="com.geng.attr.Person" p:pName="呵呵哒”/>
 ```
 
-```
+``` java
 public class Person {
 
     private String pName;
@@ -107,7 +107,7 @@ public class Person {
 
 ## 复杂类型注入
 
-```
+``` java
 public class MulitDemo {
 
     private String[] arrs;
@@ -140,7 +140,7 @@ public class MulitDemo {
 }
 ```
 xml 分别配置：
-```
+``` xml
 <bean id="mulitDemo" class="com.geng.collection.MulitDemo">
     <property name="arrs">
         <array>

@@ -12,17 +12,19 @@ tags: Spring
 控制反转
 不通过手动 new 方式，来创建对象，而是交给Spring 容器根据配置，进行创建。从而将类的对象交给Spring 进行控制管理
 
-	* ioc 的2种方式来创建对象：
-	（1）通过配置文件
-	（2）通过注解
+    * ioc 的2种方式来创建对象：
+    （1）通过配置文件
+    （2）通过注解
 <br>
-	* ioc 实现原理
-	
-	通过dom4j 解析 xml 文件，拿到类的全路径，然后通过反射的技术创建该类的对象，结合工厂模式返给调用方
+    * ioc 实现原理
+    
+    通过dom4j 解析 xml 文件，拿到类的全路径，然后通过反射的技术创建该类的对象，结合工厂模式返给调用方
 伪代码实现说明：
 
-```
+``` xml
 <bean id=“userService” class=“com.geng.UserService” />
+```
+``` java
 public class Factory {
     public static UserService getUserService() {
         String classValue = dom4j.getValue(“userService”);
@@ -41,7 +43,7 @@ Spring 提供了全面的Java web 服务框架，从web层到业务层，再到�
 在 idea 中，创建 maven 项目，然后，编辑 pom.xml 文件。
 引入：Spring 主要的几个库，log4j，junit
 
-```
+``` xml
 <dependencies>
     <dependency>
         <groupId>org.springframework</groupId>
@@ -66,7 +68,7 @@ Spring 提供了全面的Java web 服务框架，从web层到业务层，再到�
 
 Idea 在你编辑时候，会提示相关的属性，方便书写配置
 
-```
+``` xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -80,7 +82,7 @@ Idea 在你编辑时候，会提示相关的属性，方便书写配置
 
 创建测试用例：
 
-```
+``` java
 public class UserTest {
 
     private ApplicationContext context;
@@ -106,16 +108,15 @@ public class UserTest {
 * 通过静态工厂实现对象创建
 代码示例：
 
-```
+
+``` java
 public class BeanFactory {
 
     public static User2 createUser2() {
         return new User2();
     }
 }
-```
 
-```
 public class User2 {
 
     public void add() {
@@ -123,15 +124,16 @@ public class User2 {
     }
 }
 ```
+
 xml中配置：
 
-```
+``` xml
 <!--用静态工厂创建-->
 <bean id="user2" class="com.geng.ioc.BeanFactory" factory-method="createUser2”/>
 ```
 测试：
 
-```
+``` java
 public class User2Test {
 
     private ApplicationContext context;
@@ -153,7 +155,7 @@ public class User2Test {
 ![](http://7xr1vo.com1.z0.glb.clouddn.com/0815D096-5833-4AA4-9BD8-EE493BE15F32.png)
 * 通过实例工厂创建对象
 
-```
+``` xml
 <!--用实例工厂创建—>
 <bean id="bean2Factory" class="com.geng.ioc.Bean2Factory" />
 <bean id="user2" factory-bean="bean2Factory" factory-method="getBean"/>
@@ -167,11 +169,11 @@ name：可以含有特殊符号，如：#，历史版本中使用的，后期不
 class：类的全路径
 scope：作用域  
 
-	singleton(默认)  
-	prototype(多例)
-	request 创建对象放在request域
-	session 创建对象放在session域
-	globalSession 一次登陆，任何地方都保存有登录状态
+    singleton(默认)  
+    prototype(多例)
+    request 创建对象放在request域
+    session 创建对象放在session域
+    globalSession 一次登陆，任何地方都保存有登录状态
 
 ## 附录：IDEA Resource 目录下，存放的文件类型
 ![](http://7xr1vo.com1.z0.glb.clouddn.com/23395798-F73A-4EBB-95E2-1641C5EF8A24.png)

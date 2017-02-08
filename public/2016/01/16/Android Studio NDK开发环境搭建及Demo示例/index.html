@@ -46,6 +46,7 @@ android-ndk-r10e-windows-x86_64.exe
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/4.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/5.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/6.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/7.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/8.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/10.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/11.png">
@@ -55,7 +56,7 @@ android-ndk-r10e-windows-x86_64.exe
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/14.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/16.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/17.png">
-<meta property="og:updated_time" content="2016-12-17T15:11:57.475Z">
+<meta property="og:updated_time" content="2017-02-08T11:49:06.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android Studio NDK开发环境搭建及Demo示例">
 <meta name="twitter:description" content="说明：Android Studio 1.4后支持C/C++开发，1.3之前的版本坑点较多，所以使用1.4后的版本较为容易
@@ -227,8 +228,10 @@ android-ndk-r10e-windows-x86_64.exe
 <li><p>自行下载 <strong>ndk</strong> 工具，在你的要安装 ndk 的目录下，直接双击 此安装包，就会自动安装至此目录下，过程中会打开cmd窗口，命令行不断执行命令，需等待一会即可</p>
 </li>
 <li><p>cmd窗口自动关闭后，会出现 <strong>ndk</strong> 的文件夹，如图： </p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/1.jpg" alt=""><img src="http://7xr1vo.com1.z0.glb.clouddn.com/2.png" alt=""></p>
 </li>
+</ul>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/1.jpg" alt=""><img src="http://7xr1vo.com1.z0.glb.clouddn.com/2.png" alt=""></p>
+<ul>
 <li><p>配置<strong>ndk</strong>环境变量，path 中添加即可，如我的路径如下：</p>
 <blockquote>
 <p><strong>PATH： D:\android-ndk-r10e</strong></p>
@@ -239,43 +242,54 @@ android-ndk-r10e-windows-x86_64.exe
 <p><strong>ndk-build</strong> </p>
 </blockquote>
 <p>  出现如下显示，则安装成功：</p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/3.png" alt=""></p>
 </li>
 </ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
 <h3 id="第一个NDKDemo"><a href="#第一个NDKDemo" class="headerlink" title="第一个NDKDemo"></a>第一个NDKDemo</h3><ul>
 <li>studio中，新建一个project，    name： NDKDemo</li>
-<li><p>在本项目中，配置 <strong>ndk</strong> 路径，如图：</p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4.png" alt=""></p>
-  <figure class="image-bubble">
+<li>在本项目中，配置 <strong>ndk</strong> 路径，如图：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
                     <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
-<p>  点击<strong>OK</strong>， 此时，等待gradle构建，构建完成后，观察 <strong>local.properties</strong> 文件，多出来了 <strong>ndk</strong> 的路径，如图所示：</p>
-  <figure class="image-bubble">
+<p>点击<strong>OK</strong>， 此时，等待gradle构建，构建完成后，观察 <strong>local.properties</strong> 文件，多出来了 <strong>ndk</strong> 的路径，如图所示：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
                     <img src="http://7xr1vo.com1.z0.glb.clouddn.com/6.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
-            </figure></li>
+            </figure></p>
+<ul>
 <li><p>打开 <strong>grade.properties</strong> 文件，在末尾添加：</p>
 <blockquote>
 <p><strong>android.useDeprecatedNdk=”true”</strong></p>
 </blockquote>
 </li>
 </ul>
-<pre><code>![](http://7xr1vo.com1.z0.glb.clouddn.com/7.png)
-
-    * 此步骤，为了防止下一步修改 app/build.gradle 文件后报错
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/7.png" alt=""></p>
+<pre><code>* 此步骤，为了防止下一步修改 app/build.gradle 文件后报错
 </code></pre><ul>
-<li><p>打开 <strong>app/build.gradle</strong> 文件，在 <strong>defaultConfig</strong> 下加入<strong>ndk</strong>相关配置参数：</p>
-<pre><code>ndk {
-    moduleName &quot;HelloNDK&quot;
-}
-</code></pre><figure class="image-bubble">
+<li>打开 <strong>app/build.gradle</strong> 文件，在 <strong>defaultConfig</strong> 下加入<strong>ndk</strong>相关配置参数：</li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ndk &#123;</div><div class="line">	moduleName <span class="string">"HelloNDK"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
                     <img src="http://7xr1vo.com1.z0.glb.clouddn.com/8.png" alt="" title="">
@@ -283,31 +297,52 @@ android-ndk-r10e-windows-x86_64.exe
                 <div class="image-caption"></div>
             </figure>
 <pre><code>* 此处的 modleName 是 加载库文件的标识，必须和后面代码中的 System.loadLibrary(&quot;HelloNDK&quot;) 保持一致，否则会报错
-</code></pre></li>
-<li><p>书写 <strong>native</strong> 方法 和 加载类库，代码如下：</p>
-<pre><code>static {
-    // 加载类库
-    System.loadLibrary(&quot;HelloNDK&quot;);
-}
-
-// native方法 调用 C代码
-public native String javaCallC();
-</code></pre><p>如图，我这是后续的图片，过程中的未截：</p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/10.png" alt=""></p>
-</li>
+</code></pre><ul>
+<li>书写 <strong>native</strong> 方法 和 加载类库，代码如下：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> &#123;</div><div class="line">	<span class="comment">// 加载类库</span></div><div class="line">	System.loadLibrary(<span class="string">"HelloNDK"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// native方法 调用 C代码</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">native</span> String <span class="title">javaCallC</span><span class="params">()</span></span>;</div></pre></td></tr></table></figure>
+<p>如图，我这是后续的图片，过程中的未截：</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/10.png" alt=""></p>
+<ul>
 <li><p>打开左下角的 <strong>Terminal</strong>，<strong>cd</strong> 至 <strong>java</strong> 路径下，并执行命令：</p>
 <pre><code>javah -d jni [native方法所在类的全路径]
 </code></pre><p>  如图：</p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/11.png" alt=""></p>
-<pre><code>* 在studio中：类的全路径可 通过 右击该类 -&gt; Copy Reference获得
-</code></pre><p>  执行成功后，刷新下目录，可看到目录中多了一个 <strong>咖啡色的jni目录</strong>，和一个 <strong>.h文件</strong>，如图：</p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/12.png" alt=""></p>
 </li>
-<li><p>右击 <strong>Main目录的图标 -&gt; New -&gt; Floder -&gt; JNI Floder</strong>，之后会出现一个 <strong>蓝色的JNI</strong> 文件夹，如图：</p>
-<p>   <img src="http://7xr1vo.com1.z0.glb.clouddn.com/13.png" alt=""></p>
-<p>  此时，继续解决上面 <strong>native</strong> 方法名报错（红色）的问题，<strong>Alt + Enter</strong> 选择创建 <strong>.c</strong> 中的方法，这时，会在蓝色的JNI文件夹下自动生成一个 <strong>.c</strong> 文件，并且 含有 <strong>c代码</strong>，里面有复杂的方法头</p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/9.png" alt=""></p>
-  <figure class="image-bubble">
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>在studio中：类的全路径可 通过 右击该类 -&gt; Copy Reference获得，执行成功后，刷新下目录，可看到目录中多了一个 <strong>咖啡色的jni目录</strong>，和一个 <strong>.h文件</strong>，如图：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/12.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>右击 <strong>Main目录的图标 -&gt; New -&gt; Floder -&gt; JNI Floder</strong>，之后会出现一个 <strong>蓝色的JNI</strong> 文件夹，如图：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/13.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>此时，继续解决上面 <strong>native</strong> 方法名报错（红色）的问题，<strong>Alt + Enter</strong> 选择创建 <strong>.c</strong> 中的方法，这时，会在蓝色的JNI文件夹下自动生成一个 <strong>.c</strong> 文件，并且 含有 <strong>c代码</strong>，里面有复杂的方法头</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
                     <img src="http://7xr1vo.com1.z0.glb.clouddn.com/14.png" alt="" title="">
@@ -315,23 +350,37 @@ public native String javaCallC();
                 <div class="image-caption"></div>
             </figure>
 <pre><code>* 可能 native 方法名仍然是红色的，这可能是 Studio 的一个bug，但其实是可以运行的。可能过一段时间红色会消失变为正常，我的就是这种情况
-</code></pre></li>
+</code></pre><ul>
 <li><p>下面就可以书写真正的 <strong>C代码</strong>了，此处 只简单写下，关于更牛逼的用法，将更新在后面blog中，继续总结。</p>
 <p>  此处代码改为：</p>
-<pre><code>return (*env)-&gt;NewStringUTF(env, &quot;你好，NDK&quot;);
-</code></pre></li>
-<li><p>OK，第一个NDK Demo可以运行了，上图：</p>
-<p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/16.png" alt=""></p>
 </li>
 </ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> (*env)-&gt;NewStringUTF(env, <span class="string">"你好，NDK"</span>);</div></pre></td></tr></table></figure>
+<ul>
+<li>OK，第一个NDK Demo可以运行了，上图：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/16.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
 <li>相比以前在 <strong>eclipse</strong> 中进行 <strong>NDK</strong> 开发，<strong>studio</strong>中显得方便多了，并不用安装 <strong>CDT</strong> 和 <strong>cygwin</strong>，而且 <strong>.c</strong> 文件及其内容可以自动生成</li>
 <li>利用命令 <strong>javah -d jni [native方法所在类的全路径]</strong>  生成的  <strong>.h头文件</strong> 可以在 有了 <strong>.c</strong> 文件后删除，此 <strong>.h</strong> 文件主要是用来用于生成 <strong>.c</strong> 文件中相应比较长的方法头。如果之前没有 <strong>.h</strong> 文件，<strong>Alt + Enter</strong> 是无法自动生成 <strong>.c</strong>文件的</li>
 <li>必须在 有 <strong>/src/main/jni</strong> 的文件夹（蓝色的jni文件夹）下，才能自动生成<strong>.c</strong> 文件</li>
 <li><strong>.c</strong> 文件中要出现了中文，必须是 <strong>UTF-8</strong> 下，否则，运行时会崩溃报错</li>
-<li><p>注意观察 <strong>/app/build/intermediates/ndk</strong> 目录下，有相关的 所有平台的 .so 文件（默认情况下，生成所有平台的；若只想生成某几种平台的，可在 <strong>app/build.gradle（abi-Filters “armeabi”,”armeabi-v7a”,”x86”）</strong> 中  或者 <strong>Android.mk</strong>中 进行配置）</p>
-<p>   <img src="http://7xr1vo.com1.z0.glb.clouddn.com/17.png" alt=""></p>
-<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3></li>
+<li>注意观察 <strong>/app/build/intermediates/ndk</strong> 目录下，有相关的 所有平台的 .so 文件（默认情况下，生成所有平台的；若只想生成某几种平台的，可在 <strong>app/build.gradle（abi-Filters “armeabi”,”armeabi-v7a”,”x86”）</strong> 中  或者 <strong>Android.mk</strong>中 进行配置）</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/17.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><ul>
 <li>so文件和native类与混淆无关，无需keep语句</li>
 <li>实现类一定要方法名正确否则会报java.lang.UnsatisfiedLinkError: dlopen failed异常</li>
 <li>studio工具的提示并不是很智能，所以有时要rebuild project</li>
@@ -343,7 +392,7 @@ public native String javaCallC();
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2016-12-17T15:11:57.475Z" title="2016-12-17 23:11" itemprop="dateUpdated">2016年12月17日 23:11</time>
+    最后更新时间：<time datetime="2017-02-08T11:49:06.000Z" title="2017-2-8 19:49" itemprop="dateUpdated">2017年2月8日 19:49</time>
 </span><br>
 
 

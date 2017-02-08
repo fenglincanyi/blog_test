@@ -19,7 +19,7 @@ get请求链接中： 传参中含有url
 所以这个 url 中的 第二个及以后的参数第一次就会被router解析，并不会将 url 整体作为一个参数传到下一个页面中去再次解析识别。
 #### 解决方法
 ##### Android端
-```
+``` java
 JSONObject jsonObject = new JSONObject();
 try {
     jsonObject.put("uid", cUid);
@@ -33,7 +33,7 @@ try {
 BaseH5Activity.startWebViewActivity(this, "file:///android_asset/hybird/cp/index.html?params=" + paramsResult, "","","","");
 ```
 ##### 前端js
-```
+``` javascript
 var me = this;
 var href = window.location.url || window.location.href;
 var params = me.getParams(href, 'params');
@@ -52,7 +52,7 @@ var gender = info.gender;
 * 对于 Android 5.0 以上的WebView，默认关闭了接收三方cookie，但是提供了设置 cookie的接口，需要开发者去手动设置三方信任cookie。否则，加载本地 html 时，cookie 同步不过去。
 代码如下：
 
-```
+``` java
 CookieManager cookieManager = CookieManager.getInstance();
 cookieManager.setAcceptCookie(true);
 cookieManager.setAcceptFileSchemeCookies(true);
@@ -64,7 +64,7 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
 * webview 加载 sd 卡下的 html 是不能访问的，权限问题。
 * 如果访问 /data/data/包名/files/index.html，需要开启文件访问权限（默认是开启的，不要动态设置关闭）
-```
+``` java
 webSettings.setAllowFileAccess(false);// 关闭
 ```
 

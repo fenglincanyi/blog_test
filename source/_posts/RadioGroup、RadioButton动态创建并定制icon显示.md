@@ -5,7 +5,7 @@ categories: Android
 tags: Radiobutton
 ---
 由于原生的Radiobutton不能满足业务需求，所以需要自己定制icon图片，和默认选中某一项。需要自己代码动态实现。废话不多说，上代码：
-```
+``` java
 private void setViewData() {
         radioGroup.removeAllViews();
 
@@ -54,7 +54,7 @@ private void setViewData() {
 ```
 R.drawable.relay_message_radio_selector 代码如下：
 
-```
+``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!--设置自己的图片icon-->

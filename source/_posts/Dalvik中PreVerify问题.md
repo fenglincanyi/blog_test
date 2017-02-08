@@ -11,7 +11,7 @@ Dalvik 虚拟机在启动的时候，会有许多的启动参数，其中有一�
 ## Class 被 Preverify 的过程
 在dex 被 dexopt 的过程中，源码中有校验和优化 Class 相关的操作：
 
-```
+``` cpp
 /*
  * Verify and/or optimize a specific class.
  */
@@ -74,7 +74,7 @@ static void verifyAndOptimizeClass(DexFile* pDexFile, ClassObject* clazz,
 
 dvmVerifyClass 的具体过程，源码中是这样描述的：
 
-```
+``` cpp
 /*
  * Verify a class.
  *
@@ -108,7 +108,7 @@ bool dvmVerifyClass(ClassObject*clazz) {
 
 其中，dvmVerifyClass中又去调用了 方法的校验 verifyMethod, 再去追源码：
 
-```
+``` cpp
 /*
  * Perform verification on a single method.
  */
@@ -232,7 +232,7 @@ dvmVerifyClass 具体过程中，会去校验 这个 Class中的所有的 direct
 * 一方面，Dalvik 虚拟机在安装期间，为Class 打上 CLASS_ISPREVERIFIED 是为了提高性能，下次使用时，则会省去校验操作，提高访问效率。
 * 另一方面，被标上“CLASS_ISPREVERIFIED”的类，dvm在运行期载入Class时候，会对其内存中对应的直接引用类进行校验，如果该类存在与直接引用类所在的dex不是同一个，则直接报“pre-verification” 错误，该类无法加载。
 
-```
+``` cpp
 ClassObject* dvmResolveClass(const ClassObject* referrer, u4 classIdx,
     bool fromUnverifiedConstant)
 {

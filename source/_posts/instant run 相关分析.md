@@ -93,7 +93,7 @@ findClass过程依次委托给 父ClassLoader，最后是让PathClassLoader去�
 ##### Server 部署工作
 在Server 建立起连接后，三种部署工作（hot swap、warm swap、cold swap），都是通过Server进行操作。具体在那种情形下进行哪种交换，源码中有具体实现：
 
-```
+``` java
 private int handlePatches(List<ApplicationPatch> paramList, boolean paramBoolean, int paramInt) {
     if (paramBoolean) {
         FileManager.startUpdate();
@@ -148,7 +148,7 @@ AppPatchesLoaderImpl类记录了更改的类，存储在一个数组中，供类
 
 第一次运行打包生成的 “业务代码” 中，生成的类中的方法里都增加了 IncrementalChange 相关的判断，如果 $change 不为空，说明我们有更改的代码，有更改的代码，则执行最新更改的代码
 
-```
+``` java
 public Object access$dispatch(String paramString, Object... paramVarArgs) {
         switch (paramString.hashCode()) {
             case -833446436:

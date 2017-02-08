@@ -4,7 +4,7 @@ date: 2016-09-09 10:36
 categories: Android 
 tags: Gradle
 ---
-```
+``` gradle
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
