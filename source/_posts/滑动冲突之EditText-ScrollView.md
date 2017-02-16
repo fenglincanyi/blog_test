@@ -18,7 +18,7 @@ et.setOnTouchListener(new View.OnTouchListener() {
                 switch (event.getAction() & MotionEvent.ACTION_MASK){
                     case MotionEvent.ACTION_UP:
                     // 手指离开时：重置ScrollView事件拦截的状态
-                    slContainer.requestDisallowInterceptTouchEvent(false);
+                    scrollView.requestDisallowInterceptTouchEvent(false);
                         break;
                 }
                 return false;
@@ -29,7 +29,7 @@ et.setOnTouchListener(new View.OnTouchListener() {
 ### 问题二
         若有ScrollView内容比较多，比较长时，编辑EditText里的内容时会出现ScrollView滑到底部的现象，使得当前编辑的EditText看不到了
 ### 解决
-        修改AndroidManifest.xml中Activity的windowSoftInputMode属性
+        修改AndroidManifest.xml中Activity的windowSoftInputMode属性(看具体逻辑而定：adjustPan)
 ``` xml
 <activity
     android:name=".me.MineResumeProjectExperienceActivity"
