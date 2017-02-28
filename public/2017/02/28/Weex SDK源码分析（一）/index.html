@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Weex SDK源码分析（一） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Weex,Android">
+    <meta name="description" content="WeexSDK 初始化源码分析
+
+整个Weex SDK 初始化过程，入口是WXSDKEngine.initialize()，方法主要是依靠 doInitInternal() 方法执行初始化操作。里面涉及了WXEnvironment 相关环境的设置，几个重要的Manager的初始化操作，包括WXBridgeManager、WXSDKManager、WXRenderManager、WXDomMana">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Weex SDK源码分析（一）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="WeexSDK 初始化源码分析
+
+整个Weex SDK 初始化过程，入口是WXSDKEngine.initialize()，方法主要是依靠 doInitInternal() 方法执行初始化操作。里面涉及了WXEnvironment 相关环境的设置，几个重要的Manager的初始化操作，包括WXBridgeManager、WXSDKManager、WXRenderManager、WXDomMana">
+<meta property="og:updated_time" content="2017-02-28T07:52:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Weex SDK源码分析（一）">
+<meta name="twitter:description" content="WeexSDK 初始化源码分析
+
+整个Weex SDK 初始化过程，入口是WXSDKEngine.initialize()，方法主要是依靠 doInitInternal() 方法执行初始化操作。里面涉及了WXEnvironment 相关环境的设置，几个重要的Manager的初始化操作，包括WXBridgeManager、WXSDKManager、WXRenderManager、WXDomMana">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Weex SDK源码分析（一）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Weex SDK源码分析（一）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-02-28T07:06:00.000Z" itemprop="datePublished" class="page-time">
+  2017-02-28
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#WXSDKManager的初始化"><span class="post-toc-number">1.</span> <span class="post-toc-text">WXSDKManager的初始化</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#WXBridgeManager-的初始化"><span class="post-toc-number">2.</span> <span class="post-toc-text">WXBridgeManager 的初始化</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#注册操作"><span class="post-toc-number">3.</span> <span class="post-toc-text">注册操作</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Weex SDK源码分析（一）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Weex SDK源码分析（一）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-2-28 15:06" datetime="2017-02-28T07:06:00.000Z"  itemprop="datePublished">2017-02-28</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p><strong>WeexSDK 初始化源码分析</strong></p>
+</blockquote>
+<p>整个Weex SDK 初始化过程，入口是WXSDKEngine.initialize()，方法主要是依靠 doInitInternal() 方法执行初始化操作。里面涉及了WXEnvironment 相关环境的设置，几个重要的Manager的初始化操作，包括WXBridgeManager、WXSDKManager、WXRenderManager、WXDomManager，前两个 manager 以单例形式呈现的。<br>初始化完相关管理类，后面进行 component、module的注册。</p>
+<p>下面对这一过程，进行一一分析：</p>
+<p>WXSDKEngine.doInitInternal() 方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">doInitInternal</span><span class="params">(<span class="keyword">final</span> Application application, <span class="keyword">final</span> InitConfig config)</span> </span>&#123;</div><div class="line">        WXEnvironment.sApplication = application;</div><div class="line">        WXEnvironment.JsFrameworkInit = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">        WXBridgeManager.getInstance().post(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">long</span> start = System.currentTimeMillis();</div><div class="line">                WXSDKManager sm = WXSDKManager.getInstance();</div><div class="line">                <span class="keyword">if</span> (config != <span class="keyword">null</span>) &#123;</div><div class="line">                    sm.setInitConfig(config);</div><div class="line">                    <span class="keyword">if</span> (config.getDebugAdapter() != <span class="keyword">null</span>) &#123;</div><div class="line">                        config.getDebugAdapter().initDebug(application);<span class="comment">// 关于weex debug操作，不是此篇关注的重点，略过</span></div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">                WXSoInstallMgrSdk.init(application);</div><div class="line">                <span class="keyword">boolean</span> isSoInitSuccess = WXSoInstallMgrSdk.initSo(V8_SO_NAME, <span class="number">1</span>, config != <span class="keyword">null</span> ? config.getUtAdapter() : <span class="keyword">null</span>);</div><div class="line">                <span class="keyword">if</span> (!isSoInitSuccess) &#123;</div><div class="line">                    <span class="keyword">return</span>;</div><div class="line">                &#125;</div><div class="line">                sm.initScriptsFramework(config != <span class="keyword">null</span> ? config.getFramework() : <span class="keyword">null</span>);</div><div class="line"></div><div class="line">                WXEnvironment.sSDKInitExecuteTime = System.currentTimeMillis() - start;</div><div class="line">                WXLogUtils.renderPerformanceLog(<span class="string">"SDKInitExecuteTime"</span>, WXEnvironment.sSDKInitExecuteTime);</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">        register();</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<h2 id="WXSDKManager的初始化"><a href="#WXSDKManager的初始化" class="headerlink" title="WXSDKManager的初始化"></a>WXSDKManager的初始化</h2><p>首先，是WXSDKManager的初始化，会将WXRenderManager、WXDomManager初始化，并拿到WXBridgeManager实例的引用。</p>
+<ul>
+<li>关于 WXRenderManager<br>管理渲染操作，主要操作管理的是WXRenderStatement对象（WXRenderManager 也并不是一个线程安全的类，涉及到UI的更新操作。后面会对WXRenderStatement 进行分析）<br>WXRenderManager 主要的2个成员：mRegistries 和 mWXRenderHandler：<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> ConcurrentHashMap&lt;String, WXRenderStatement&gt; mRegistries;</div><div class="line"><span class="keyword">private</span> WXRenderHandler mWXRenderHandler;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>mRegistries存储WXRenderStatement，以 WXSDKInstance.id 为key存储WXRenderStatement，所以一个WXSDKInstance对应一个WXRenderStatement。<br>WXRenderManager 的 createBody、addComponent等等操作都是针对某个WXSDKInstance的 statement 调用操作的。具体的渲染，WXRenderStatement负责完成。<br>mWXRenderHandler 是将外界传给它的 渲染相关的task 发送消息，然后主线程收到messge后，进行相关渲染操作。</p>
+<ul>
+<li>关于 WXDomManager<br>管理dom操作，作为客户端执行dom命令，会调用 WXDomStatement 创建命令执行相对应的操作。里面提供的方法通常是在 dom 线程中调用。<br>其中有：<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> WXThread mDomThread;</div><div class="line"> <span class="comment">/** package **/</span></div><div class="line"> Handler mDomHandler;</div><div class="line"> <span class="keyword">private</span> WXRenderManager mWXRenderManager;</div><div class="line"> <span class="keyword">private</span> ConcurrentHashMap&lt;String, WXDomStatement&gt; mDomRegistries;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>mDomRegistries 和上面类似，大家一看就懂，<wxsdkinstance.id，wxdomstatement>。<br>mWXRenderManager 是拿到上一步初始化好的 mWXRenderManager实例。<br>mDomThread是WXDomManager创建的一个thread，也是WXThread，其中的handler是WXDomHandler<br>mDomHandler 是这个mDomThread的handler引用。<br>WXDomHandler 是关于dom操作的一个类，实现了Handler.Callback接口，会将mDomHandler发送的dom消息分类处理，这一任务是交给了 WXDomManager：</wxsdkinstance.id，wxdomstatement></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (msg == <span class="keyword">null</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">int</span> what = msg.what;</div><div class="line">    Object obj = msg.obj;</div><div class="line">    WXDomTask task = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> WXDomTask) &#123;</div><div class="line">        task = (WXDomTask) obj;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (!mHasBatch) &#123;</div><div class="line">        mHasBatch = <span class="keyword">true</span>;</div><div class="line">        mWXDomManager.sendEmptyMessageDelayed(WXDomHandler.MsgType.WX_DOM_BATCH, DELAY_TIME);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">switch</span> (what) &#123;</div><div class="line">        <span class="keyword">case</span> MsgType.WX_DOM_CREATE_BODY:</div><div class="line">            mWXDomManager.createBody(task.instanceId, (JSONObject) task.args.get(<span class="number">0</span>));</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        <span class="keyword">case</span> MsgType.WX_DOM_UPDATE_ATTRS:</div><div class="line">            mWXDomManager.updateAttrs(task.instanceId, (String) task.args.get(<span class="number">0</span>), (JSONObject) task.args.get(<span class="number">1</span>));</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        <span class="keyword">case</span> MsgType.WX_DOM_UPDATE_STYLE:</div><div class="line">            mWXDomManager.updateStyle(</div><div class="line">                    task.instanceId,</div><div class="line">                    (String) task.args.get(<span class="number">0</span>),</div><div class="line">                    (JSONObject) task.args.get(<span class="number">1</span>),</div><div class="line">                    task.args.size() &gt; <span class="number">2</span> &amp;&amp; (<span class="keyword">boolean</span>) task.args.get(<span class="number">2</span>)</div><div class="line">            );</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        <span class="keyword">case</span> ...</div><div class="line">        <span class="keyword">case</span> ...</div></pre></td></tr></table></figure>
+<p>具体的manager操作，会交给对应的 domstatement 操作，上面已经说过。</p>
+<p>WXSoInstallMgrSdk 是管理 so 相关操作和cpu平台的支持情况。<br>WXSoInstallMgrSdk.initSo() 执行 weexv8.so 包的加载，就和普通加载so包的方式一样（System.loadLibrary(libName) ）。</p>
+<blockquote>
+<p>这里注意：weex 的 so 包不支持 mips平台的</p>
+</blockquote>
+<p>如果so包加载失败，则初始化操作会就此结束，后续工作不再执行。<br>so包加载完成之后，WXSDKManager会调用WXBridgeManager执行 js Framework的初始化，并发送消息给<br>WXBridgeManager，WXBridgeManager调用自己的 handleMessage() 处理操作，下面会有分析。</p>
+<h2 id="WXBridgeManager-的初始化"><a href="#WXBridgeManager-的初始化" class="headerlink" title="WXBridgeManager 的初始化"></a>WXBridgeManager 的初始化</h2><p>其次，WXBridgeManager 的初始化。会创建名为：WeexJSBridgeThread的 WXThread，WXThread是一个weex封装的HandlerThread。为了方便该线程的消息处理，具体细节可参考源码查看。WXBridgeManager 自己也实现了 Handler.Callback 接口，用于处理消息，接受消息后对 js framework 的初始化操作进行控制。</p>
+<p>发送消息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Initialize JavaScript framework</div><div class="line"> * <span class="doctag">@param</span> framework String representation of the framework to be init.</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">initScriptsFramework</span><span class="params">(String framework)</span> </span>&#123;</div><div class="line">    Message msg = mJSHandler.obtainMessage();</div><div class="line">    msg.obj = framework;</div><div class="line">    msg.what = WXJSBridgeMsgType.INIT_FRAMEWORK;</div><div class="line">    msg.setTarget(mJSHandler);</div><div class="line">    msg.sendToTarget();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>接收消息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (msg == <span class="keyword">null</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">int</span> what = msg.what;</div><div class="line">    <span class="keyword">switch</span> (what) &#123;</div><div class="line">        <span class="keyword">case</span> WXJSBridgeMsgType.INIT_FRAMEWORK:</div><div class="line">            invokeInitFramework(msg);<span class="comment">// 过程中会加载 main.js，调用c++ 进行Framework的初始化：mWXBridge.initFramework(framework, assembleDefaultOptions())</span></div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        <span class="keyword">case</span> WXJSBridgeMsgType.CALL_JS_BATCH:</div><div class="line">            invokeCallJSBatch(msg);</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        <span class="keyword">case</span> ...</div></pre></td></tr></table></figure>
+<p>在 WXBridge 中，是调用 底层native的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Init JSFrameWork</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> framework assets/main.js</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">int</span> <span class="title">initFramework</span><span class="params">(String framework, WXParams params)</span></span>;</div></pre></td></tr></table></figure>
+<p>底层 C++代码中：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function">jint <span class="title">Java_com_taobao_weex_bridge_WXBridge_initFramework</span><span class="params">(JNIEnv *env,</span></span></div><div class="line">                                                        jobject object, jstring script,</div><div class="line">                                                        jobject params)</div></pre></td></tr></table></figure>
+<p>js framework 初始化就交给 C++ 来处理了</p>
+<h2 id="注册操作"><a href="#注册操作" class="headerlink" title="注册操作"></a>注册操作</h2><p>weex 内置的 component 和 module 都会在此过程中注册，这一过程还包含了dom的注册操作。<br>注册操作，会由registerModules来进行操作：registerModules()，registerComponents()，这两个都是异步执行，最终调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// modules the format is like &#123;'dom':['updateAttrs','updateStyle'],'event':['openUrl']&#125;</span></div><div class="line">WXJSObject[] args = &#123;<span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                                        WXJsonUtils.fromObjectToJSONString(modules))&#125;;</div><div class="line">mWXBridge.execJS(<span class="string">""</span>, <span class="keyword">null</span>, METHOD_REGISTER_MODULES, args);</div><div class="line"></div><div class="line">WXJSObject[] args = &#123;<span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                                        WXJsonUtils.fromObjectToJSONString(components))&#125;;</div><div class="line">mWXBridge.execJS(<span class="string">""</span>, <span class="keyword">null</span>, METHOD_REGISTER_COMPONENTS, args);</div></pre></td></tr></table></figure>
+<p>execJS() 最终是调用WXBridge.execJS() 的native方法，交给底层c++来执行：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function">jint <span class="title">Java_com_taobao_weex_bridge_WXBridge_execJS</span><span class="params">(JNIEnv *env, jobject this1, jstring jinstanceid,</span></span></div><div class="line">                                                 jstring jnamespace, jstring jfunction,</div><div class="line">                                                 jobjectArray jargs)</div></pre></td></tr></table></figure>
+<p>C++ 使用反射的方式，找到WXJSObject类，找到相关的属性和方法，</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jclass jsObjectClazz = env-&gt;FindClass(<span class="string">"com/taobao/weex/bridge/WXJSObject"</span>);</div></pre></td></tr></table></figure>
+<p>调用 js Framework的相关api 执行。</p>
+<p>源码：<br><a href="https://github.com/apache/incubator-weex/tree/master/android/sdk" target="_blank" rel="external">https://github.com/apache/incubator-weex/tree/master/android/sdk</a><br><a href="https://github.com/alibaba/weex_v8core" target="_blank" rel="external">https://github.com/alibaba/weex_v8core</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-02-28T07:52:37.000Z" title="2017-2-28 15:52" itemprop="dateUpdated">2017年2月28日 15:52</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/02/28/Weex SDK源码分析（一）/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/&title=《Weex SDK源码分析（一）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/&title=《Weex SDK源码分析（一）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Weex SDK源码分析（一）》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/02/01/Gradle实现自动拉取git及压缩文件/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Gradle实现自动拉取git及压缩文件</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Weex SDK源码分析（一）" data-title="Weex SDK源码分析（一）" data-url="https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/&title=《Weex SDK源码分析（一）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/&title=《Weex SDK源码分析（一）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Weex SDK源码分析（一）》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACr0lEQVR42u3aQW7jQAwEQP//09lrgF3b3aRG0AKlk2EH0pQOM0yTr1d8/fy6/v7m9/fvfk2u5FmvExceHh7eYun5I9/dJ//87pvPq8rXjIeHh3ealy93//jkGEiOpc9rxsPDw3sOL9mOZ68sOR7w8PDw/kdeWwrnsOQIwcPDw3sOL7/153giD3bbmON41oKHh4cX8/Iu0nM+H+nv4eHh4a276u1wwCb8bQcIovvg4eHhHeDN4tQTbf72JRbrxMPDw7uU1y56Fra2cfDsnv/4ezw8PLzDvDZazY+NNlZIDoNotXh4eHi38DZXMp61J+VHFB4eHt79vHbrj0ag2s09KMTfPgUPDw/vAG+24baNsbZ5dlVLDA8PD+8c7/6AdRZ/tIcHHh4e3gnebONum1tFyyoouItyHw8PD+8Arx26muHzF9SGy8MTDw8PD2/Ba/+939Tsszu0wfGXmTI8PDy8W3ht0DALJjaHVhFG4OHh4a15STM+KV5nbarZi8sjZjw8PLx7eEnJ2y53Nmg1K7WjxBoPDw/vGK+NUGcF96YNljfJ8PDw8K7lzYYA2lg2P3LaX4dtMDw8PLwRLw8aNi3/pCWWrKddIR4eHt4J3mbb/YxsGZvSOWp94eHh4V3KmzX7NwMHeXCchxdF1oKHh4e35p3b9Gdt/llcG81E4OHh4R3jzbb7lpGXyKvyGg8PD+8wL3lM/iI28Ud+fUHi4eHhXcqbDVrlL2ITXsyeeMEcGR4eHl4wdDXbfPPtPokq2rghiiHw8PDwjvGSw2AWELQF9Kz99gWMh4eHd4yXPCxpce1j2dmh9fYbPDw8vMfwNiHCpkCvxxHw8PDwHsBrg9p8E/9ZXMW5gYeHh3cR79rlzgrlfWxRd/nw8PDwRrz9P/zXlsv5gNfFowN4eHh433l/ADvKxptRmJqfAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
