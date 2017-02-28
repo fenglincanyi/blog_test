@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-02-28T07:52:37.000Z</updated>
+  <updated>2017-02-28T12:58:35.000Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -16,11 +16,101 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Weex SDK源码分析（二）</title>
+    <link href="https://fenglincanyi.github.io/2017/02/28/Weex%20SDK%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
+    <id>https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/</id>
+    <published>2017-02-28T11:32:00.000Z</published>
+    <updated>2017-02-28T12:58:35.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p> <strong>Weex 渲染页面过程</strong></p>
+</blockquote>
+<h2 id="weex-渲染入口-render"><a href="#weex-渲染入口-render" class="headerlink" title="weex 渲染入口 render()"></a>weex 渲染入口 render()</h2><p>渲染过程从 WXSDKInstance.render() 开始追溯，render()方法是异步执行渲染工作的。render()重载的方法比较多，此处介绍最基础的一个。<br>参数代表的含义：</p>
+<ul>
+<li>pageName：用于查看日志，渲染的哪个页面作为标识</li>
+<li>template：加载的本地的或远程的 js（we文件被weex transform后的 js）</li>
+<li>options：配置信息，包括系统版本、app版本、设备信息等</li>
+<li>jsonInitData：用于渲染的初始数据</li>
+<li>flag：监听渲染的时机：<ul>
+<li>APPEND_ASYNC：渲染完第一个view后，IWXRenderListener.onViewCreated()调用</li>
+<li>APPEND_ONCE：渲染完整个view tree后，onViewCreated()调用</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">wxSDKInstance.render(</div><div class="line">      getPageName(),</div><div class="line">      template,</div><div class="line">      options,</div><div class="line">      jsonInitData,</div><div class="line">      ScreenUtil.getDisplayWidth(<span class="keyword">this</span>),</div><div class="line">      ScreenUtil.getDisplayHeight(<span class="keyword">this</span>),</div><div class="line">      WXRenderStrategy.APPEND_ASYNC);</div></pre></td></tr></table></figure>
+<p>接着，渲染工作真正开始于 renderInternal()：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ensureRenderArchor</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">if</span>(mRenderContainer == <span class="keyword">null</span>)&#123;</div><div class="line">      mRenderContainer = <span class="keyword">new</span> RenderContainer(getContext());</div><div class="line">      mRenderContainer.setLayoutParams(<span class="keyword">new</span> ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));</div><div class="line">      mRenderContainer.setBackgroundColor(Color.TRANSPARENT);</div><div class="line">      mRenderContainer.setSDKInstance(<span class="keyword">this</span>);</div><div class="line">      mRenderContainer.addOnLayoutChangeListener(<span class="keyword">this</span>);</div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>会进行 mRenderContainer 的初始化，RenderContainer 是一个 weex 扩展的 FrameLayout，后期操作，会在这个 container 中添加view元素。<br>我们接着看 render 过程，WXSDKManager.createInstance() 创建实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">createInstance</span><span class="params">(WXSDKInstance instance, String code, Map&lt;String, Object&gt; options, String jsonInitData)</span> </span>&#123;</div><div class="line">     mWXRenderManager.registerInstance(instance);</div><div class="line">     mBridgeManager.createInstance(instance.getInstanceId(), code, options, jsonInitData);</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>此过程中，WXRenderManager 注册实例，实际就是在 mRegistries（map<wxsdkinstanceid, wxrenderstatement="">）中存储该实例的信息，并且创建 renderStatement。<br>mBridgeManager 创建实例时，WXModuleManager 会创建 DomModule，由WXDomManager进行创建，sDomModuleMap 存储该 wxSDKInstance 的WXDomModule。<br>然后，异步执行 invokeCreateInstance()，此过程还会执行 initFramework() 操作。initFramework() 后，会创建出一个 WXJSObject 将 wxsdkinstance相关的数据存储，组成一个数组的形式，传给执行 js 的方法：</wxsdkinstanceid,></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">WXJSObject instanceIdObj = <span class="keyword">new</span> WXJSObject(WXJSObject.String,</div><div class="line">                instance.getInstanceId());</div><div class="line">        WXJSObject instanceObj = <span class="keyword">new</span> WXJSObject(WXJSObject.String,</div><div class="line">                                                template);</div><div class="line">        WXJSObject optionsObj = <span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                options == <span class="keyword">null</span> ? <span class="string">"&#123;&#125;"</span></div><div class="line">                        : WXJsonUtils.fromObjectToJSONString(options));</div><div class="line">        WXJSObject dataObj = <span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                data == <span class="keyword">null</span> ? <span class="string">"&#123;&#125;"</span> : data);</div><div class="line">        WXJSObject[] args = &#123;instanceIdObj, instanceObj, optionsObj,</div><div class="line">                dataObj&#125;;</div><div class="line">        invokeExecJS(instance.getInstanceId(), <span class="keyword">null</span>, METHOD_CREATE_INSTANCE, args,<span class="keyword">false</span>);</div></pre></td></tr></table></figure>
+<p>然后，WXBridgeManager 会调用 mWXBridge.execJS() 去调用底层的 C++方法，执行js。</p>
+<h2 id="底层C-调用Weex-Android-功能"><a href="#底层C-调用Weex-Android-功能" class="headerlink" title="底层C++ 调用Weex Android 功能"></a>底层C++ 调用Weex Android 功能</h2><p>我们再来看看 c++ 代码实现的功能，以 callNative() 为例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> *  This Function is a built-in function that JS bundle can execute</div><div class="line"> *  to call native module.</div><div class="line"> */</div><div class="line">v8::Handle&lt;v8::Value&gt; callNative(<span class="keyword">const</span> v8::Arguments &amp;args) &#123;</div><div class="line"></div><div class="line">    JNIEnv *env = getJNIEnv();</div><div class="line">    <span class="comment">//instacneID args[0]</span></div><div class="line">    jstring jInstanceId = <span class="literal">NULL</span>;</div><div class="line">    <span class="keyword">if</span> (!args[<span class="number">0</span>].IsEmpty()) &#123;</div><div class="line">        v8::String::<span class="function">Utf8Value <span class="title">instanceId</span><span class="params">(args[<span class="number">0</span>])</span></span>;</div><div class="line">        jInstanceId = env-&gt;NewStringUTF(*instanceId);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//task args[1]</span></div><div class="line">    jbyteArray jTaskString = <span class="literal">NULL</span>;</div><div class="line">    <span class="keyword">if</span> (!args[<span class="number">1</span>].IsEmpty() &amp;&amp; args[<span class="number">1</span>]-&gt;IsObject()) &#123;</div><div class="line">        v8::Handle&lt;v8::Value&gt; obj[<span class="number">1</span>];</div><div class="line">        v8::Handle&lt;v8::Object&gt; global = V8context-&gt;Global();</div><div class="line">        json = v8::Handle&lt;v8::Object&gt;::Cast(global-&gt;Get(v8::String::New(<span class="string">"JSON"</span>)));</div><div class="line">        json_stringify = v8::Handle&lt;v8::Function&gt;::Cast(json-&gt;Get(v8::String::New(<span class="string">"stringify"</span>)));</div><div class="line">        obj[<span class="number">0</span>] = args[<span class="number">1</span>];</div><div class="line">        v8::Handle&lt;v8::Value&gt; ret = json_stringify-&gt;Call(json, <span class="number">1</span>, obj);</div><div class="line">        v8::String::<span class="function">Utf8Value <span class="title">str</span><span class="params">(ret)</span></span>;</div><div class="line"></div><div class="line">        <span class="keyword">int</span> strLen = <span class="built_in">strlen</span>(ToCString(str));</div><div class="line">        jTaskString = env-&gt;NewByteArray(strLen);</div><div class="line">        env-&gt;SetByteArrayRegion(jTaskString, <span class="number">0</span>, strLen,</div><div class="line">                                <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">const</span> jbyte *&gt;(ToCString(str)));</div><div class="line">        <span class="comment">// jTaskString = env-&gt;NewStringUTF(ToCString(str));</span></div><div class="line"></div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!args[<span class="number">1</span>].IsEmpty() &amp;&amp; args[<span class="number">1</span>]-&gt;IsString()) &#123;</div><div class="line">        v8::String::Utf8Value tasks(args[<span class="number">1</span>]);</div><div class="line">        <span class="keyword">int</span> strLen = <span class="built_in">strlen</span>(*tasks);</div><div class="line">        jTaskString = env-&gt;NewByteArray(strLen);</div><div class="line">        env-&gt;SetByteArrayRegion(jTaskString, <span class="number">0</span>, strLen, <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">const</span> jbyte *&gt;(*tasks));</div><div class="line">        <span class="comment">// jTaskString = env-&gt;NewStringUTF(*tasks);</span></div><div class="line">    &#125;</div><div class="line">    <span class="comment">//callback args[2]</span></div><div class="line">    jstring jCallback = <span class="literal">NULL</span>;</div><div class="line">    <span class="keyword">if</span> (!args[<span class="number">2</span>].IsEmpty()) &#123;</div><div class="line">        v8::String::<span class="function">Utf8Value <span class="title">callback</span><span class="params">(args[<span class="number">2</span>])</span></span>;</div><div class="line">        jCallback = env-&gt;NewStringUTF(*callback);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (jCallNativeMethodId == <span class="literal">NULL</span>) &#123;</div><div class="line">        <span class="comment">// 反射方式，拿到 weexsdk 的callNative方法的ID</span></div><div class="line">        jCallNativeMethodId = env-&gt;GetMethodID(jBridgeClazz,</div><div class="line">                                               <span class="string">"callNative"</span>,</div><div class="line">                                               <span class="string">"(Ljava/lang/String;[BLjava/lang/String;)I"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 调用 java 的 callNative 方法</span></div><div class="line">    <span class="keyword">int</span> flag = env-&gt;CallIntMethod(jThis, jCallNativeMethodId, jInstanceId, jTaskString, jCallback);</div><div class="line">    <span class="keyword">if</span> (flag == <span class="number">-1</span>) &#123;</div><div class="line">        LOGE(<span class="string">"instance destroy JFM must stop callNative"</span>);</div><div class="line">    &#125;</div><div class="line">    env-&gt;DeleteLocalRef(jTaskString);</div><div class="line">    env-&gt;DeleteLocalRef(jInstanceId);</div><div class="line">    env-&gt;DeleteLocalRef(jCallback);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> v8::Integer::New(flag);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>C++ 解析 js 代码后，返回来再调用 weex sdk 的 Android 代码，通过 JNI 提供的反射方式拿到方法的 id，并调用执行。<br>相对应的，我们找到 Android callNative() 代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">callNative</span><span class="params">(String instanceId, String tasks, String callback)</span> </span>&#123;</div><div class="line">    <span class="keyword">long</span> start = System.currentTimeMillis();</div><div class="line">    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);</div><div class="line">    <span class="keyword">if</span>(instance != <span class="keyword">null</span>) &#123;</div><div class="line">      instance.firstScreenCreateInstanceTime(start);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">int</span> errorCode = IWXBridge.INSTANCE_RENDERING;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">      <span class="comment">// 通过 WXBridgeManager.callNative 进行 tasks 的分发执行</span></div><div class="line">      errorCode = WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);</div><div class="line">    &#125;<span class="keyword">catch</span> (Throwable e)&#123;</div><div class="line">      <span class="comment">//catch everything during call native.</span></div><div class="line">      <span class="keyword">if</span>(WXEnvironment.isApkDebugable())&#123;</div><div class="line">        WXLogUtils.e(TAG,<span class="string">"callNative throw exception:"</span>+e.getMessage());</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span>(instance != <span class="keyword">null</span>) &#123;</div><div class="line">      instance.callNativeTime(System.currentTimeMillis() - start);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(WXEnvironment.isApkDebugable())&#123;</div><div class="line">      <span class="keyword">if</span>(errorCode == IWXBridge.DESTROY_INSTANCE)&#123;</div><div class="line">        WXLogUtils.w(<span class="string">"destroyInstance :"</span>+instanceId+<span class="string">" JSF must stop callNative"</span>);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> errorCode;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h2 id="Weex-native-响应-C-的调用"><a href="#Weex-native-响应-C-的调用" class="headerlink" title="Weex native 响应 C++ 的调用"></a>Weex native 响应 C++ 的调用</h2><p>WXBridgeManager.callNative() 对 tasks 进行分发，我们来看看如何分发的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">JSONArray array = JSON.parseArray(tasks);</div><div class="line">... ...</div><div class="line"><span class="keyword">int</span> size = array.size();</div><div class="line">    <span class="keyword">if</span> (size &gt; <span class="number">0</span>) &#123;</div><div class="line">      <span class="keyword">try</span> &#123;</div><div class="line">        JSONObject task;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</div><div class="line">          task = (JSONObject) array.get(i);</div><div class="line">          <span class="keyword">if</span> (task != <span class="keyword">null</span> &amp;&amp; WXSDKManager.getInstance().getSDKInstance(instanceId) != <span class="keyword">null</span>) &#123;</div><div class="line">            Object target = task.get(MODULE);</div><div class="line">            <span class="keyword">if</span>(target != <span class="keyword">null</span>)&#123;</div><div class="line">              <span class="keyword">if</span>(WXDomModule.WXDOM.equals(target))&#123;</div><div class="line">                WXDomModule dom = getDomModule(instanceId);</div><div class="line">                dom.callDomMethod(task);</div><div class="line">              &#125;<span class="keyword">else</span> &#123;</div><div class="line">                WXModuleManager.callModuleMethod(instanceId, (String) target,</div><div class="line">                    (String) task.get(METHOD), (JSONArray) task.get(ARGS));</div><div class="line">              &#125;</div><div class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(task.get(COMPONENT) != <span class="keyword">null</span>)&#123;</div><div class="line">              <span class="comment">//call component</span></div><div class="line">              WXDomModule dom = getDomModule(instanceId);</div><div class="line">              dom.invokeMethod((String) task.get(REF),(String) task.get(METHOD),(JSONArray) task.get(ARGS));</div><div class="line">            &#125;<span class="keyword">else</span>&#123;</div><div class="line">              <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"unknown callNative"</span>);</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">        WXLogUtils.e(<span class="string">"[WXBridgeManager] callNative exception: "</span>, e);</div><div class="line">        commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE,<span class="string">"[WXBridgeManager] callNative exception "</span>+e.getCause());</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    ... ...</div></pre></td></tr></table></figure>
+<p>分发规则，对 tasks 逐个分类处理：</p>
+<ul>
+<li>如果是 module:<ul>
+<li>如果 是 dom：执行 WXDomModule.callDomMethod()；</li>
+<li>如果 不是 dom (普通的WXModule) : 执行WXModuleManager.callModuleMethod()</li>
+</ul>
+</li>
+<li>如果是 component：<ul>
+<li>调用 WXDomModule.invokeMethod()</li>
+</ul>
+</li>
+</ul>
+<p>task 数据格式（json），如图：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20debug%E5%9B%BE.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>这里只分析第一种情况（其他相似）：<br>WXDomModule.callDomMethod()：<br>会根据 task 的 method 属性分类处理，此处只分析一个：CREATE_BODY：<br>会继续调用 createBody() 方法，将 wxSDKInstance.id 和 task的args 信息发送给WXDomHandler。<br>WXDomHandler 的 handleMessage() 中也有很多分类处理，对于WX_DOM_CREATE_BODY：会执行：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mWXDomManager.createBody(task.instanceId, (JSONObject) task.args.get(<span class="number">0</span>));</div></pre></td></tr></table></figure></p>
+<p>具体可参考 WXDomModule、WXDomHandler 类分析<br>这个时候，就回到我们之前说过的 WXDomStatement 的流程了，WXDomStatement会添加dom 节点（addDomInternal() ），在 addDomInternal 过程中，对dom节点又是一通猛烈的操作：根节点（root节点的准备工作），普通节点（add到父节点下）。<br>然后，对 dom 对象 进行遍历操作（递归）：domObject.traverseTree()，在dom 线程创建 component，生成 component 树（也是递归操作：通过WXRenderStatement.generateComponentTree() ）。<br>对于每个dom节点都会进行 setLayout()、setExtra()、setPadding()，可以去看看compent.setLayout()，就是去使用Android的API 对view进布局和绘制，此处不再贴代码。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20component%20%E6%96%B9%E6%B3%95.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>WXBridge 是 Android 与 底层 C++ 的衔接处，Android &lt;=&gt; C++ 的交互，及方法接口都在此类中，的确起到了见名知义的效果</li>
+<li>Weex Android SDK 是使用 Android的API（Java层），实现了view的布局、绘制。并不是依靠 底层so包实现，与IOS的sdk实现方式不同（听同事说……）</li>
+<li>component 处置 weex 的view绘制、布局过程，和Android native处理view的流程十分相似，具体可以参考后面的链接（阿里大神也分析过）</li>
+</ul>
+<p><br></p>
+<p>参考：<br><a href="http://www.jianshu.com/p/3160a0297345" target="_blank" rel="external">http://www.jianshu.com/p/3160a0297345</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt; &lt;strong&gt;Weex 渲染页面过程&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;weex-渲染入口-render&quot;&gt;&lt;a href=&quot;#weex-渲染入口-render&quot; class=&quot;headerlink&quot; tit
+    
+    </summary>
+    
+      <category term="Weex" scheme="https://fenglincanyi.github.io/categories/Weex/"/>
+    
+    
+      <category term="Weex" scheme="https://fenglincanyi.github.io/tags/Weex/"/>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/tags/Android/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Weex SDK源码分析（一）</title>
     <link href="https://fenglincanyi.github.io/2017/02/28/Weex%20SDK%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/</id>
     <published>2017-02-28T07:06:00.000Z</published>
-    <updated>2017-02-28T07:52:37.000Z</updated>
+    <updated>2017-02-28T13:02:59.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p><strong>WeexSDK 初始化源码分析</strong></p>
@@ -56,6 +146,8 @@
 <p>底层 C++代码中：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function">jint <span class="title">Java_com_taobao_weex_bridge_WXBridge_initFramework</span><span class="params">(JNIEnv *env,</span></span></div><div class="line">                                                        jobject object, jstring script,</div><div class="line">                                                        jobject params)</div></pre></td></tr></table></figure>
 <p>js framework 初始化就交给 C++ 来处理了</p>
+<p>在这里再多看一眼：在so包加载后，C++层第一步就会把 WXBridge 加载出来，作为2层之间的桥梁：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * This function will be call when the library first be load.</div><div class="line"> * You can do some init in the lib. return which version jni it support.</div><div class="line"> */</div><div class="line"><span class="function">jint <span class="title">JNI_OnLoad</span><span class="params">(JavaVM *vm, <span class="keyword">void</span> *reserved)</span> </span>&#123;</div><div class="line">    LOGD(<span class="string">"begin JNI_OnLoad"</span>);</div><div class="line">    JNIEnv *env;</div><div class="line">    <span class="comment">/* Get environment */</span></div><div class="line">    <span class="keyword">if</span> ((vm)-&gt;GetEnv((<span class="keyword">void</span> **) &amp;env, JNI_VERSION_1_4) != JNI_OK) &#123;</div><div class="line">        <span class="keyword">return</span> JNI_FALSE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    sVm = vm;</div><div class="line">    jclass tempClass = env-&gt;FindClass(</div><div class="line">            <span class="string">"com/taobao/weex/bridge/WXBridge"</span>);</div><div class="line">    jBridgeClazz = (jclass) env-&gt;NewGlobalRef(tempClass);</div><div class="line">    env-&gt;DeleteLocalRef(tempClass);</div><div class="line">    LOGD(<span class="string">"end JNI_OnLoad"</span>);</div><div class="line">    <span class="keyword">return</span> JNI_VERSION_1_4;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h2 id="注册操作"><a href="#注册操作" class="headerlink" title="注册操作"></a>注册操作</h2><p>weex 内置的 component 和 module 都会在此过程中注册，这一过程还包含了dom的注册操作。<br>注册操作，会由registerModules来进行操作：registerModules()，registerComponents()，这两个都是异步执行，最终调用：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// modules the format is like &#123;'dom':['updateAttrs','updateStyle'],'event':['openUrl']&#125;</span></div><div class="line">WXJSObject[] args = &#123;<span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                                        WXJsonUtils.fromObjectToJSONString(modules))&#125;;</div><div class="line">mWXBridge.execJS(<span class="string">""</span>, <span class="keyword">null</span>, METHOD_REGISTER_MODULES, args);</div><div class="line"></div><div class="line">WXJSObject[] args = &#123;<span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                                        WXJsonUtils.fromObjectToJSONString(components))&#125;;</div><div class="line">mWXBridge.execJS(<span class="string">""</span>, <span class="keyword">null</span>, METHOD_REGISTER_COMPONENTS, args);</div></pre></td></tr></table></figure>
 <p>execJS() 最终是调用WXBridge.execJS() 的native方法，交给底层c++来执行：</p>
@@ -63,6 +155,7 @@
 <p>C++ 使用反射的方式，找到WXJSObject类，找到相关的属性和方法，</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jclass jsObjectClazz = env-&gt;FindClass(<span class="string">"com/taobao/weex/bridge/WXJSObject"</span>);</div></pre></td></tr></table></figure>
 <p>调用 js Framework的相关api 执行。</p>
+<p><br></p>
 <p>源码：<br><a href="https://github.com/apache/incubator-weex/tree/master/android/sdk" target="_blank" rel="external">https://github.com/apache/incubator-weex/tree/master/android/sdk</a><br><a href="https://github.com/alibaba/weex_v8core" target="_blank" rel="external">https://github.com/alibaba/weex_v8core</a></p>
 ]]></content>
     
@@ -571,6 +664,129 @@ globalSession 一次登陆，任何地方都保存有登录状态
   </entry>
   
   <entry>
+    <title>Android 类加载初探</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2016-12-17T14:23:04.669Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
+</blockquote>
+<p>需要关注的类有：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
+<ul>
+<li>BaseDexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>DexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>PathClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
+<p><strong>ClassLoader 相关说明：</strong></p>
+<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
+<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
+<p>DexPathList 构造函数：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>makeDexElements过程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
+<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Android apk安装过程实例分析</title>
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
@@ -691,129 +907,6 @@ globalSession 一次登陆，任何地方都保存有登录状态
       <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
     
       <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Android 类加载初探</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2016-12-17T14:23:04.669Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
-</blockquote>
-<p>需要关注的类有：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
-<ul>
-<li>BaseDexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>DexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>PathClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
-<p><strong>ClassLoader 相关说明：</strong></p>
-<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
-<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
-<p>DexPathList 构造函数：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>makeDexElements过程：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
-<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
     
   </entry>
   

@@ -30,7 +30,7 @@
 <meta property="og:description" content="WeexSDK 初始化源码分析
 
 整个Weex SDK 初始化过程，入口是WXSDKEngine.initialize()，方法主要是依靠 doInitInternal() 方法执行初始化操作。里面涉及了WXEnvironment 相关环境的设置，几个重要的Manager的初始化操作，包括WXBridgeManager、WXSDKManager、WXRenderManager、WXDomMana">
-<meta property="og:updated_time" content="2017-02-28T07:52:37.000Z">
+<meta property="og:updated_time" content="2017-02-28T13:02:59.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Weex SDK源码分析（一）">
 <meta name="twitter:description" content="WeexSDK 初始化源码分析
@@ -219,6 +219,8 @@
 <p>底层 C++代码中：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function">jint <span class="title">Java_com_taobao_weex_bridge_WXBridge_initFramework</span><span class="params">(JNIEnv *env,</span></span></div><div class="line">                                                        jobject object, jstring script,</div><div class="line">                                                        jobject params)</div></pre></td></tr></table></figure>
 <p>js framework 初始化就交给 C++ 来处理了</p>
+<p>在这里再多看一眼：在so包加载后，C++层第一步就会把 WXBridge 加载出来，作为2层之间的桥梁：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * This function will be call when the library first be load.</div><div class="line"> * You can do some init in the lib. return which version jni it support.</div><div class="line"> */</div><div class="line"><span class="function">jint <span class="title">JNI_OnLoad</span><span class="params">(JavaVM *vm, <span class="keyword">void</span> *reserved)</span> </span>&#123;</div><div class="line">    LOGD(<span class="string">"begin JNI_OnLoad"</span>);</div><div class="line">    JNIEnv *env;</div><div class="line">    <span class="comment">/* Get environment */</span></div><div class="line">    <span class="keyword">if</span> ((vm)-&gt;GetEnv((<span class="keyword">void</span> **) &amp;env, JNI_VERSION_1_4) != JNI_OK) &#123;</div><div class="line">        <span class="keyword">return</span> JNI_FALSE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    sVm = vm;</div><div class="line">    jclass tempClass = env-&gt;FindClass(</div><div class="line">            <span class="string">"com/taobao/weex/bridge/WXBridge"</span>);</div><div class="line">    jBridgeClazz = (jclass) env-&gt;NewGlobalRef(tempClass);</div><div class="line">    env-&gt;DeleteLocalRef(tempClass);</div><div class="line">    LOGD(<span class="string">"end JNI_OnLoad"</span>);</div><div class="line">    <span class="keyword">return</span> JNI_VERSION_1_4;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h2 id="注册操作"><a href="#注册操作" class="headerlink" title="注册操作"></a>注册操作</h2><p>weex 内置的 component 和 module 都会在此过程中注册，这一过程还包含了dom的注册操作。<br>注册操作，会由registerModules来进行操作：registerModules()，registerComponents()，这两个都是异步执行，最终调用：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// modules the format is like &#123;'dom':['updateAttrs','updateStyle'],'event':['openUrl']&#125;</span></div><div class="line">WXJSObject[] args = &#123;<span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                                        WXJsonUtils.fromObjectToJSONString(modules))&#125;;</div><div class="line">mWXBridge.execJS(<span class="string">""</span>, <span class="keyword">null</span>, METHOD_REGISTER_MODULES, args);</div><div class="line"></div><div class="line">WXJSObject[] args = &#123;<span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                                        WXJsonUtils.fromObjectToJSONString(components))&#125;;</div><div class="line">mWXBridge.execJS(<span class="string">""</span>, <span class="keyword">null</span>, METHOD_REGISTER_COMPONENTS, args);</div></pre></td></tr></table></figure>
 <p>execJS() 最终是调用WXBridge.execJS() 的native方法，交给底层c++来执行：</p>
@@ -226,6 +228,7 @@
 <p>C++ 使用反射的方式，找到WXJSObject类，找到相关的属性和方法，</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jclass jsObjectClazz = env-&gt;FindClass(<span class="string">"com/taobao/weex/bridge/WXJSObject"</span>);</div></pre></td></tr></table></figure>
 <p>调用 js Framework的相关api 执行。</p>
+<p><br></p>
 <p>源码：<br><a href="https://github.com/apache/incubator-weex/tree/master/android/sdk" target="_blank" rel="external">https://github.com/apache/incubator-weex/tree/master/android/sdk</a><br><a href="https://github.com/alibaba/weex_v8core" target="_blank" rel="external">https://github.com/alibaba/weex_v8core</a></p>
 
         </div>
@@ -234,7 +237,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2017-02-28T07:52:37.000Z" title="2017-2-28 15:52" itemprop="dateUpdated">2017年2月28日 15:52</time>
+    最后更新时间：<time datetime="2017-02-28T13:02:59.000Z" title="2017-2-28 21:02" itemprop="dateUpdated">2017年2月28日 21:02</time>
 </span><br>
 
 
@@ -312,7 +315,14 @@
     </div>
 
     
-<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/02/28/Weex SDK源码分析（二）/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Weex SDK源码分析（二）</h4>
+      </a>
+    </div>
   
 
   

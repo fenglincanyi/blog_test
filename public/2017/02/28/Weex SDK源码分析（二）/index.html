@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Weex SDK源码分析（二） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Weex,Android">
+    <meta name="description" content="Weex 渲染页面过程
+
+weex 渲染入口 render()渲染过程从 WXSDKInstance.render() 开始追溯，render()方法是异步执行渲染工作的。render()重载的方法比较多，此处介绍最基础的一个。参数代表的含义：
+
+pageName：用于查看日志，渲染的哪个页面作为标识
+template：加载的本地的或远程的 js（we文件被weex transform后的 j">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Weex SDK源码分析（二）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="Weex 渲染页面过程
+
+weex 渲染入口 render()渲染过程从 WXSDKInstance.render() 开始追溯，render()方法是异步执行渲染工作的。render()重载的方法比较多，此处介绍最基础的一个。参数代表的含义：
+
+pageName：用于查看日志，渲染的哪个页面作为标识
+template：加载的本地的或远程的 js（we文件被weex transform后的 j">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20debug%E5%9B%BE.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20component%20%E6%96%B9%E6%B3%95.png">
+<meta property="og:updated_time" content="2017-02-28T12:58:35.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Weex SDK源码分析（二）">
+<meta name="twitter:description" content="Weex 渲染页面过程
+
+weex 渲染入口 render()渲染过程从 WXSDKInstance.render() 开始追溯，render()方法是异步执行渲染工作的。render()重载的方法比较多，此处介绍最基础的一个。参数代表的含义：
+
+pageName：用于查看日志，渲染的哪个页面作为标识
+template：加载的本地的或远程的 js（we文件被weex transform后的 j">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20debug%E5%9B%BE.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Weex SDK源码分析（二）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Weex SDK源码分析（二）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-02-28T11:32:00.000Z" itemprop="datePublished" class="page-time">
+  2017-02-28
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#weex-渲染入口-render"><span class="post-toc-number">1.</span> <span class="post-toc-text">weex 渲染入口 render()</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#底层C-调用Weex-Android-功能"><span class="post-toc-number">2.</span> <span class="post-toc-text">底层C++ 调用Weex Android 功能</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Weex-native-响应-C-的调用"><span class="post-toc-number">3.</span> <span class="post-toc-text">Weex native 响应 C++ 的调用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">4.</span> <span class="post-toc-text">总结</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Weex SDK源码分析（二）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Weex SDK源码分析（二）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-2-28 19:32" datetime="2017-02-28T11:32:00.000Z"  itemprop="datePublished">2017-02-28</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p> <strong>Weex 渲染页面过程</strong></p>
+</blockquote>
+<h2 id="weex-渲染入口-render"><a href="#weex-渲染入口-render" class="headerlink" title="weex 渲染入口 render()"></a>weex 渲染入口 render()</h2><p>渲染过程从 WXSDKInstance.render() 开始追溯，render()方法是异步执行渲染工作的。render()重载的方法比较多，此处介绍最基础的一个。<br>参数代表的含义：</p>
+<ul>
+<li>pageName：用于查看日志，渲染的哪个页面作为标识</li>
+<li>template：加载的本地的或远程的 js（we文件被weex transform后的 js）</li>
+<li>options：配置信息，包括系统版本、app版本、设备信息等</li>
+<li>jsonInitData：用于渲染的初始数据</li>
+<li>flag：监听渲染的时机：<ul>
+<li>APPEND_ASYNC：渲染完第一个view后，IWXRenderListener.onViewCreated()调用</li>
+<li>APPEND_ONCE：渲染完整个view tree后，onViewCreated()调用</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">wxSDKInstance.render(</div><div class="line">      getPageName(),</div><div class="line">      template,</div><div class="line">      options,</div><div class="line">      jsonInitData,</div><div class="line">      ScreenUtil.getDisplayWidth(<span class="keyword">this</span>),</div><div class="line">      ScreenUtil.getDisplayHeight(<span class="keyword">this</span>),</div><div class="line">      WXRenderStrategy.APPEND_ASYNC);</div></pre></td></tr></table></figure>
+<p>接着，渲染工作真正开始于 renderInternal()：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ensureRenderArchor</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">if</span>(mRenderContainer == <span class="keyword">null</span>)&#123;</div><div class="line">      mRenderContainer = <span class="keyword">new</span> RenderContainer(getContext());</div><div class="line">      mRenderContainer.setLayoutParams(<span class="keyword">new</span> ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));</div><div class="line">      mRenderContainer.setBackgroundColor(Color.TRANSPARENT);</div><div class="line">      mRenderContainer.setSDKInstance(<span class="keyword">this</span>);</div><div class="line">      mRenderContainer.addOnLayoutChangeListener(<span class="keyword">this</span>);</div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>会进行 mRenderContainer 的初始化，RenderContainer 是一个 weex 扩展的 FrameLayout，后期操作，会在这个 container 中添加view元素。<br>我们接着看 render 过程，WXSDKManager.createInstance() 创建实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">createInstance</span><span class="params">(WXSDKInstance instance, String code, Map&lt;String, Object&gt; options, String jsonInitData)</span> </span>&#123;</div><div class="line">     mWXRenderManager.registerInstance(instance);</div><div class="line">     mBridgeManager.createInstance(instance.getInstanceId(), code, options, jsonInitData);</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>此过程中，WXRenderManager 注册实例，实际就是在 mRegistries（map<wxsdkinstanceid, wxrenderstatement="">）中存储该实例的信息，并且创建 renderStatement。<br>mBridgeManager 创建实例时，WXModuleManager 会创建 DomModule，由WXDomManager进行创建，sDomModuleMap 存储该 wxSDKInstance 的WXDomModule。<br>然后，异步执行 invokeCreateInstance()，此过程还会执行 initFramework() 操作。initFramework() 后，会创建出一个 WXJSObject 将 wxsdkinstance相关的数据存储，组成一个数组的形式，传给执行 js 的方法：</wxsdkinstanceid,></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">WXJSObject instanceIdObj = <span class="keyword">new</span> WXJSObject(WXJSObject.String,</div><div class="line">                instance.getInstanceId());</div><div class="line">        WXJSObject instanceObj = <span class="keyword">new</span> WXJSObject(WXJSObject.String,</div><div class="line">                                                template);</div><div class="line">        WXJSObject optionsObj = <span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                options == <span class="keyword">null</span> ? <span class="string">"&#123;&#125;"</span></div><div class="line">                        : WXJsonUtils.fromObjectToJSONString(options));</div><div class="line">        WXJSObject dataObj = <span class="keyword">new</span> WXJSObject(WXJSObject.JSON,</div><div class="line">                data == <span class="keyword">null</span> ? <span class="string">"&#123;&#125;"</span> : data);</div><div class="line">        WXJSObject[] args = &#123;instanceIdObj, instanceObj, optionsObj,</div><div class="line">                dataObj&#125;;</div><div class="line">        invokeExecJS(instance.getInstanceId(), <span class="keyword">null</span>, METHOD_CREATE_INSTANCE, args,<span class="keyword">false</span>);</div></pre></td></tr></table></figure>
+<p>然后，WXBridgeManager 会调用 mWXBridge.execJS() 去调用底层的 C++方法，执行js。</p>
+<h2 id="底层C-调用Weex-Android-功能"><a href="#底层C-调用Weex-Android-功能" class="headerlink" title="底层C++ 调用Weex Android 功能"></a>底层C++ 调用Weex Android 功能</h2><p>我们再来看看 c++ 代码实现的功能，以 callNative() 为例：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> *  This Function is a built-in function that JS bundle can execute</div><div class="line"> *  to call native module.</div><div class="line"> */</div><div class="line">v8::Handle&lt;v8::Value&gt; callNative(<span class="keyword">const</span> v8::Arguments &amp;args) &#123;</div><div class="line"></div><div class="line">    JNIEnv *env = getJNIEnv();</div><div class="line">    <span class="comment">//instacneID args[0]</span></div><div class="line">    jstring jInstanceId = <span class="literal">NULL</span>;</div><div class="line">    <span class="keyword">if</span> (!args[<span class="number">0</span>].IsEmpty()) &#123;</div><div class="line">        v8::String::<span class="function">Utf8Value <span class="title">instanceId</span><span class="params">(args[<span class="number">0</span>])</span></span>;</div><div class="line">        jInstanceId = env-&gt;NewStringUTF(*instanceId);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//task args[1]</span></div><div class="line">    jbyteArray jTaskString = <span class="literal">NULL</span>;</div><div class="line">    <span class="keyword">if</span> (!args[<span class="number">1</span>].IsEmpty() &amp;&amp; args[<span class="number">1</span>]-&gt;IsObject()) &#123;</div><div class="line">        v8::Handle&lt;v8::Value&gt; obj[<span class="number">1</span>];</div><div class="line">        v8::Handle&lt;v8::Object&gt; global = V8context-&gt;Global();</div><div class="line">        json = v8::Handle&lt;v8::Object&gt;::Cast(global-&gt;Get(v8::String::New(<span class="string">"JSON"</span>)));</div><div class="line">        json_stringify = v8::Handle&lt;v8::Function&gt;::Cast(json-&gt;Get(v8::String::New(<span class="string">"stringify"</span>)));</div><div class="line">        obj[<span class="number">0</span>] = args[<span class="number">1</span>];</div><div class="line">        v8::Handle&lt;v8::Value&gt; ret = json_stringify-&gt;Call(json, <span class="number">1</span>, obj);</div><div class="line">        v8::String::<span class="function">Utf8Value <span class="title">str</span><span class="params">(ret)</span></span>;</div><div class="line"></div><div class="line">        <span class="keyword">int</span> strLen = <span class="built_in">strlen</span>(ToCString(str));</div><div class="line">        jTaskString = env-&gt;NewByteArray(strLen);</div><div class="line">        env-&gt;SetByteArrayRegion(jTaskString, <span class="number">0</span>, strLen,</div><div class="line">                                <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">const</span> jbyte *&gt;(ToCString(str)));</div><div class="line">        <span class="comment">// jTaskString = env-&gt;NewStringUTF(ToCString(str));</span></div><div class="line"></div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!args[<span class="number">1</span>].IsEmpty() &amp;&amp; args[<span class="number">1</span>]-&gt;IsString()) &#123;</div><div class="line">        v8::String::Utf8Value tasks(args[<span class="number">1</span>]);</div><div class="line">        <span class="keyword">int</span> strLen = <span class="built_in">strlen</span>(*tasks);</div><div class="line">        jTaskString = env-&gt;NewByteArray(strLen);</div><div class="line">        env-&gt;SetByteArrayRegion(jTaskString, <span class="number">0</span>, strLen, <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">const</span> jbyte *&gt;(*tasks));</div><div class="line">        <span class="comment">// jTaskString = env-&gt;NewStringUTF(*tasks);</span></div><div class="line">    &#125;</div><div class="line">    <span class="comment">//callback args[2]</span></div><div class="line">    jstring jCallback = <span class="literal">NULL</span>;</div><div class="line">    <span class="keyword">if</span> (!args[<span class="number">2</span>].IsEmpty()) &#123;</div><div class="line">        v8::String::<span class="function">Utf8Value <span class="title">callback</span><span class="params">(args[<span class="number">2</span>])</span></span>;</div><div class="line">        jCallback = env-&gt;NewStringUTF(*callback);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (jCallNativeMethodId == <span class="literal">NULL</span>) &#123;</div><div class="line">        <span class="comment">// 反射方式，拿到 weexsdk 的callNative方法的ID</span></div><div class="line">        jCallNativeMethodId = env-&gt;GetMethodID(jBridgeClazz,</div><div class="line">                                               <span class="string">"callNative"</span>,</div><div class="line">                                               <span class="string">"(Ljava/lang/String;[BLjava/lang/String;)I"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 调用 java 的 callNative 方法</span></div><div class="line">    <span class="keyword">int</span> flag = env-&gt;CallIntMethod(jThis, jCallNativeMethodId, jInstanceId, jTaskString, jCallback);</div><div class="line">    <span class="keyword">if</span> (flag == <span class="number">-1</span>) &#123;</div><div class="line">        LOGE(<span class="string">"instance destroy JFM must stop callNative"</span>);</div><div class="line">    &#125;</div><div class="line">    env-&gt;DeleteLocalRef(jTaskString);</div><div class="line">    env-&gt;DeleteLocalRef(jInstanceId);</div><div class="line">    env-&gt;DeleteLocalRef(jCallback);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> v8::Integer::New(flag);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>C++ 解析 js 代码后，返回来再调用 weex sdk 的 Android 代码，通过 JNI 提供的反射方式拿到方法的 id，并调用执行。<br>相对应的，我们找到 Android callNative() 代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">callNative</span><span class="params">(String instanceId, String tasks, String callback)</span> </span>&#123;</div><div class="line">    <span class="keyword">long</span> start = System.currentTimeMillis();</div><div class="line">    WXSDKInstance instance = WXSDKManager.getInstance().getSDKInstance(instanceId);</div><div class="line">    <span class="keyword">if</span>(instance != <span class="keyword">null</span>) &#123;</div><div class="line">      instance.firstScreenCreateInstanceTime(start);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">int</span> errorCode = IWXBridge.INSTANCE_RENDERING;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">      <span class="comment">// 通过 WXBridgeManager.callNative 进行 tasks 的分发执行</span></div><div class="line">      errorCode = WXBridgeManager.getInstance().callNative(instanceId, tasks, callback);</div><div class="line">    &#125;<span class="keyword">catch</span> (Throwable e)&#123;</div><div class="line">      <span class="comment">//catch everything during call native.</span></div><div class="line">      <span class="keyword">if</span>(WXEnvironment.isApkDebugable())&#123;</div><div class="line">        WXLogUtils.e(TAG,<span class="string">"callNative throw exception:"</span>+e.getMessage());</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span>(instance != <span class="keyword">null</span>) &#123;</div><div class="line">      instance.callNativeTime(System.currentTimeMillis() - start);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span>(WXEnvironment.isApkDebugable())&#123;</div><div class="line">      <span class="keyword">if</span>(errorCode == IWXBridge.DESTROY_INSTANCE)&#123;</div><div class="line">        WXLogUtils.w(<span class="string">"destroyInstance :"</span>+instanceId+<span class="string">" JSF must stop callNative"</span>);</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> errorCode;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h2 id="Weex-native-响应-C-的调用"><a href="#Weex-native-响应-C-的调用" class="headerlink" title="Weex native 响应 C++ 的调用"></a>Weex native 响应 C++ 的调用</h2><p>WXBridgeManager.callNative() 对 tasks 进行分发，我们来看看如何分发的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">JSONArray array = JSON.parseArray(tasks);</div><div class="line">... ...</div><div class="line"><span class="keyword">int</span> size = array.size();</div><div class="line">    <span class="keyword">if</span> (size &gt; <span class="number">0</span>) &#123;</div><div class="line">      <span class="keyword">try</span> &#123;</div><div class="line">        JSONObject task;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</div><div class="line">          task = (JSONObject) array.get(i);</div><div class="line">          <span class="keyword">if</span> (task != <span class="keyword">null</span> &amp;&amp; WXSDKManager.getInstance().getSDKInstance(instanceId) != <span class="keyword">null</span>) &#123;</div><div class="line">            Object target = task.get(MODULE);</div><div class="line">            <span class="keyword">if</span>(target != <span class="keyword">null</span>)&#123;</div><div class="line">              <span class="keyword">if</span>(WXDomModule.WXDOM.equals(target))&#123;</div><div class="line">                WXDomModule dom = getDomModule(instanceId);</div><div class="line">                dom.callDomMethod(task);</div><div class="line">              &#125;<span class="keyword">else</span> &#123;</div><div class="line">                WXModuleManager.callModuleMethod(instanceId, (String) target,</div><div class="line">                    (String) task.get(METHOD), (JSONArray) task.get(ARGS));</div><div class="line">              &#125;</div><div class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(task.get(COMPONENT) != <span class="keyword">null</span>)&#123;</div><div class="line">              <span class="comment">//call component</span></div><div class="line">              WXDomModule dom = getDomModule(instanceId);</div><div class="line">              dom.invokeMethod((String) task.get(REF),(String) task.get(METHOD),(JSONArray) task.get(ARGS));</div><div class="line">            &#125;<span class="keyword">else</span>&#123;</div><div class="line">              <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"unknown callNative"</span>);</div><div class="line">            &#125;</div><div class="line">          &#125;</div><div class="line">        &#125;</div><div class="line">      &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">        WXLogUtils.e(<span class="string">"[WXBridgeManager] callNative exception: "</span>, e);</div><div class="line">        commitJSBridgeAlarmMonitor(instanceId, WXErrorCode.WX_ERR_INVOKE_NATIVE,<span class="string">"[WXBridgeManager] callNative exception "</span>+e.getCause());</div><div class="line">      &#125;</div><div class="line">    &#125;</div><div class="line">    ... ...</div></pre></td></tr></table></figure>
+<p>分发规则，对 tasks 逐个分类处理：</p>
+<ul>
+<li>如果是 module:<ul>
+<li>如果 是 dom：执行 WXDomModule.callDomMethod()；</li>
+<li>如果 不是 dom (普通的WXModule) : 执行WXModuleManager.callModuleMethod()</li>
+</ul>
+</li>
+<li>如果是 component：<ul>
+<li>调用 WXDomModule.invokeMethod()</li>
+</ul>
+</li>
+</ul>
+<p>task 数据格式（json），如图：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20debug%E5%9B%BE.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>这里只分析第一种情况（其他相似）：<br>WXDomModule.callDomMethod()：<br>会根据 task 的 method 属性分类处理，此处只分析一个：CREATE_BODY：<br>会继续调用 createBody() 方法，将 wxSDKInstance.id 和 task的args 信息发送给WXDomHandler。<br>WXDomHandler 的 handleMessage() 中也有很多分类处理，对于WX_DOM_CREATE_BODY：会执行：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mWXDomManager.createBody(task.instanceId, (JSONObject) task.args.get(<span class="number">0</span>));</div></pre></td></tr></table></figure></p>
+<p>具体可参考 WXDomModule、WXDomHandler 类分析<br>这个时候，就回到我们之前说过的 WXDomStatement 的流程了，WXDomStatement会添加dom 节点（addDomInternal() ），在 addDomInternal 过程中，对dom节点又是一通猛烈的操作：根节点（root节点的准备工作），普通节点（add到父节点下）。<br>然后，对 dom 对象 进行遍历操作（递归）：domObject.traverseTree()，在dom 线程创建 component，生成 component 树（也是递归操作：通过WXRenderStatement.generateComponentTree() ）。<br>对于每个dom节点都会进行 setLayout()、setExtra()、setPadding()，可以去看看compent.setLayout()，就是去使用Android的API 对view进布局和绘制，此处不再贴代码。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20component%20%E6%96%B9%E6%B3%95.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>WXBridge 是 Android 与 底层 C++ 的衔接处，Android &lt;=&gt; C++ 的交互，及方法接口都在此类中，的确起到了见名知义的效果</li>
+<li>Weex Android SDK 是使用 Android的API（Java层），实现了view的布局、绘制。并不是依靠 底层so包实现，与IOS的sdk实现方式不同（听同事说……）</li>
+<li>component 处置 weex 的view绘制、布局过程，和Android native处理view的流程十分相似，具体可以参考后面的链接（阿里大神也分析过）</li>
+</ul>
+<p><br></p>
+<p>参考：<br><a href="http://www.jianshu.com/p/3160a0297345" target="_blank" rel="external">http://www.jianshu.com/p/3160a0297345</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-02-28T12:58:35.000Z" title="2017-2-28 20:58" itemprop="dateUpdated">2017年2月28日 20:58</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/02/28/Weex SDK源码分析（二）/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/&title=《Weex SDK源码分析（二）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/&title=《Weex SDK源码分析（二）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Weex SDK源码分析（二）》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/02/28/Weex SDK源码分析（一）/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Weex SDK源码分析（一）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Weex SDK源码分析（二）" data-title="Weex SDK源码分析（二）" data-url="https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/&title=《Weex SDK源码分析（二）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/&title=《Weex SDK源码分析（二）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Weex SDK源码分析（二）》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACqUlEQVR42u3aMXLDQAgF0Nz/0k7rRsoHFtmZeao8ir3ap2IhwM9PfL3ervyb1evqWfnTmxceHh7eYOv5I9/vX32+WudqhWRX+Z7x8PDwtnlXD8i3lT++t/L9ry7v4+Hh4X0BLzqOb/Pb++fehwc8PDy8/86rJsFnV8DDw8P7LK+3dJL+3h/xSZB4qNaCh4eHF/MmqfCnPq/09/Dw8PDGXfVJcpyEjckAQbQOHh4e3gJvXk49lf72EvFoOAwPDw/vKC8vK1Tb/3nLvzookIcQPDw8vD1e9ZjujQJUv5kn64X6NB4eHt4jvN7BPUnEq2HmjzIEHh4e3hpvUpZNgkHzcJ8EJDw8PLwFXu/AzcNGtTh7tiWGh4eHt8ErHK/xAV3dUBIYesEDDw8Pb5uXsCcbilpWwYtLiiN4eHh4T/J6JdTqcFV10Ko3uICHh4e3x6seytXyRG8gIE/0L9fBw8PDe5zXY/cCSa+FFhUj8PDw8I7yqk39fABr40UkISRC4uHh4R3l9dLi/LivBoZ50QQPDw9vj1ctnvbKvvlrmiTxeHh4eE/yqon1vN01/2tUjMDDw8M7xJs3+HuNrjx4jIIQHh4e3hqvGhjyYms1ve6lztFMGR4eHt4h3qTPPmluTULIfDU8PDy8OS8p2vYO/V6bv1eujXp6eHh4eEd5+dbz8kTv0L9fp5xe4+Hh4a3xqsnxpDRwoIiQ7wEPDw/vKO9VvPJG1yQtnjyxOUeGh4eHV+v1lw/fagJd/VVetD0Aw8PDw2vxqmXcPGxUE+hqsy16iXh4eHhrvMlI1tmy7GRuCg8PD+87ecmmqyWPaqm30GzDw8PD+wJecqc6XtArK0fJOh4eHt4abz46kBd85yMFeZECDw8Pb4M3/4f/bLqcFzsOjw7g4eHh/c37BaQm0HUmzzC2AAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

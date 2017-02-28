@@ -179,6 +179,31 @@ jint Java_com_taobao_weex_bridge_WXBridge_initFramework(JNIEnv *env,
 ```
 js framework 初始化就交给 C++ 来处理了
 
+在这里再多看一眼：在so包加载后，C++层第一步就会把 WXBridge 加载出来，作为2层之间的桥梁：
+
+``` cpp
+/**
+ * This function will be call when the library first be load.
+ * You can do some init in the lib. return which version jni it support.
+ */
+jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    LOGD("begin JNI_OnLoad");
+    JNIEnv *env;
+    /* Get environment */
+    if ((vm)->GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
+        return JNI_FALSE;
+    }
+
+    sVm = vm;
+    jclass tempClass = env->FindClass(
+            "com/taobao/weex/bridge/WXBridge");
+    jBridgeClazz = (jclass) env->NewGlobalRef(tempClass);
+    env->DeleteLocalRef(tempClass);
+    LOGD("end JNI_OnLoad");
+    return JNI_VERSION_1_4;
+}
+```
+
 ## 注册操作
 weex 内置的 component 和 module 都会在此过程中注册，这一过程还包含了dom的注册操作。
 注册操作，会由registerModules来进行操作：registerModules()，registerComponents()，这两个都是异步执行，最终调用：
@@ -206,6 +231,7 @@ C++ 使用反射的方式，找到WXJSObject类，找到相关的属性和方法
 jclass jsObjectClazz = env->FindClass("com/taobao/weex/bridge/WXJSObject");
 ```
 调用 js Framework的相关api 执行。
+
 
 <br/>
 
