@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Mybatis 学习（二） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Mybatis">
+    <meta name="description" content="本次学习内容：MyBatis 高级结合demo进行学习
+
+2张表关联查询，一对一查询
+需求查询订单的信息及用户信息
+
+1234selectorders.*,user.username,user.sex, user.addressfrom orders, userwhere orders.user_id=user.id
+结果集：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mybatis 学习（二）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="本次学习内容：MyBatis 高级结合demo进行学习
+
+2张表关联查询，一对一查询
+需求查询订单的信息及用户信息
+
+1234selectorders.*,user.username,user.sex, user.addressfrom orders, userwhere orders.user_id=user.id
+结果集：">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/0A6D42AE-B4E6-4960-8313-FAE563CBA426.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/CB9AFFD6-B061-41CC-BC0B-0376C263DC0F.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/937F9118-45DC-4D2F-83A3-8ED359C2CD7F.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/C9339305-3D30-4A4F-B349-73DC6B6C9D50.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/51C2ECFE-8AD9-4354-B9D1-3E0B7DC66FE8.png">
+<meta property="og:updated_time" content="2017-03-05T09:45:47.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mybatis 学习（二）">
+<meta name="twitter:description" content="本次学习内容：MyBatis 高级结合demo进行学习
+
+2张表关联查询，一对一查询
+需求查询订单的信息及用户信息
+
+1234selectorders.*,user.username,user.sex, user.addressfrom orders, userwhere orders.user_id=user.id
+结果集：">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/0A6D42AE-B4E6-4960-8313-FAE563CBA426.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Mybatis 学习（二）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Mybatis 学习（二）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-01-15T06:32:00.000Z" itemprop="datePublished" class="page-time">
+  2017-01-15
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2张表关联查询，一对一查询"><span class="post-toc-number">1.</span> <span class="post-toc-text">2张表关联查询，一对一查询</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3张表关联查询，一对多查询"><span class="post-toc-number">2.</span> <span class="post-toc-text">3张表关联查询，一对多查询</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3张表联合查询，多对多查询"><span class="post-toc-number">3.</span> <span class="post-toc-text">3张表联合查询，多对多查询</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#懒加载"><span class="post-toc-number">4.</span> <span class="post-toc-text">懒加载</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#mybatis-缓存相关"><span class="post-toc-number">5.</span> <span class="post-toc-text">mybatis 缓存相关</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">6.</span> <span class="post-toc-text">总结</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Mybatis 学习（二）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Mybatis 学习（二）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-1-15 14:32" datetime="2017-01-15T06:32:00.000Z"  itemprop="datePublished">2017-01-15</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本次学习内容：MyBatis 高级<br>结合demo进行学习</p>
+</blockquote>
+<h2 id="2张表关联查询，一对一查询"><a href="#2张表关联查询，一对一查询" class="headerlink" title="2张表关联查询，一对一查询"></a>2张表关联查询，一对一查询</h2><ul>
+<li>需求<br>查询订单的信息及用户信息</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span></div><div class="line">orders.*,user.username,user.sex, user.address</div><div class="line"><span class="keyword">from</span> orders, <span class="keyword">user</span></div><div class="line"><span class="keyword">where</span> orders.user_id=user.id</div></pre></td></tr></table></figure>
+<p>结果集：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/0A6D42AE-B4E6-4960-8313-FAE563CBA426.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>主要对 结果集 进行分析，再书写 mapper.xml</p>
+<ul>
+<li>resultType实现<br>新建一个 po , 继承自 Orders（因为此sql 中 orders表的字段较多），再增加 user 的几个字段即可.</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrdersCustom</span> <span class="keyword">extends</span> <span class="title">Orders</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// 需求：</span></div><div class="line">    <span class="comment">// select orders.*,user.username,user.sex, user.address</span></div><div class="line">    <span class="comment">// from orders, user</span></div><div class="line">    <span class="comment">// where orders.user_id=user.id</span></div><div class="line"></div><div class="line">    <span class="keyword">private</span> String username;</div><div class="line">    <span class="keyword">private</span> String sex;</div><div class="line">    <span class="keyword">private</span> String address;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getUsername</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> username;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUsername</span><span class="params">(String username)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.username = username;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getSex</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> sex;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSex</span><span class="params">(String sex)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.sex = sex;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAddress</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> address;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAddress</span><span class="params">(String address)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.address = address;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">OrdersCustomMapper</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// 一对一查询 使用 resultType实现</span></div><div class="line">    <span class="function">List&lt;OrdersCustom&gt; <span class="title">queryOrdersUser</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"queryOrdersUser"</span> <span class="attr">resultType</span>=<span class="string">"com.gjr.po.OrdersCustom"</span>&gt;</span></div><div class="line">    select</div><div class="line">    orders.*,user.username,user.sex, user.address</div><div class="line">    from orders, user</div><div class="line">    where orders.user_id=user.id</div><div class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>resultMap实现<br>需要使用 association 进行关联，在原来的 Orders 类中 添加 user 属性</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">* 一对一查询：使用 resultMap实现，优点：可实现懒加载</div><div class="line">*/</div><div class="line"><span class="keyword">private</span> User user;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> User <span class="title">getUser</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> user;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUser</span><span class="params">(User user)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>.user = user;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"queryOrdersUser1"</span> <span class="attr">resultMap</span>=<span class="string">"OrdersUserResultMap"</span>&gt;</span></div><div class="line">    select</div><div class="line">    orders.*,user.username,user.sex, user.address</div><div class="line">    from orders, user</div><div class="line">    where orders.user_id=user.id</div><div class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"OrdersUserResultMap"</span> <span class="attr">type</span>=<span class="string">"com.gjr.po.Orders"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 配置订单信息 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"userId"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"number"</span> <span class="attr">property</span>=<span class="string">"number"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"createtime"</span> <span class="attr">property</span>=<span class="string">"createtime"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"note"</span> <span class="attr">property</span>=<span class="string">"note"</span>/&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 配置用户信息 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">"user"</span> <span class="attr">javaType</span>=<span class="string">"com.gjr.po.User"</span>&gt;</span> <span class="comment">&lt;!-- 这个 property="user" 就是 com.gjr.po.Orders 中增加的那个 user 属性--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span> <span class="comment">&lt;!-- column="user_id" 是查出来的结果中 用户的 唯一标示 --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"username"</span> <span class="attr">property</span>=<span class="string">"username"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"sex"</span> <span class="attr">property</span>=<span class="string">"sex"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"address"</span> <span class="attr">property</span>=<span class="string">"address"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">association</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/CB9AFFD6-B061-41CC-BC0B-0376C263DC0F.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="3张表关联查询，一对多查询"><a href="#3张表关联查询，一对多查询" class="headerlink" title="3张表关联查询，一对多查询"></a>3张表关联查询，一对多查询</h2><p><strong>确定主表，对其 po 添加所需字段</strong></p>
+<ul>
+<li>需求<br>– 查询用户订单详情</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span></div><div class="line">orders.*,</div><div class="line">user.username,user.sex, user.address,</div><div class="line">orderdetail.id orderdetail_id,</div><div class="line">orderdetail.items_id,</div><div class="line">orderdetail.items_num,</div><div class="line">orderdetail.orders_id</div><div class="line"><span class="keyword">from</span> orders, <span class="keyword">user</span>, orderdetail</div><div class="line"><span class="keyword">where</span> orders.user_id = user.id <span class="keyword">and</span> orders_id = orders.id</div></pre></td></tr></table></figure>
+<p>结果集：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/937F9118-45DC-4D2F-83A3-8ED359C2CD7F.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<ul>
+<li>实现</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"queryOrdersDetailUser"</span> <span class="attr">resultMap</span>=<span class="string">"OrdersDetailUserMap"</span>&gt;</span></div><div class="line">select</div><div class="line">    orders.*,</div><div class="line">    user.username,user.sex, user.address,</div><div class="line">    orderdetail.id orderdetail_id,</div><div class="line">    orderdetail.items_id,</div><div class="line">    orderdetail.items_num,</div><div class="line">    orderdetail.orders_id</div><div class="line">from orders, user, orderdetail</div><div class="line">where orders.user_id = user.id and orders_id = orders.id</div><div class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"OrdersDetailUserMap"</span> <span class="attr">type</span>=<span class="string">"com.gjr.po.Orders"</span> <span class="attr">extends</span>=<span class="string">"OrdersUserResultMap"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 用户信息、订单信息、复用前面的--&gt;</span></div><div class="line">    </div><div class="line">    <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">"orderdetailList"</span> <span class="attr">ofType</span>=<span class="string">"com.gjr.po.Orderdetail"</span>&gt;</span> <span class="comment">&lt;!--使用 ofType--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"orderdetail_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_id"</span> <span class="attr">property</span>=<span class="string">"itemsId"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_num"</span> <span class="attr">property</span>=<span class="string">"itemsNum"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"orders_id"</span> <span class="attr">property</span>=<span class="string">"ordersId"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>在查询主表对应的po类， Orders 中增加字段 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> List&lt;Orderdetail&gt; orderdetailList;</div></pre></td></tr></table></figure>
+<h2 id="3张表联合查询，多对多查询"><a href="#3张表联合查询，多对多查询" class="headerlink" title="3张表联合查询，多对多查询"></a>3张表联合查询，多对多查询</h2><ul>
+<li>需求<br>查询用户订单商品明细</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span></div><div class="line">  orders.*,</div><div class="line">  user.username,</div><div class="line">  user.sex,</div><div class="line">  user.address,</div><div class="line">  orderdetail.id orderdetail_id,</div><div class="line">  orderdetail.items_id,</div><div class="line">  orderdetail.items_num,</div><div class="line">  orderdetail.orders_id,</div><div class="line">  items.name items_name,</div><div class="line">  items.detail items_detail,</div><div class="line">  items.price items_price</div><div class="line"><span class="keyword">FROM</span></div><div class="line">  orders,</div><div class="line">  <span class="keyword">user</span>,</div><div class="line">  orderdetail,</div><div class="line">  items</div><div class="line"><span class="keyword">WHERE</span> orders.user_id = user.id <span class="keyword">AND</span> orderdetail.orders_id=orders.id <span class="keyword">AND</span> orderdetail.items_id = items.id</div></pre></td></tr></table></figure>
+<p>结果集：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/C9339305-3D30-4A4F-B349-73DC6B6C9D50.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<ul>
+<li>实现</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"queryOrdersDetailUserItems"</span> <span class="attr">resultMap</span>=<span class="string">"OrdersDetailUserItemsMap"</span>&gt;</span></div><div class="line">--     查询用户订单商品明细</div><div class="line">        SELECT</div><div class="line">          orders.*,</div><div class="line">          user.username,</div><div class="line">          user.sex,</div><div class="line">          user.address,</div><div class="line">          orderdetail.id orderdetail_id,</div><div class="line">          orderdetail.items_id,</div><div class="line">          orderdetail.items_num,</div><div class="line">          orderdetail.orders_id,</div><div class="line">          items.name items_name,</div><div class="line">          items.detail items_detail,</div><div class="line">          items.price items_price</div><div class="line">        FROM</div><div class="line">          orders,</div><div class="line">          user,</div><div class="line">          orderdetail,</div><div class="line">          items</div><div class="line">        WHERE orders.user_id = user.id AND orderdetail.orders_id=orders.id AND orderdetail.items_id = items.id</div><div class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"OrdersDetailUserItemsMap"</span> <span class="attr">type</span>=<span class="string">"com.gjr.po.User"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 用户信息--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span> <span class="comment">&lt;!-- 根据查询结果 写 column !!! --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"username"</span> <span class="attr">property</span>=<span class="string">"username"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"sex"</span> <span class="attr">property</span>=<span class="string">"sex"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"address"</span> <span class="attr">property</span>=<span class="string">"address"</span>/&gt;</span></div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 订单信息: 一个用户对应多个订单--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">"ordersList"</span> <span class="attr">ofType</span>=<span class="string">"com.gjr.po.Orders"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"userId"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"number"</span> <span class="attr">property</span>=<span class="string">"number"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"createtime"</span> <span class="attr">property</span>=<span class="string">"createtime"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"note"</span> <span class="attr">property</span>=<span class="string">"note"</span>/&gt;</span></div><div class="line"></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- 订单明细：一个订单对应多个明细 --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">"orderdetailList"</span> <span class="attr">ofType</span>=<span class="string">"com.gjr.po.Orderdetail"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"orderdetail_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_id"</span> <span class="attr">property</span>=<span class="string">"itemsId"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_num"</span> <span class="attr">property</span>=<span class="string">"itemsNum"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"orders_id"</span> <span class="attr">property</span>=<span class="string">"ordersId"</span>/&gt;</span></div><div class="line"></div><div class="line"></div><div class="line">            <span class="comment">&lt;!-- 商品信息：一个明细对应一个商品 --&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">"items"</span> <span class="attr">javaType</span>=<span class="string">"com.gjr.po.Items"</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"items_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_name"</span> <span class="attr">property</span>=<span class="string">"name"</span>/&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_detail"</span> <span class="attr">property</span>=<span class="string">"detail"</span>/&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_price"</span> <span class="attr">property</span>=<span class="string">"price"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">association</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>各个 po 类需要分别增加相关字段即可，安装关联的类型和字段</p>
+<h2 id="懒加载"><a href="#懒加载" class="headerlink" title="懒加载"></a>懒加载</h2><p>配置 mybatisConfig.xml 相关参数：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">settings</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 打开 延迟加载 的开关--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">setting</span> <span class="attr">name</span>=<span class="string">"lazyLoadingEnabled"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 设置按需加载 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">setting</span> <span class="attr">name</span>=<span class="string">"aggressiveLazyLoading"</span> <span class="attr">value</span>=<span class="string">"false"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">settings</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"findOrdersUserLazyLoading"</span> <span class="attr">resultMap</span>=<span class="string">"OrdersUserLazyLoadingResultMap"</span>&gt;</span></div><div class="line">--         懒加载测试</div><div class="line">        SELECT * FROM orders</div><div class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>用 association 实现延迟加载：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"OrdersUserLazyLoadingResultMap"</span> <span class="attr">type</span>=<span class="string">"com.gjr.po.Orders"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!--对订单信息进行映射配置  --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"userId"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"number"</span> <span class="attr">property</span>=<span class="string">"number"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"createtime"</span> <span class="attr">property</span>=<span class="string">"createtime"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"note"</span> <span class="attr">property</span>=<span class="string">"note"</span>/&gt;</span></div><div class="line">    </div><div class="line">    <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">"user"</span> <span class="attr">javaType</span>=<span class="string">"com.gjr.po.User"</span></span></div><div class="line">                 <span class="attr">select</span>=<span class="string">"com.gjr.mapper.UserMapper.findUserById"</span></div><div class="line">                 <span class="attr">column</span>=<span class="string">"user_id"</span>&gt;</div><div class="line">        <span class="comment">&lt;!-- 实现对用户信息进行延迟加载 --&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="name">association</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>测试：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/51C2ECFE-8AD9-4354-B9D1-3E0B7DC66FE8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h2 id="mybatis-缓存相关"><a href="#mybatis-缓存相关" class="headerlink" title="mybatis 缓存相关"></a>mybatis 缓存相关</h2><ul>
+<li>mybatis默认开启一级缓存，二级缓存</li>
+<li>Mybatis查询得数据，缓存至一级缓存，再缓存至二级缓存中，二级缓存是 mapper 级别的，凡是同一个mapper，都会有自己的二级缓存区</li>
+<li>多个sqlsession可以同享同一个 mapper的二级缓存</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>resultMap可以实现高级映射（使用association、collection实现一对一及一对多映射），association、collection具备延迟加载功能。</li>
+<li>延迟加载：先从单表查询、需要时再从关联表去关联查询，大大提高数据库性能，因为查询单表要比关联查询多张表速度要快。</li>
+<li>查询结果 必须要和 pojo 类型保持一致</li>
+<li>联系实际问题的关系类型（如：一个订单对应一个用户，一个订单对应多个明细），进行 po 的修改或扩展</li>
+<li>association, collection 分别是 关系类型为：1对1，1对多   配置时分别是 javaType 、ofType</li>
+</ul>
+<p><br></p>
+<p>附录<br>demo 地址：<br><a href="https://github.com/fenglincanyi/mybaitsdemo2" target="_blank" rel="external">https://github.com/fenglincanyi/mybaitsdemo2</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-03-05T09:45:47.000Z" title="2017-3-5 17:45" itemprop="dateUpdated">2017年3月5日 17:45</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/01/15/Mybatis 学习（二）/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mybatis/">Mybatis</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/&title=《Mybatis 学习（二）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/&title=《Mybatis 学习（二）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Mybatis 学习（二）》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/02/01/Gradle实现自动拉取git及压缩文件/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Gradle实现自动拉取git及压缩文件</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/01/11/Mybatis 学习（一）/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Mybatis 学习（一）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Mybatis 学习（二）" data-title="Mybatis 学习（二）" data-url="https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/&title=《Mybatis 学习（二）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/&title=《Mybatis 学习（二）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Mybatis 学习（二）》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACrUlEQVR42u3aQXLCQAwEQP7/aXKlimBG0qrwoX2igrG3ffAqIz0e8fF8O17//n7O9W/z4/rKxw48PDy88dKTG3z6Njnz/e75qvI14+Hh4W3zPt3g+pzk/Cp+sh48PDy8e/Lyl/6pR3b9UPDw8PDuz6sWxL2rza+Ah4eHt82bBAq9cOGakf/lWNaCh4eHF/PyLtJ9Pq/09/Dw8PDGXfX5uEBSap/aDP5ZLR4eHt4Crxen9mKI3kDVJPbFw8PD2+PlQWoO6D2U6gZQfhB4eHh4h3i9S5yKMyaxbLQePDw8vKO8PDzNi+Ck6dUr3KvFOh4eHt4GrxqhJgV0/uJOzj+wReHh4eEd5SVxQy9oSErzeeBb6O/h4eHhrfHmm0E1oq0W30kQXKjQ8fDw8Aa86iZxtmHW7NddhyN4eHh4C7w8GujdoLeR5AME+SPGw8PD2+DlDadq9DApyvOlR9fEw8PDG/OqRW3vtT4vrKuFfjS5gIeHhzfm9RZRLXOrd0xGCj4i8fDw8BZ4k2ZYL3TobTZ5UFLeJPDw8PCKvMkiqnHq5MH1WnF4eHh4G7zeiMBek6yw3HgYCw8PD+8sL/9Zr1Wfx769wr08DYGHh4e3xqvGBNUt4VRw/KUQx8PDw1vg9UKEU0uZtLiSAw8PD+9XvEmDv1ocV0fBovIdDw8Pb5mXf5uPXuUFdx71NjcGPDw8vKO8agsq3xjmYUcvCMbDw8Pb4DVftXH7KtkwJvHEl0eGh4eHt8CrvnDn8cH25+aBh4eHV+Qlm0ESp1YHs+bNtmhgCw8PD2+Nl5TIvQC3GlL0Nq1o6AoPDw/vR7x5wZ3gk28LKTUeHh7eT3l5KVwtzZ/jYzT7gIeHh1fkVVtWeftqshlMRr7w8PDw9njVf/gnL+t8Kb1G2qi/h4eHh/ed9wdHVCIW20zrwgAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

@@ -234,6 +234,184 @@
   </entry>
   
   <entry>
+    <title>Mybatis 学习（二）</title>
+    <link href="https://fenglincanyi.github.io/2017/01/15/Mybatis%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
+    <id>https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/</id>
+    <published>2017-01-15T06:32:00.000Z</published>
+    <updated>2017-03-05T09:45:47.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>本次学习内容：MyBatis 高级<br>结合demo进行学习</p>
+</blockquote>
+<h2 id="2张表关联查询，一对一查询"><a href="#2张表关联查询，一对一查询" class="headerlink" title="2张表关联查询，一对一查询"></a>2张表关联查询，一对一查询</h2><ul>
+<li>需求<br>查询订单的信息及用户信息</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span></div><div class="line">orders.*,user.username,user.sex, user.address</div><div class="line"><span class="keyword">from</span> orders, <span class="keyword">user</span></div><div class="line"><span class="keyword">where</span> orders.user_id=user.id</div></pre></td></tr></table></figure>
+<p>结果集：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/0A6D42AE-B4E6-4960-8313-FAE563CBA426.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>主要对 结果集 进行分析，再书写 mapper.xml</p>
+<ul>
+<li>resultType实现<br>新建一个 po , 继承自 Orders（因为此sql 中 orders表的字段较多），再增加 user 的几个字段即可.</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OrdersCustom</span> <span class="keyword">extends</span> <span class="title">Orders</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// 需求：</span></div><div class="line">    <span class="comment">// select orders.*,user.username,user.sex, user.address</span></div><div class="line">    <span class="comment">// from orders, user</span></div><div class="line">    <span class="comment">// where orders.user_id=user.id</span></div><div class="line"></div><div class="line">    <span class="keyword">private</span> String username;</div><div class="line">    <span class="keyword">private</span> String sex;</div><div class="line">    <span class="keyword">private</span> String address;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getUsername</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> username;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUsername</span><span class="params">(String username)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.username = username;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getSex</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> sex;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSex</span><span class="params">(String sex)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.sex = sex;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAddress</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> address;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAddress</span><span class="params">(String address)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.address = address;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">OrdersCustomMapper</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// 一对一查询 使用 resultType实现</span></div><div class="line">    <span class="function">List&lt;OrdersCustom&gt; <span class="title">queryOrdersUser</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"queryOrdersUser"</span> <span class="attr">resultType</span>=<span class="string">"com.gjr.po.OrdersCustom"</span>&gt;</span></div><div class="line">    select</div><div class="line">    orders.*,user.username,user.sex, user.address</div><div class="line">    from orders, user</div><div class="line">    where orders.user_id=user.id</div><div class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>resultMap实现<br>需要使用 association 进行关联，在原来的 Orders 类中 添加 user 属性</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">* 一对一查询：使用 resultMap实现，优点：可实现懒加载</div><div class="line">*/</div><div class="line"><span class="keyword">private</span> User user;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> User <span class="title">getUser</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> user;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUser</span><span class="params">(User user)</span> </span>&#123;</div><div class="line">    <span class="keyword">this</span>.user = user;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"queryOrdersUser1"</span> <span class="attr">resultMap</span>=<span class="string">"OrdersUserResultMap"</span>&gt;</span></div><div class="line">    select</div><div class="line">    orders.*,user.username,user.sex, user.address</div><div class="line">    from orders, user</div><div class="line">    where orders.user_id=user.id</div><div class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"OrdersUserResultMap"</span> <span class="attr">type</span>=<span class="string">"com.gjr.po.Orders"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 配置订单信息 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"userId"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"number"</span> <span class="attr">property</span>=<span class="string">"number"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"createtime"</span> <span class="attr">property</span>=<span class="string">"createtime"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"note"</span> <span class="attr">property</span>=<span class="string">"note"</span>/&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 配置用户信息 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">"user"</span> <span class="attr">javaType</span>=<span class="string">"com.gjr.po.User"</span>&gt;</span> <span class="comment">&lt;!-- 这个 property="user" 就是 com.gjr.po.Orders 中增加的那个 user 属性--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span> <span class="comment">&lt;!-- column="user_id" 是查出来的结果中 用户的 唯一标示 --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"username"</span> <span class="attr">property</span>=<span class="string">"username"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"sex"</span> <span class="attr">property</span>=<span class="string">"sex"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"address"</span> <span class="attr">property</span>=<span class="string">"address"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">association</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/CB9AFFD6-B061-41CC-BC0B-0376C263DC0F.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="3张表关联查询，一对多查询"><a href="#3张表关联查询，一对多查询" class="headerlink" title="3张表关联查询，一对多查询"></a>3张表关联查询，一对多查询</h2><p><strong>确定主表，对其 po 添加所需字段</strong></p>
+<ul>
+<li>需求<br>– 查询用户订单详情</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">select</span></div><div class="line">orders.*,</div><div class="line">user.username,user.sex, user.address,</div><div class="line">orderdetail.id orderdetail_id,</div><div class="line">orderdetail.items_id,</div><div class="line">orderdetail.items_num,</div><div class="line">orderdetail.orders_id</div><div class="line"><span class="keyword">from</span> orders, <span class="keyword">user</span>, orderdetail</div><div class="line"><span class="keyword">where</span> orders.user_id = user.id <span class="keyword">and</span> orders_id = orders.id</div></pre></td></tr></table></figure>
+<p>结果集：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/937F9118-45DC-4D2F-83A3-8ED359C2CD7F.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<ul>
+<li>实现</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"queryOrdersDetailUser"</span> <span class="attr">resultMap</span>=<span class="string">"OrdersDetailUserMap"</span>&gt;</span></div><div class="line">select</div><div class="line">    orders.*,</div><div class="line">    user.username,user.sex, user.address,</div><div class="line">    orderdetail.id orderdetail_id,</div><div class="line">    orderdetail.items_id,</div><div class="line">    orderdetail.items_num,</div><div class="line">    orderdetail.orders_id</div><div class="line">from orders, user, orderdetail</div><div class="line">where orders.user_id = user.id and orders_id = orders.id</div><div class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"OrdersDetailUserMap"</span> <span class="attr">type</span>=<span class="string">"com.gjr.po.Orders"</span> <span class="attr">extends</span>=<span class="string">"OrdersUserResultMap"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 用户信息、订单信息、复用前面的--&gt;</span></div><div class="line">    </div><div class="line">    <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">"orderdetailList"</span> <span class="attr">ofType</span>=<span class="string">"com.gjr.po.Orderdetail"</span>&gt;</span> <span class="comment">&lt;!--使用 ofType--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"orderdetail_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_id"</span> <span class="attr">property</span>=<span class="string">"itemsId"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_num"</span> <span class="attr">property</span>=<span class="string">"itemsNum"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"orders_id"</span> <span class="attr">property</span>=<span class="string">"ordersId"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>在查询主表对应的po类， Orders 中增加字段 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> List&lt;Orderdetail&gt; orderdetailList;</div></pre></td></tr></table></figure>
+<h2 id="3张表联合查询，多对多查询"><a href="#3张表联合查询，多对多查询" class="headerlink" title="3张表联合查询，多对多查询"></a>3张表联合查询，多对多查询</h2><ul>
+<li>需求<br>查询用户订单商品明细</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span></div><div class="line">  orders.*,</div><div class="line">  user.username,</div><div class="line">  user.sex,</div><div class="line">  user.address,</div><div class="line">  orderdetail.id orderdetail_id,</div><div class="line">  orderdetail.items_id,</div><div class="line">  orderdetail.items_num,</div><div class="line">  orderdetail.orders_id,</div><div class="line">  items.name items_name,</div><div class="line">  items.detail items_detail,</div><div class="line">  items.price items_price</div><div class="line"><span class="keyword">FROM</span></div><div class="line">  orders,</div><div class="line">  <span class="keyword">user</span>,</div><div class="line">  orderdetail,</div><div class="line">  items</div><div class="line"><span class="keyword">WHERE</span> orders.user_id = user.id <span class="keyword">AND</span> orderdetail.orders_id=orders.id <span class="keyword">AND</span> orderdetail.items_id = items.id</div></pre></td></tr></table></figure>
+<p>结果集：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/C9339305-3D30-4A4F-B349-73DC6B6C9D50.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<ul>
+<li>实现</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"queryOrdersDetailUserItems"</span> <span class="attr">resultMap</span>=<span class="string">"OrdersDetailUserItemsMap"</span>&gt;</span></div><div class="line">--     查询用户订单商品明细</div><div class="line">        SELECT</div><div class="line">          orders.*,</div><div class="line">          user.username,</div><div class="line">          user.sex,</div><div class="line">          user.address,</div><div class="line">          orderdetail.id orderdetail_id,</div><div class="line">          orderdetail.items_id,</div><div class="line">          orderdetail.items_num,</div><div class="line">          orderdetail.orders_id,</div><div class="line">          items.name items_name,</div><div class="line">          items.detail items_detail,</div><div class="line">          items.price items_price</div><div class="line">        FROM</div><div class="line">          orders,</div><div class="line">          user,</div><div class="line">          orderdetail,</div><div class="line">          items</div><div class="line">        WHERE orders.user_id = user.id AND orderdetail.orders_id=orders.id AND orderdetail.items_id = items.id</div><div class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"OrdersDetailUserItemsMap"</span> <span class="attr">type</span>=<span class="string">"com.gjr.po.User"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 用户信息--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span> <span class="comment">&lt;!-- 根据查询结果 写 column !!! --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"username"</span> <span class="attr">property</span>=<span class="string">"username"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"sex"</span> <span class="attr">property</span>=<span class="string">"sex"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"address"</span> <span class="attr">property</span>=<span class="string">"address"</span>/&gt;</span></div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 订单信息: 一个用户对应多个订单--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">"ordersList"</span> <span class="attr">ofType</span>=<span class="string">"com.gjr.po.Orders"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"userId"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"number"</span> <span class="attr">property</span>=<span class="string">"number"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"createtime"</span> <span class="attr">property</span>=<span class="string">"createtime"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"note"</span> <span class="attr">property</span>=<span class="string">"note"</span>/&gt;</span></div><div class="line"></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- 订单明细：一个订单对应多个明细 --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">"orderdetailList"</span> <span class="attr">ofType</span>=<span class="string">"com.gjr.po.Orderdetail"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"orderdetail_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_id"</span> <span class="attr">property</span>=<span class="string">"itemsId"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_num"</span> <span class="attr">property</span>=<span class="string">"itemsNum"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"orders_id"</span> <span class="attr">property</span>=<span class="string">"ordersId"</span>/&gt;</span></div><div class="line"></div><div class="line"></div><div class="line">            <span class="comment">&lt;!-- 商品信息：一个明细对应一个商品 --&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">"items"</span> <span class="attr">javaType</span>=<span class="string">"com.gjr.po.Items"</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"items_id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_name"</span> <span class="attr">property</span>=<span class="string">"name"</span>/&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_detail"</span> <span class="attr">property</span>=<span class="string">"detail"</span>/&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"items_price"</span> <span class="attr">property</span>=<span class="string">"price"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">association</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>各个 po 类需要分别增加相关字段即可，安装关联的类型和字段</p>
+<h2 id="懒加载"><a href="#懒加载" class="headerlink" title="懒加载"></a>懒加载</h2><p>配置 mybatisConfig.xml 相关参数：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">settings</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 打开 延迟加载 的开关--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">setting</span> <span class="attr">name</span>=<span class="string">"lazyLoadingEnabled"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 设置按需加载 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">setting</span> <span class="attr">name</span>=<span class="string">"aggressiveLazyLoading"</span> <span class="attr">value</span>=<span class="string">"false"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">settings</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"findOrdersUserLazyLoading"</span> <span class="attr">resultMap</span>=<span class="string">"OrdersUserLazyLoadingResultMap"</span>&gt;</span></div><div class="line">--         懒加载测试</div><div class="line">        SELECT * FROM orders</div><div class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>用 association 实现延迟加载：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">"OrdersUserLazyLoadingResultMap"</span> <span class="attr">type</span>=<span class="string">"com.gjr.po.Orders"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!--对订单信息进行映射配置  --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">"id"</span> <span class="attr">property</span>=<span class="string">"id"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"user_id"</span> <span class="attr">property</span>=<span class="string">"userId"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"number"</span> <span class="attr">property</span>=<span class="string">"number"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"createtime"</span> <span class="attr">property</span>=<span class="string">"createtime"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">"note"</span> <span class="attr">property</span>=<span class="string">"note"</span>/&gt;</span></div><div class="line">    </div><div class="line">    <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">"user"</span> <span class="attr">javaType</span>=<span class="string">"com.gjr.po.User"</span></span></div><div class="line">                 <span class="attr">select</span>=<span class="string">"com.gjr.mapper.UserMapper.findUserById"</span></div><div class="line">                 <span class="attr">column</span>=<span class="string">"user_id"</span>&gt;</div><div class="line">        <span class="comment">&lt;!-- 实现对用户信息进行延迟加载 --&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="name">association</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>测试：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/51C2ECFE-8AD9-4354-B9D1-3E0B7DC66FE8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h2 id="mybatis-缓存相关"><a href="#mybatis-缓存相关" class="headerlink" title="mybatis 缓存相关"></a>mybatis 缓存相关</h2><ul>
+<li>mybatis默认开启一级缓存，二级缓存</li>
+<li>Mybatis查询得数据，缓存至一级缓存，再缓存至二级缓存中，二级缓存是 mapper 级别的，凡是同一个mapper，都会有自己的二级缓存区</li>
+<li>多个sqlsession可以同享同一个 mapper的二级缓存</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>resultMap可以实现高级映射（使用association、collection实现一对一及一对多映射），association、collection具备延迟加载功能。</li>
+<li>延迟加载：先从单表查询、需要时再从关联表去关联查询，大大提高数据库性能，因为查询单表要比关联查询多张表速度要快。</li>
+<li>查询结果 必须要和 pojo 类型保持一致</li>
+<li>联系实际问题的关系类型（如：一个订单对应一个用户，一个订单对应多个明细），进行 po 的修改或扩展</li>
+<li>association, collection 分别是 关系类型为：1对1，1对多   配置时分别是 javaType 、ofType</li>
+</ul>
+<p><br></p>
+<p>附录<br>demo 地址：<br><a href="https://github.com/fenglincanyi/mybaitsdemo2" target="_blank" rel="external">https://github.com/fenglincanyi/mybaitsdemo2</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;本次学习内容：MyBatis 高级&lt;br&gt;结合demo进行学习&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;2张表关联查询，一对一查询&quot;&gt;&lt;a href=&quot;#2张表关联查询，一对一查询&quot; class=&quot;headerlink&quot; title=&quot;
+    
+    </summary>
+    
+      <category term="Java后台" scheme="https://fenglincanyi.github.io/categories/Java%E5%90%8E%E5%8F%B0/"/>
+    
+    
+      <category term="Mybatis" scheme="https://fenglincanyi.github.io/tags/Mybatis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mybatis 学习（一）</title>
+    <link href="https://fenglincanyi.github.io/2017/01/11/Mybatis%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
+    <id>https://fenglincanyi.github.io/2017/01/11/Mybatis 学习（一）/</id>
+    <published>2017-01-11T04:01:00.000Z</published>
+    <updated>2017-03-05T09:14:37.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>本次学习内容：MyBatis 基础</p>
+</blockquote>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>mybatis 是一个持久层框架，是apache下的开源项目<br>是一个半自动化框架，与Hibernate相比，需要开发者手动写sql，这样更为灵活配置<br>mybatis 可以将PreparedStatement 中输入的参数自动进行输入映射，将查询结果灵活映射成 Java 对象</p>
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><p>执行过程：</p>
+<p>SqlMapConfig.xml/mapper.xml … —&gt;<br>SqlSessionFactory —&gt;<br>SqlSession —&gt;<br>Executor —&gt;<br>mapper statement —&gt;<br>db</p>
+<ul>
+<li>配置数据源，映射文件</li>
+<li>创建SqlSession 交给执行器操作数据库</li>
+<li>操作数据库</li>
+<li>对操作数据库存储做封装，包括SQL语句，输入参数，输出结果</li>
+</ul>
+<h2 id="遇到问题"><a href="#遇到问题" class="headerlink" title="遇到问题"></a>遇到问题</h2><p>报错：<br>org.apache.ibatis.binding.BindingException: Invalid bound statement (not found):    ………<br>然后，发现target目录下，XxxMapper.xml 没有在 target 下相应的目录生成<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4B5E209A-0C22-4072-8B8D-AD3532042E98.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>原因：</p>
+<pre><code>在使用maven等构建工具时，默认会将源码编译后再加上资源目录的文件放到target目录下作为最后运行的文件（可以是war,jar,或者目录）。有时为了方便，我们会在src/main/java源码目录下放了资源文件，例如mybatis的mapper文件，方便我们编程时展开查看。这时，我们需要设置编译时也将这些配置文件放到target目录下，否则最后的target目录式没有这些文件的。
+</code></pre><p>解决：<br>在maven中，在build元素中添加：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">resource</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">directory</span>&gt;</span>src/main/java<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">includes</span>&gt;</span></div><div class="line">                <span class="tag">&lt;<span class="name">include</span>&gt;</span>**/*.xml<span class="tag">&lt;/<span class="name">include</span>&gt;</span></div><div class="line">            <span class="tag">&lt;/<span class="name">includes</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">resource</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>Mybatis 框架实际上 是对原来 jdbc 代码的封装，将繁琐重复的代码，交付给配置文件和接口类进行灵活的对象映射</li>
+<li>动态sql 有点像 jstl，很容易理解，目的就是为了灵活的玩 sql 语句</li>
+<li>对于各种类型的sql 语句，需要记住mybatis的处理方式即可</li>
+<li>Mybatis 是将 对象或简单类型输入，将结果以数据实体/简单类型输出，省去了 jdbc 的复杂操作</li>
+<li>进行 事务性操作时，一定要 commit，否则不生效<br>sqlSession.commit();</li>
+</ul>
+<h2 id="mybatis-插件"><a href="#mybatis-插件" class="headerlink" title="mybatis 插件"></a>mybatis 插件</h2><p>附录：<br>    使用：<a href="https://www.oschina.net/p/intellij-mybatis-plugin" target="_blank" rel="external">https://www.oschina.net/p/intellij-mybatis-plugin</a><br>    下载：<a href="https://github.com/CHN-Jaylin/Plugins-Cracked" target="_blank" rel="external">https://github.com/CHN-Jaylin/Plugins-Cracked</a> （破解的)</p>
+<p><br></p>
+<p>参考：<br><a href="http://ask.csdn.net/questions/226091" target="_blank" rel="external">http://ask.csdn.net/questions/226091</a></p>
+<p>附录<br>demo 地址：<br><a href="https://github.com/fenglincanyi/mybaitsdemo1" target="_blank" rel="external">https://github.com/fenglincanyi/mybaitsdemo1</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;本次学习内容：MyBatis 基础&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;介绍&quot;&gt;&lt;a href=&quot;#介绍&quot; class=&quot;headerlink&quot; title=&quot;介绍&quot;&gt;&lt;/a&gt;介绍&lt;/h2&gt;&lt;p&gt;mybatis 是一个持久层框架，是
+    
+    </summary>
+    
+      <category term="Java后台" scheme="https://fenglincanyi.github.io/categories/Java%E5%90%8E%E5%8F%B0/"/>
+    
+    
+      <category term="Mybatis" scheme="https://fenglincanyi.github.io/tags/Mybatis/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Spring 学习（三）</title>
     <link href="https://fenglincanyi.github.io/2017/01/07/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/</id>
@@ -882,129 +1060,6 @@ globalSession 一次登陆，任何地方都保存有登录状态
   </entry>
   
   <entry>
-    <title>Android 类加载初探</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
-</blockquote>
-<p>需要关注的类有：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
-<ul>
-<li>BaseDexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>DexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>PathClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
-<p><strong>ClassLoader 相关说明：</strong></p>
-<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
-<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
-<p>DexPathList 构造函数：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>makeDexElements过程：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
-<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
-    
-  </entry>
-  
-  <entry>
     <title>Android apk安装过程实例分析</title>
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
@@ -1125,6 +1180,129 @@ globalSession 一次登陆，任何地方都保存有登录状态
       <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
     
       <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android 类加载初探</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2017-01-19T08:20:55.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
+</blockquote>
+<p>需要关注的类有：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
+<ul>
+<li>BaseDexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>DexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>PathClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
+<p><strong>ClassLoader 相关说明：</strong></p>
+<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
+<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
+<p>DexPathList 构造函数：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>makeDexElements过程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
+<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
     
   </entry>
   
