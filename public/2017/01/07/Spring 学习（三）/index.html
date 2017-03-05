@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Spring 学习（三） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Spring">
+    <meta name="description" content="本次学习内容：Spring AOP相关
+
+问题引入123456public class User &amp;#123;    public void addUser() &amp;#123;        // ...    &amp;#125;&amp;#125;
+—— 需求，在上面原有的功能中，加入用户日志，记录用户信息？如何做？—— 方法尝试：
+123456public class BaseUser &amp;#123;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring 学习（三）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="本次学习内容：Spring AOP相关
+
+问题引入123456public class User &amp;#123;    public void addUser() &amp;#123;        // ...    &amp;#125;&amp;#125;
+—— 需求，在上面原有的功能中，加入用户日志，记录用户信息？如何做？—— 方法尝试：
+123456public class BaseUser &amp;#123;">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/DE37AB73-E35C-4515-8EE9-377A606E3956.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/83664DD4-196B-44DB-BF22-16A94F0FFA01.png">
+<meta property="og:updated_time" content="2017-03-05T08:26:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring 学习（三）">
+<meta name="twitter:description" content="本次学习内容：Spring AOP相关
+
+问题引入123456public class User &amp;#123;    public void addUser() &amp;#123;        // ...    &amp;#125;&amp;#125;
+—— 需求，在上面原有的功能中，加入用户日志，记录用户信息？如何做？—— 方法尝试：
+123456public class BaseUser &amp;#123;">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/DE37AB73-E35C-4515-8EE9-377A606E3956.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Spring 学习（三）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Spring 学习（三）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-01-07T04:01:00.000Z" itemprop="datePublished" class="page-time">
+  2017-01-07
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#问题引入"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题引入</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#AOP-原理"><span class="post-toc-number">2.</span> <span class="post-toc-text">AOP 原理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#有接口"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">有接口</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#没有接口"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">没有接口</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#几个重要-术语"><span class="post-toc-number">3.</span> <span class="post-toc-text">几个重要 术语</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#实现AOP"><span class="post-toc-number">4.</span> <span class="post-toc-text">实现AOP</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#xml-配置实现"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">xml 配置实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#注解实现-aop（只列出-Before，其他的相同）"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">注解实现 aop（只列出@Before，其他的相同）</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Spring 学习（三）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Spring 学习（三）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-1-7 12:01" datetime="2017-01-07T04:01:00.000Z"  itemprop="datePublished">2017-01-07</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本次学习内容：Spring AOP相关</p>
+</blockquote>
+<h1 id="问题引入"><a href="#问题引入" class="headerlink" title="问题引入"></a>问题引入</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addUser</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// ...</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>—— 需求，在上面原有的功能中，加入用户日志，记录用户信息？如何做？<br>—— 方法尝试：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseUser</span> </span>&#123;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeLog</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// 写日志，记录用户信息</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">extends</span> <span class="title">BaseUser</span></span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addUser</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// ...</span></div><div class="line">        <span class="keyword">super</span>.writeLog();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这种 纵向 的抽取，并不能友好的解决问题，一旦父类的名称改变，后面也要接着更改</p>
+<h1 id="AOP-原理"><a href="#AOP-原理" class="headerlink" title="AOP 原理"></a>AOP 原理</h1><h2 id="有接口"><a href="#有接口" class="headerlink" title="有接口"></a>有接口</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Dao</span> </span>&#123;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">add</span><span class="params">()</span></span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DaoImpl</span> <span class="keyword">implements</span> <span class="title">Dao</span> </span>&#123;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">()</span> </span>&#123;</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用 jdk 动态代理，生成 接口实现类的代理对象，来增相应方法的功能</p>
+<h2 id="没有接口"><a href="#没有接口" class="headerlink" title="没有接口"></a>没有接口</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addUser</span><span class="params">()</span> </span>&#123;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使用 cglib 动态代理，生成其子类的代理对象，调用父类的方法，来增强相应功能</p>
+<h1 id="几个重要-术语"><a href="#几个重要-术语" class="headerlink" title="几个重要 术语"></a>几个重要 术语</h1><ul>
+<li>连接点 JoinPoint：类中哪些方法可以被 增强，这些方法就是 连接点</li>
+<li>切入点 PointCut：类中实际增强类那些方法（如：add,update)，这些方法称为 切入点</li>
+<li>通知／增强 advice: 增强的逻辑，如：要扩展日志功能，则日志功能为 增强／通知<br>分为：前置通知(方法之前执行），后置通知，异常通知(方法出现异常)，最终通知(后置之后执行)，环绕通知(方法之前和之后执行)</li>
+<li>切面 aspect：把增强功能应用到具体方法上，这个过程叫切面。即：把增强应用到切入点的过程</li>
+<li>目标对象 target: 要增强的类，代理的目标对象</li>
+<li>织入 weaving: 把增强应用到目标的过程，把advice 应用到target的过程</li>
+<li>代理 Proxy: 一个类被aop织入增强后，就产生一个结果代理类</li>
+</ul>
+<h1 id="实现AOP"><a href="#实现AOP" class="headerlink" title="实现AOP"></a>实现AOP</h1><h2 id="xml-配置实现"><a href="#xml-配置实现" class="headerlink" title="xml 配置实现"></a>xml 配置实现</h2><ul>
+<li><p>切入点配置表达式：<br><strong>execution(&lt;访问修饰符&gt; &lt;返回类型&gt;&lt;方法名&gt;(参数)&lt;异常&gt;）</strong><br>e.g.</p>
+<pre><code>execution(* com.gjr.aop.Book.add(..))
+execution(* com.gjr.aop.Book.*(..))          book 类下的所有方法加强
+execution(* *.*(..))                         所有类下的所有方法加强
+execution(* xxx*(..))                        所有xxx开头的方法加强
+</code></pre></li>
+</ul>
+<p><br><br>demo 示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Book</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"show book ...."</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyBook</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addFunctionBefore</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"在前面，加点功能 。。。"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addFunctionAfter</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"在后面，加点功能 。。。"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">arroundFunction</span><span class="params">(ProceedingJoinPoint proceedingJoinPoint)</span> <span class="keyword">throws</span> Throwable </span>&#123;</div><div class="line">        System.out.println(<span class="string">"之前环绕 。。。"</span>);</div><div class="line">        proceedingJoinPoint.proceed();</div><div class="line">        System.out.println(<span class="string">"之后环绕 。。。"</span>);</div><div class="line">        <span class="comment">// 注意 环绕通知 的参数：ProceedingJoinPoint</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>xml配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></div><div class="line">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">       <span class="attr">xmlns:aop</span>=<span class="string">"http://www.springframework.org/schema/aop"</span></div><div class="line">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans</span></div><div class="line">            http://www.springframework.org/schema/beans/spring-beans.xsd</div><div class="line">            http://www.springframework.org/schema/aop</div><div class="line">            http://www.springframework.org/schema/aop/spring-aop.xsd"&gt;</div><div class="line">    <span class="comment">&lt;!-- 加入 aop 约束，xml 配置aop 来实现功能—&gt;</span></div><div class="line"></div><div class="line">    &lt;bean id="book" class="com.gjr.aspect.Book"/&gt;</div><div class="line">    &lt;bean id="myBook" class="com.gjr.aspect.MyBook"/&gt;</div><div class="line"></div><div class="line">    &lt;aop:config&gt;</div><div class="line">        &lt;!-- 切点: 需要被增强功能的方法 --&gt;</div><div class="line">        <span class="tag">&lt;<span class="name">aop:pointcut</span> <span class="attr">id</span>=<span class="string">"bookPoint"</span> <span class="attr">expression</span>=<span class="string">"execution(* com.gjr.aspect.Book.show(..))"</span>/&gt;</span></div><div class="line">        <span class="comment">&lt;!-- 切面: 把增强方法加到需要增强的方法上 --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">aop:aspect</span> <span class="attr">ref</span>=<span class="string">"myBook"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">aop:before</span> <span class="attr">method</span>=<span class="string">"addFunctionBefore"</span> <span class="attr">pointcut-ref</span>=<span class="string">"bookPoint"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">aop:after</span> <span class="attr">method</span>=<span class="string">"addFunctionAfter"</span> <span class="attr">pointcut-ref</span>=<span class="string">"bookPoint"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">aop:around</span> <span class="attr">method</span>=<span class="string">"arroundFunction"</span> <span class="attr">pointcut-ref</span>=<span class="string">"bookPoint"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">aop:aspect</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">aop:config</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/DE37AB73-E35C-4515-8EE9-377A606E3956.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>3种 切面类型同时存在时：before最先调用，after最后调用</p>
+<h2 id="注解实现-aop（只列出-Before，其他的相同）"><a href="#注解实现-aop（只列出-Before，其他的相同）" class="headerlink" title="注解实现 aop（只列出@Before，其他的相同）"></a>注解实现 aop（只列出@Before，其他的相同）</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Order</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"show order ..."</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="meta">@Aspect</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyOrder</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Before</span>(value = <span class="string">"execution(* Order.show(..))"</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addFunction</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"add function ..."</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"order"</span> <span class="attr">class</span>=<span class="string">"com.gjr.annaop.Order"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"myOrder"</span> <span class="attr">class</span>=<span class="string">"com.gjr.annaop.MyOrder"</span>/&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- 注解 实现 aop--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">aop:aspectj-autoproxy</span>/&gt;</span></div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/83664DD4-196B-44DB-BF22-16A94F0FFA01.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p><br></p>
+<p>附录<br>demo 地址：<br><a href="https://github.com/fenglincanyi/springdemo2" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo2</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-03-05T08:26:27.000Z" title="2017-3-5 16:26" itemprop="dateUpdated">2017年3月5日 16:26</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/01/07/Spring 学习（三）/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/&title=《Spring 学习（三）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/&title=《Spring 学习（三）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Spring 学习（三）》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2017/02/01/Gradle实现自动拉取git及压缩文件/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Gradle实现自动拉取git及压缩文件</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/12/27/Spring 学习（二）/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Spring 学习（二）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Spring 学习（三）" data-title="Spring 学习（三）" data-url="https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/&title=《Spring 学习（三）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/&title=《Spring 学习（三）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Spring 学习（三）》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACu0lEQVR42u3aXbKCMAwGUPe/ae8CvMiXnzo8HJ4cwdJTZ2hI8nrFx/vi+Lzm6lef13z//P23ywceHh7e0tSvbvl9hO9TrGKqZ/+ZIR4eHt4x3tWk84d+9cpk88ivufweDw8P7/G8ZORk/F54jYeHh/dMXjVNkAfoSRiNh4eH9xxePnSyVUxStHlIvZxrwcPDw4t5eRXpOZ+P1Pfw8PDwxlX15IHbSyj0Sm7lcfDw8PAO8PIHbtIKsFu46oXLeHh4eKd589f+reRsvnx5IxceHh7eCV7ePjVJs+atBtUtIUpP4OHh4a3y3oNjUvRK0hbVv+HyXQEPDw9vlVcdOp96OfCNt5yFYhgeHh7egDdJ4OblrkkjQrUkdpNrwcPDw1vi5SmDfEuoLlOv3HWzC+Dh4eH9kJef7UWzeTBdbVy4KX3h4eHhjXnJcL1Audo6MGnwihYdDw8Pb4lXLXdVg9o8/Zo3WiWz+icZgYeHh7fKS6Y7r7P1EhDJDC/BeHh4eMd41RarvO2gVwyrbgALPWV4eHh4RV7ykt+8Qfzb6jXRQuPh4eEd41U3hrxsNhmnum3cNF3h4eHhrfImIXLO+F6s6oXyUdMVHh4e3ipvi9prOKgy8hku/5N4eHh4F71JW01U1XRD717JZoOHh4f3S17eNFAtj82XpjxbPDw8vGO8SSkrb4fqJX/zMP3V21vw8PDwlnjVVGx+fbVloZo+xsPDw/sNL/9cPZtsGFvHTTICDw8Pb8x7F4/eg7u3iMldov8NDw8Pb5U3Ty70RsiLZL2FwMPDwzvN+81jvRfvV1u4yoE1Hh4e3oDXeygnG0C5Taq4QDfhNR4eHt6Deb1iWA9ZaCbAw8PDewAvedOvBsqT5HKUjMDDw8M7wKs2ifYKY5M0cbKI5SofHh4eXos3eeGfJBoScO8sHh4e3jHeH1SZAycBX5LBAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
