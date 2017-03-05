@@ -36,7 +36,7 @@
 123456public class BaseUser &amp;#123;">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/DE37AB73-E35C-4515-8EE9-377A606E3956.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/83664DD4-196B-44DB-BF22-16A94F0FFA01.png">
-<meta property="og:updated_time" content="2017-03-05T08:26:27.000Z">
+<meta property="og:updated_time" content="2017-03-05T08:53:15.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring 学习（三）">
 <meta name="twitter:description" content="本次学习内容：Spring AOP相关
@@ -167,7 +167,7 @@
     <aside class="post-widget">
         <nav class="post-toc-wrap" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#问题引入"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题引入</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#AOP-原理"><span class="post-toc-number">2.</span> <span class="post-toc-text">AOP 原理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#有接口"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">有接口</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#没有接口"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">没有接口</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#几个重要-术语"><span class="post-toc-number">3.</span> <span class="post-toc-text">几个重要 术语</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#实现AOP"><span class="post-toc-number">4.</span> <span class="post-toc-text">实现AOP</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#xml-配置实现"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">xml 配置实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#注解实现-aop（只列出-Before，其他的相同）"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">注解实现 aop（只列出@Before，其他的相同）</span></a></li></ol></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#问题引入"><span class="post-toc-number">1.</span> <span class="post-toc-text">问题引入</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#AOP-原理"><span class="post-toc-number">2.</span> <span class="post-toc-text">AOP 原理</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#有接口"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">有接口</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#没有接口"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">没有接口</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#几个重要-术语"><span class="post-toc-number">3.</span> <span class="post-toc-text">几个重要 术语</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#实现AOP"><span class="post-toc-number">4.</span> <span class="post-toc-text">实现AOP</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#xml-配置实现"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">xml 配置实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#注解实现-aop（只列出-Before，其他的相同）"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">注解实现 aop（只列出@Before，其他的相同）</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Spring-相关的-pom-配置"><span class="post-toc-number">5.</span> <span class="post-toc-text">Spring 相关的 pom 配置</span></a></li></ol>
         </nav>
     </aside>
     
@@ -244,6 +244,117 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
                 </div>
                 <div class="image-caption"></div>
             </figure>
+<h1 id="Spring-相关的-pom-配置"><a href="#Spring-相关的-pom-配置" class="headerlink" title="Spring 相关的 pom 配置"></a>Spring 相关的 pom 配置</h1><table>
+<thead>
+<tr>
+<th style="text-align:left">GroupId</th>
+<th style="text-align:right">ArtifactId</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-aop</td>
+<td style="text-align:center">Proxy-based AOP support</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-aspects</td>
+<td style="text-align:center">AspectJ based aspects</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-beans</td>
+<td style="text-align:center">Beans support, including Groovy</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-context</td>
+<td style="text-align:center">Application context runtime, including scheduling and remoting abstractions</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-context-support</td>
+<td style="text-align:center">Support classes for integrating common third-party libraries into a Spring application context</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-core</td>
+<td style="text-align:center">Core utilities, used by many other Spring modules</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-expression</td>
+<td style="text-align:center">Spring Expression Language (SpEL)</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-instrument</td>
+<td style="text-align:center">Instrumentation agent for JVM bootstrapping</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-instrument-tomcat</td>
+<td style="text-align:center">Instrumentation agent for Tomcat</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-jdbc</td>
+<td style="text-align:center">JDBC support package, including DataSource setup and JDBC access support</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-jms</td>
+<td style="text-align:center">JMS support package, including helper classes to send and receive JMS messages</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-messaging</td>
+<td style="text-align:center">Support for messaging architectures and protocols</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-orm</td>
+<td style="text-align:center">Object/Relational Mapping, including JPA and Hibernate support</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-oxm</td>
+<td style="text-align:center">Object/XML Mapping</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-test</td>
+<td style="text-align:center">Support for unit testing and integration testing Spring components</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-tx</td>
+<td style="text-align:center">Transaction infrastructure, including DAO support and JCA integration</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-web</td>
+<td style="text-align:center">Web support packages, including client and web remoting</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-webmvc</td>
+<td style="text-align:center">REST Web Services and model-view-controller implementation for web applications</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-webmvc-portlet</td>
+<td style="text-align:center">MVC implementation to be used in a Portlet environment</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-websocket</td>
+<td style="text-align:center">WebSocket and SockJS implementations, including STOMP support</td>
+</tr>
+</tbody>
+</table>
 <p><br></p>
 <p>附录<br>demo 地址：<br><a href="https://github.com/fenglincanyi/springdemo2" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo2</a></p>
 
@@ -253,7 +364,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2017-03-05T08:26:27.000Z" title="2017-3-5 16:26" itemprop="dateUpdated">2017年3月5日 16:26</time>
+    最后更新时间：<time datetime="2017-03-05T08:53:15.000Z" title="2017-3-5 16:53" itemprop="dateUpdated">2017年3月5日 16:53</time>
 </span><br>
 
 

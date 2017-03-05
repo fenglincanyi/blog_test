@@ -250,6 +250,14 @@ public class UserService {
 <br>
 > xml 配置注入 和 注解注入 两种可以联合使用，用法和前面一样，不再举例。
 
+# IOC 与 DI 区别
+
+IOC ：控制反转，将创建对象交给 Spring 的配置来完成
+DI ：将对象的属性赋值
+
+DI 是依赖于 ioc 才能完成操作，不能单独存在
+
+
 <br>
 
 附录：

@@ -238,7 +238,7 @@
     <link href="https://fenglincanyi.github.io/2017/01/07/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/</id>
     <published>2017-01-07T04:01:00.000Z</published>
-    <updated>2017-03-05T08:26:27.000Z</updated>
+    <updated>2017-03-05T08:53:15.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：Spring AOP相关</p>
@@ -290,6 +290,117 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
                 </div>
                 <div class="image-caption"></div>
             </figure>
+<h1 id="Spring-相关的-pom-配置"><a href="#Spring-相关的-pom-配置" class="headerlink" title="Spring 相关的 pom 配置"></a>Spring 相关的 pom 配置</h1><table>
+<thead>
+<tr>
+<th style="text-align:left">GroupId</th>
+<th style="text-align:right">ArtifactId</th>
+<th style="text-align:center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-aop</td>
+<td style="text-align:center">Proxy-based AOP support</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-aspects</td>
+<td style="text-align:center">AspectJ based aspects</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-beans</td>
+<td style="text-align:center">Beans support, including Groovy</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-context</td>
+<td style="text-align:center">Application context runtime, including scheduling and remoting abstractions</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-context-support</td>
+<td style="text-align:center">Support classes for integrating common third-party libraries into a Spring application context</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-core</td>
+<td style="text-align:center">Core utilities, used by many other Spring modules</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-expression</td>
+<td style="text-align:center">Spring Expression Language (SpEL)</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-instrument</td>
+<td style="text-align:center">Instrumentation agent for JVM bootstrapping</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-instrument-tomcat</td>
+<td style="text-align:center">Instrumentation agent for Tomcat</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-jdbc</td>
+<td style="text-align:center">JDBC support package, including DataSource setup and JDBC access support</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-jms</td>
+<td style="text-align:center">JMS support package, including helper classes to send and receive JMS messages</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-messaging</td>
+<td style="text-align:center">Support for messaging architectures and protocols</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-orm</td>
+<td style="text-align:center">Object/Relational Mapping, including JPA and Hibernate support</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-oxm</td>
+<td style="text-align:center">Object/XML Mapping</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-test</td>
+<td style="text-align:center">Support for unit testing and integration testing Spring components</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-tx</td>
+<td style="text-align:center">Transaction infrastructure, including DAO support and JCA integration</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-web</td>
+<td style="text-align:center">Web support packages, including client and web remoting</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-webmvc</td>
+<td style="text-align:center">REST Web Services and model-view-controller implementation for web applications</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-webmvc-portlet</td>
+<td style="text-align:center">MVC implementation to be used in a Portlet environment</td>
+</tr>
+<tr>
+<td style="text-align:left">org.springframework</td>
+<td style="text-align:right">spring-websocket</td>
+<td style="text-align:center">WebSocket and SockJS implementations, including STOMP support</td>
+</tr>
+</tbody>
+</table>
 <p><br></p>
 <p>附录<br>demo 地址：<br><a href="https://github.com/fenglincanyi/springdemo2" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo2</a></p>
 ]]></content>
@@ -315,7 +426,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
     <link href="https://fenglincanyi.github.io/2016/12/27/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/</id>
     <published>2016-12-27T09:01:00.000Z</published>
-    <updated>2017-03-05T08:02:39.000Z</updated>
+    <updated>2017-03-05T08:41:50.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：Spring 依赖注入相关</p>
@@ -382,6 +493,8 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <blockquote>
 <p>xml 配置注入 和 注解注入 两种可以联合使用，用法和前面一样，不再举例。</p>
 </blockquote>
+<h1 id="IOC-与-DI-区别"><a href="#IOC-与-DI-区别" class="headerlink" title="IOC 与 DI 区别"></a>IOC 与 DI 区别</h1><p>IOC ：控制反转，将创建对象交给 Spring 的配置来完成<br>DI ：将对象的属性赋值</p>
+<p>DI 是依赖于 ioc 才能完成操作，不能单独存在</p>
 <p><br></p>
 <p>附录：<br>demo地址：<br><a href="https://github.com/fenglincanyi/springdemo1" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo1</a><br><a href="https://github.com/fenglincanyi/springdemo2" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo2</a></p>
 ]]></content>
