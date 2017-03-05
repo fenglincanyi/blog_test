@@ -234,6 +234,188 @@
   </entry>
   
   <entry>
+    <title>Springmvc 相关</title>
+    <link href="https://fenglincanyi.github.io/2017/01/21/Springmvc%20%E7%9B%B8%E5%85%B3/"/>
+    <id>https://fenglincanyi.github.io/2017/01/21/Springmvc 相关/</id>
+    <published>2017-01-21T06:55:00.000Z</published>
+    <updated>2017-03-05T10:49:24.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="springmvc-框架原理"><a href="#springmvc-框架原理" class="headerlink" title="springmvc 框架原理"></a>springmvc 框架原理</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/mvc.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>springmvc执行流程：</p>
+<ol>
+<li>前端控制器（DispatcherServlet）, 接受请求，然后请求 处理器映射器（HanderMapping）</li>
+<li>HanderMapping 根据 xml / 注解 进行查找相关的 handler，并返回给 前端控制器</li>
+<li>前端控制器 调用 处理器适配器（HanderAdapter）按照一定规则去执行 handler</li>
+<li>handler执行完毕后，返回给 HanderAdapter ModelAndView，HandlerAdapter 再返回给 前端控制器</li>
+<li>前端控制器 将 ModelAndView 发送给 视图解析器（ViewResolver），试图解析器根据试图名解析为真正的视图</li>
+<li>视图解析器解析后，将view 返回给 前端控制器，前端控制器 进行视图渲染，视图渲染将模型数据(在ModelAndView对象中)填充到request域</li>
+<li>前端控制器 向用户相应结果</li>
+</ol>
+<p>重要的组件：</p>
+<ul>
+<li>前端控制器 DispatherServlet：接受请求，相应结果，转发器的作用</li>
+<li>处理器映射器 HandlerMapping: 根据配置查找 handler</li>
+<li>处理器适配器 HandlerAdapter: 按照规则去执行 handler</li>
+<li>处理器 Handler: 业务处理</li>
+<li>视图解析器 ViewResolver: 进行视图解析，将ModelAndView解析为真正的view</li>
+</ul>
+<h2 id="springmvc-基本配置"><a href="#springmvc-基本配置" class="headerlink" title="springmvc 基本配置"></a>springmvc 基本配置</h2><p>如果不在 springmvc.xml 配置相关的映射器、适配器，spring会使用默认的，默认的配置 在 DispatcherServlet.properties 中：<br>这些默认的都不建议使用了。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/B77F53FF-BBEF-40EC-BD0A-E176EB7AD8DA.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"># Default implementation classes for DispatcherServlet's strategy interfaces.</div><div class="line"># Used as fallback when no matching beans are found in the DispatcherServlet context.</div><div class="line"># Not meant to be customized by application developers.</div><div class="line"></div><div class="line">org.springframework.web.servlet.LocaleResolver=org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver</div><div class="line"></div><div class="line">org.springframework.web.servlet.ThemeResolver=org.springframework.web.servlet.theme.FixedThemeResolver</div><div class="line"></div><div class="line">org.springframework.web.servlet.HandlerMapping=org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping,\</div><div class="line">   org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping</div><div class="line"></div><div class="line">org.springframework.web.servlet.HandlerAdapter=org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter,\</div><div class="line">   org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter,\</div><div class="line">   org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter</div><div class="line"></div><div class="line">org.springframework.web.servlet.HandlerExceptionResolver=org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver,\</div><div class="line">   org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver,\</div><div class="line">   org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver</div><div class="line"></div><div class="line">org.springframework.web.servlet.RequestToViewNameTranslator=org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator</div><div class="line"></div><div class="line">org.springframework.web.servlet.ViewResolver=org.springframework.web.servlet.view.InternalResourceViewResolver</div><div class="line"></div><div class="line">org.springframework.web.servlet.FlashMapManager=org.springframework.web.servlet.support.SessionFlashMapManager</div></pre></td></tr></table></figure>
+<p>Spring 3.1之后 使用的 映射器 和 适配器：</p>
+<p>org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping<br>org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter</p>
+<p>springmvc.xml 中的约束配置，参考文档进行配置：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5665FF5D-517B-45F0-819D-3707A9534C8B.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></div><div class="line">    <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></div><div class="line">    <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans         </span></div><div class="line">        http://www.springframework.org/schema/beans/spring-beans.xsd         </div><div class="line">        http://www.springframework.org/schema/mvc         </div><div class="line">        http://www.springframework.org/schema/mvc/spring-mvc.xsd"&gt;</div><div class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>基本配置：<br>web.xml：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE web-app PUBLIC</span></div><div class="line">        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"</div><div class="line">        "http://java.sun.com/dtd/web-app_2_3.dtd" &gt;</div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">web-app</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">display-name</span>&gt;</span>springmvcdemo1<span class="tag">&lt;/<span class="name">display-name</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">servlet</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>springmvc<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- 设置 springmvc 的配置文件 --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:springmvcConfig.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>springmvc<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></div><div class="line">        <span class="comment">&lt;!-- 访问 action 结尾的，由 DispatcherServlet 来解析--&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!--http://localhost:8080/springmvcdemo1/queryItems.action--&gt;</span></div><div class="line">        <span class="comment">&lt;!--&lt;url-pattern&gt;*.action&lt;/url-pattern&gt;--&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!--http://localhost:8080/springmvcdemo1/queryItems--&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>springmvc.xml 基本配置： </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></div><div class="line">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">       <span class="attr">xmlns:mvc</span>=<span class="string">"http://www.springframework.org/schema/mvc"</span></div><div class="line">       <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></div><div class="line">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans</span></div><div class="line">      http://www.springframework.org/schema/beans/spring-beans-3.2.xsd</div><div class="line">      http://www.springframework.org/schema/context</div><div class="line">        http://www.springframework.org/schema/context/spring-context.xsd</div><div class="line">      http://www.springframework.org/schema/mvc</div><div class="line">      http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd"&gt;</div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 注解的 映射器、适配器--&gt;</span></div><div class="line">    <span class="comment">&lt;!--&lt;bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/&gt;--&gt;</span></div><div class="line">    <span class="comment">&lt;!--&lt;bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/&gt;--&gt;</span></div><div class="line"></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 此配置默认 设置了 映射器、适配器，而且加载了许多的参数绑定，如json的自动转换</span></div><div class="line">        开发时候使用它 ：   --&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">mvc:annotation-driven</span> /&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 视图解析器--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.springframework.web.servlet.view.InternalResourceViewResolver"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"prefix"</span> <span class="attr">value</span>=<span class="string">"/WEB-INF/jsp/"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"suffix"</span> <span class="attr">value</span>=<span class="string">".jsp"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- 使用扫描controller,service等等 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"com.gjr.controller"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="参数绑定"><a href="#参数绑定" class="headerlink" title="参数绑定"></a>参数绑定</h2><p>此处举例，具体看项目<br>@RequestMap中的简单类型，直接安装相关参数进行设置即可<br>对于包装类型 pojo, 客户端请求时候，相关的参数必须要和Pojo的属性名称一致</p>
+<p>如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ItemsQueryVo</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// 商品信息</span></div><div class="line">    <span class="keyword">private</span> Items items;</div><div class="line"></div><div class="line">    <span class="comment">// 为了扩展性，对生成的 po 进行扩展</span></div><div class="line">    <span class="keyword">private</span> ItemsCustom itemsCustom;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/editItemsSubmit"</span>)</div><div class="line"><span class="function"><span class="keyword">public</span> ModelAndView <span class="title">editItemsSubmit</span><span class="params">(Integer id, ItemsQueryVo itemsQueryVo)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> modelAndView;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>前端页面请求时候，表单信息中：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">input</span> <span class="attr">name</span>=<span class="string">“itemsCustom.name”</span> …/&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="Spring-校验相关"><a href="#Spring-校验相关" class="headerlink" title="Spring 校验相关"></a>Spring 校验相关</h2><p>使用的是 Hibernate 的校验框架：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.hibernate<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hibernate-validator<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.3.4.Final<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/BD15A0C3-C8A8-4C0E-84AB-656C19A1C1B0.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>具体看项目。。。</p>
+<p><br></p>
+<p>附录<br>demo 地址：<br><a href="https://github.com/fenglincanyi/ssmdemo" target="_blank" rel="external">https://github.com/fenglincanyi/ssmdemo</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;springmvc-框架原理&quot;&gt;&lt;a href=&quot;#springmvc-框架原理&quot; class=&quot;headerlink&quot; title=&quot;springmvc 框架原理&quot;&gt;&lt;/a&gt;springmvc 框架原理&lt;/h2&gt;&lt;figure class=&quot;image-bubb
+    
+    </summary>
+    
+      <category term="Java后台" scheme="https://fenglincanyi.github.io/categories/Java%E5%90%8E%E5%8F%B0/"/>
+    
+    
+      <category term="Springmvc" scheme="https://fenglincanyi.github.io/tags/Springmvc/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mybatis 逆向工程</title>
+    <link href="https://fenglincanyi.github.io/2017/01/17/Mybatis%20%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B/"/>
+    <id>https://fenglincanyi.github.io/2017/01/17/Mybatis 逆向工程/</id>
+    <published>2017-01-17T02:11:00.000Z</published>
+    <updated>2017-03-05T10:14:14.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="pom-配置"><a href="#pom-配置" class="headerlink" title="pom 配置"></a>pom 配置</h2><p>pom.xml 中 加入：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis.generator<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-generator-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.3.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">verbose</span>&gt;</span>true<span class="tag">&lt;/<span class="name">verbose</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">overwrite</span>&gt;</span>true<span class="tag">&lt;/<span class="name">overwrite</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="maven配置"><a href="#maven配置" class="headerlink" title="maven配置"></a>maven配置</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5709477C-1A4B-4AEF-B0E6-5EBE20688677.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/8C4EFD37-2282-4BEA-81C7-4C4E11D2A91C.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>命名：<br>mybatis-generator:generate -e</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/C97FA1F0-DEDF-4A13-9810-6029D03D97DE.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4EAE9177-A8D0-411D-869D-2167D54CB026.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/E3C00FBA-21F9-4B6B-80BE-74D553270C6A.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/D0FC7201-E1D6-4D16-90E6-87D079213CA3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>注意：<br>文件名必须是：generatorConfig.xml<br>否则报错： configfile /Users/geng/ssm/Demo/ssmdemo/src/main/resources/generatorConfig.xml does not exist</p>
+<h2 id="mybatis-config-xml-文件配置"><a href="#mybatis-config-xml-文件配置" class="headerlink" title="mybatis config.xml 文件配置"></a>mybatis config.xml 文件配置</h2><p>拷贝驱动包的绝对路径<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/68C3A3B3-DB05-4786-A412-C808F0A8AA17.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>xml 配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</div><div class="line"><span class="meta">&lt;!DOCTYPE generatorConfiguration PUBLIC</span></div><div class="line">        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"</div><div class="line">        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" &gt;</div><div class="line"><span class="tag">&lt;<span class="name">generatorConfiguration</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!-- !!!! Driver Class Path !!!! —&gt;</span></div><div class="line">    &lt;classPathEntry location="/Users/geng/ssm/Demo/mybaitsdemo2/src/main/resources/mysql-connector-java-5.1.7-bin.jar"/&gt;</div><div class="line"></div><div class="line">    &lt;context id="context" targetRuntime="MyBatis3"&gt;</div><div class="line">        &lt;commentGenerator&gt;</div><div class="line">            &lt;property name="suppressAllComments" value="false"/&gt;</div><div class="line">            &lt;property name="suppressDate" value="true"/&gt;</div><div class="line">        &lt;/commentGenerator&gt;</div><div class="line"></div><div class="line">        &lt;!-- !!!! Database Configurations !!!! --&gt;</div><div class="line">        <span class="tag">&lt;<span class="name">jdbcConnection</span> <span class="attr">driverClass</span>=<span class="string">"com.mysql.jdbc.Driver"</span></span></div><div class="line">                        <span class="attr">connectionURL</span>=<span class="string">"jdbc:mysql://localhost:3306/mybatis_demo2_db?characterEncoding=utf-8"</span></div><div class="line">                        <span class="attr">userId</span>=<span class="string">"root"</span></div><div class="line">                        <span class="attr">password</span>=<span class="string">"root"</span>/&gt;</div><div class="line"></div><div class="line">        <span class="tag">&lt;<span class="name">javaTypeResolver</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"forceBigDecimals"</span> <span class="attr">value</span>=<span class="string">"false"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">javaTypeResolver</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- !!!! Model Configurations !!!! --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">javaModelGenerator</span> <span class="attr">targetPackage</span>=<span class="string">"com.gjr.testgenerator.po"</span> <span class="attr">targetProject</span>=<span class="string">"src/main/java"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"enableSubPackages"</span> <span class="attr">value</span>=<span class="string">"false"</span>/&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"trimStrings"</span> <span class="attr">value</span>=<span class="string">"true"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">javaModelGenerator</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- !!!! Mapper XML Configurations !!!! --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">sqlMapGenerator</span> <span class="attr">targetPackage</span>=<span class="string">"com.gjr.testgenerator.mapper"</span> <span class="attr">targetProject</span>=<span class="string">"src/main/java"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"enableSubPackages"</span> <span class="attr">value</span>=<span class="string">"false"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">sqlMapGenerator</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- !!!! Mapper Interface Configurations !!!! --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">javaClientGenerator</span> <span class="attr">targetPackage</span>=<span class="string">"com.gjr.testgenerator.mapper"</span> <span class="attr">targetProject</span>=<span class="string">"src/main/java"</span> <span class="attr">type</span>=<span class="string">"XMLMAPPER"</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"enableSubPackages"</span> <span class="attr">value</span>=<span class="string">"false"</span>/&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">javaClientGenerator</span>&gt;</span></div><div class="line"></div><div class="line">        <span class="comment">&lt;!-- !!!! Table Configurations !!!! --&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">table</span> <span class="attr">tableName</span>=<span class="string">"items"</span> <span class="attr">enableCountByExample</span>=<span class="string">"false"</span> <span class="attr">enableDeleteByExample</span>=<span class="string">"false"</span> <span class="attr">enableSelectByExample</span>=<span class="string">"false"</span></span></div><div class="line">               <span class="attr">enableUpdateByExample</span>=<span class="string">"false"</span>/&gt;</div><div class="line">        <span class="tag">&lt;<span class="name">table</span> <span class="attr">tableName</span>=<span class="string">"orders"</span> <span class="attr">enableCountByExample</span>=<span class="string">"false"</span> <span class="attr">enableDeleteByExample</span>=<span class="string">"false"</span> <span class="attr">enableSelectByExample</span>=<span class="string">"false"</span></span></div><div class="line">               <span class="attr">enableUpdateByExample</span>=<span class="string">"false"</span>/&gt;</div><div class="line">        <span class="tag">&lt;<span class="name">table</span> <span class="attr">tableName</span>=<span class="string">"orderdetail"</span> <span class="attr">enableCountByExample</span>=<span class="string">"false"</span> <span class="attr">enableDeleteByExample</span>=<span class="string">"false"</span> <span class="attr">enableSelectByExample</span>=<span class="string">"false"</span></span></div><div class="line">               <span class="attr">enableUpdateByExample</span>=<span class="string">"false"</span>/&gt;</div><div class="line">        <span class="tag">&lt;<span class="name">table</span> <span class="attr">tableName</span>=<span class="string">"user"</span> <span class="attr">enableCountByExample</span>=<span class="string">"false"</span> <span class="attr">enableDeleteByExample</span>=<span class="string">"false"</span> <span class="attr">enableSelectByExample</span>=<span class="string">"false"</span></span></div><div class="line">               <span class="attr">enableUpdateByExample</span>=<span class="string">"false"</span>/&gt;</div><div class="line"></div><div class="line">    <span class="tag">&lt;/<span class="name">context</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">generatorConfiguration</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="运行逆向生成代码"><a href="#运行逆向生成代码" class="headerlink" title="运行逆向生成代码"></a>运行逆向生成代码</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/90C77448-2475-4EE3-B0D3-BF49D2A79606.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/617ABCDF-11AB-45AF-BA9C-1150393FEDC9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>运行成功</p>
+<p><br></p>
+<p>附录<br>demo 地址：<br><a href="https://github.com/fenglincanyi/mybaitsdemo2" target="_blank" rel="external">https://github.com/fenglincanyi/mybaitsdemo2</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;pom-配置&quot;&gt;&lt;a href=&quot;#pom-配置&quot; class=&quot;headerlink&quot; title=&quot;pom 配置&quot;&gt;&lt;/a&gt;pom 配置&lt;/h2&gt;&lt;p&gt;pom.xml 中 加入：&lt;/p&gt;
+&lt;figure class=&quot;highlight xml&quot;&gt;&lt;table
+    
+    </summary>
+    
+      <category term="Java后台" scheme="https://fenglincanyi.github.io/categories/Java%E5%90%8E%E5%8F%B0/"/>
+    
+    
+      <category term="Mybatis" scheme="https://fenglincanyi.github.io/tags/Mybatis/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Mybatis 学习（二）</title>
     <link href="https://fenglincanyi.github.io/2017/01/15/Mybatis%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/</id>
