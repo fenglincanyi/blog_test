@@ -4,8 +4,10 @@ date: 2016-12-27 17:01
 categories: Java后台
 tags: Spring
 ---
-> 本次学习内容：Spring 依赖注入相关，本次通过xml配置实现
+> 本次学习内容：Spring 依赖注入相关
 
+
+# xml 配置实现
 ## setXXX() 方法注入
 
 ``` xml
@@ -178,7 +180,79 @@ xml 分别配置：
 测试：
 ![](http://7xr1vo.com1.z0.glb.clouddn.com/76FF4DDF-95DD-4F5A-B43F-30946D328A30.png)
 
+
+# 注解实现
+
+``` xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">
+    <!-- 上面 加入 spring-context 约束，参照spring文档： 41.2.8 the context schema；否则，无法使用 context标 签 -->
+</beans>
+```
+
+## 创建对象注解
+* @Component
+* @Controller ------ web 层
+* @Service  ------ 业务层
+* @Repository ------ 持久层
+
+以上4个注解 功能是一致的，都是用于创建对象，作用在 **类** 上，只是为了后期方便扩展
+
+## 对象的 scope
+
+``` java
+@Scope(scopeName = ConfigurableBeanFactory.SCOPE_PROTOTYPE) // 默认是 singleton
+```
+可查看源码进行设置
+
+## 对象属性注入
+* @Autowired：自动装配
+* @Resource(name=“userDao”) 指定创建哪种类型的对象
+
+``` java
+@Component(value = "userDao")
+public class UserDao {
+
+    public void showUserDao() {
+        System.out.println("show user dao ...");
+    }
+}
+```
+
+``` java
+@Service(value = "userService")
+public class UserService {
+
+    // 1. 第一种
+//    @Autowired
+//    private UserDao userDao;// 要使用UserDao的对象，使用自动装配
+
+    // 2. 第二种
+    @Resource(name = "userDao") // name 值必须和 UserDao 内的value值必须一样，否则报错：no such bean is defined
+    private UserDao userDao;// 这种是明确指定创建哪种类型的对象，比较常用
+
+    public void showUserService() {
+        System.out.println("show user service ...");
+        userDao.showUserDao();
+    }
+}
+```
+测试：
+![](http://7xr1vo.com1.z0.glb.clouddn.com/A49E426F-CDC3-4A7E-8AD2-D428586B749D.png)
+
+
 <br>
+> xml 配置注入 和 注解注入 两种可以联合使用，用法和前面一样，不再举例。
+
+<br>
+
 附录：
 demo地址：
 https://github.com/fenglincanyi/springdemo1
+https://github.com/fenglincanyi/springdemo2

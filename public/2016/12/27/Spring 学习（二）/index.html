@@ -20,28 +20,29 @@
     
     
     <meta name="keywords" content="Spring">
-    <meta name="description" content="本次学习内容：Spring 依赖注入相关，本次通过xml配置实现
+    <meta name="description" content="本次学习内容：Spring 依赖注入相关
 
-setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.attr.Book&quot;&amp;gt;    &amp;lt;property name=&quot;bookName&quot; value=&quot;西游记&quot;/&amp;gt;&amp;lt;/bean&amp;gt;
-构造方法注入1234// 这里通过有参构造注入&amp;lt;bean id=&quot;p">
+xml 配置实现setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.attr.Book&quot;&amp;gt;    &amp;lt;property name=&quot;bookName&quot; value=&quot;西游记&quot;/&amp;gt;&amp;lt;/bean&amp;gt;
+构造方法注入1234// 这里通过有参构造注入&amp;lt;bean id=&quot;peopl">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spring 学习（二）">
 <meta property="og:url" content="https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/index.html">
 <meta property="og:site_name" content="fenglincanyi">
-<meta property="og:description" content="本次学习内容：Spring 依赖注入相关，本次通过xml配置实现
+<meta property="og:description" content="本次学习内容：Spring 依赖注入相关
 
-setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.attr.Book&quot;&amp;gt;    &amp;lt;property name=&quot;bookName&quot; value=&quot;西游记&quot;/&amp;gt;&amp;lt;/bean&amp;gt;
-构造方法注入1234// 这里通过有参构造注入&amp;lt;bean id=&quot;p">
+xml 配置实现setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.attr.Book&quot;&amp;gt;    &amp;lt;property name=&quot;bookName&quot; value=&quot;西游记&quot;/&amp;gt;&amp;lt;/bean&amp;gt;
+构造方法注入1234// 这里通过有参构造注入&amp;lt;bean id=&quot;peopl">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/EA20EBAD-5360-4197-BA0C-4059ABF7636F.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/76FF4DDF-95DD-4F5A-B43F-30946D328A30.png">
-<meta property="og:updated_time" content="2017-02-08T11:58:46.000Z">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/A49E426F-CDC3-4A7E-8AD2-D428586B749D.png">
+<meta property="og:updated_time" content="2017-03-05T08:02:39.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring 学习（二）">
-<meta name="twitter:description" content="本次学习内容：Spring 依赖注入相关，本次通过xml配置实现
+<meta name="twitter:description" content="本次学习内容：Spring 依赖注入相关
 
-setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.attr.Book&quot;&amp;gt;    &amp;lt;property name=&quot;bookName&quot; value=&quot;西游记&quot;/&amp;gt;&amp;lt;/bean&amp;gt;
-构造方法注入1234// 这里通过有参构造注入&amp;lt;bean id=&quot;p">
+xml 配置实现setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.attr.Book&quot;&amp;gt;    &amp;lt;property name=&quot;bookName&quot; value=&quot;西游记&quot;/&amp;gt;&amp;lt;/bean&amp;gt;
+构造方法注入1234// 这里通过有参构造注入&amp;lt;bean id=&quot;peopl">
 <meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png">
     
         <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
@@ -165,7 +166,7 @@ setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.at
     <aside class="post-widget">
         <nav class="post-toc-wrap" id="post-toc">
             <h4>TOC</h4>
-            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#setXXX-方法注入"><span class="post-toc-number">1.</span> <span class="post-toc-text">setXXX() 方法注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#构造方法注入"><span class="post-toc-number">2.</span> <span class="post-toc-text">构造方法注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#对象注入"><span class="post-toc-number">3.</span> <span class="post-toc-text">对象注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#p命名空间注入"><span class="post-toc-number">4.</span> <span class="post-toc-text">p命名空间注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#复杂类型注入"><span class="post-toc-number">5.</span> <span class="post-toc-text">复杂类型注入</span></a></li></ol>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#xml-配置实现"><span class="post-toc-number">1.</span> <span class="post-toc-text">xml 配置实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#setXXX-方法注入"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">setXXX() 方法注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#构造方法注入"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">构造方法注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#对象注入"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">对象注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#p命名空间注入"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">p命名空间注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#复杂类型注入"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">复杂类型注入</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#注解实现"><span class="post-toc-number">2.</span> <span class="post-toc-text">注解实现</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#创建对象注解"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">创建对象注解</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#对象的-scope"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">对象的 scope</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#对象属性注入"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">对象属性注入</span></a></li></ol></li></ol>
         </nav>
     </aside>
     
@@ -193,9 +194,9 @@ setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.at
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
             <blockquote>
-<p>本次学习内容：Spring 依赖注入相关，本次通过xml配置实现</p>
+<p>本次学习内容：Spring 依赖注入相关</p>
 </blockquote>
-<h2 id="setXXX-方法注入"><a href="#setXXX-方法注入" class="headerlink" title="setXXX() 方法注入"></a>setXXX() 方法注入</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"book"</span> <span class="attr">class</span>=<span class="string">"com.geng.attr.Book"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"bookName"</span> <span class="attr">value</span>=<span class="string">"西游记"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div></pre></td></tr></table></figure>
+<h1 id="xml-配置实现"><a href="#xml-配置实现" class="headerlink" title="xml 配置实现"></a>xml 配置实现</h1><h2 id="setXXX-方法注入"><a href="#setXXX-方法注入" class="headerlink" title="setXXX() 方法注入"></a>setXXX() 方法注入</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"book"</span> <span class="attr">class</span>=<span class="string">"com.geng.attr.Book"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"bookName"</span> <span class="attr">value</span>=<span class="string">"西游记"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div></pre></td></tr></table></figure>
 <h2 id="构造方法注入"><a href="#构造方法注入" class="headerlink" title="构造方法注入"></a>构造方法注入</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">// 这里通过有参构造注入</div><div class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"people"</span> <span class="attr">class</span>=<span class="string">"com.geng.attr.People"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">"name"</span> <span class="attr">value</span>=<span class="string">"小明"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div></pre></td></tr></table></figure>
 <h2 id="对象注入"><a href="#对象注入" class="headerlink" title="对象注入"></a>对象注入</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"userDao"</span> <span class="attr">class</span>=<span class="string">"com.geng.obj.UserDao"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"userService"</span> <span class="attr">class</span>=<span class="string">"com.geng.obj.UserService"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"userDao"</span> <span class="attr">ref</span>=<span class="string">"userDao"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></div></pre></td></tr></table></figure>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDao</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showUserDao</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"show user dao..."</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -230,7 +231,35 @@ setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.at
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
-<p><br><br>附录：<br>demo地址：<br><a href="https://github.com/fenglincanyi/springdemo1" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo1</a></p>
+<h1 id="注解实现"><a href="#注解实现" class="headerlink" title="注解实现"></a>注解实现</h1><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></div><div class="line">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></div><div class="line">       <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></div><div class="line">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans</span></div><div class="line">            http://www.springframework.org/schema/beans/spring-beans.xsd</div><div class="line">            http://www.springframework.org/schema/context</div><div class="line">            http://www.springframework.org/schema/context/spring-context.xsd"&gt;</div><div class="line">    <span class="comment">&lt;!-- 上面 加入 spring-context 约束，参照spring文档： 41.2.8 the context schema；否则，无法使用 context标 签 --&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="创建对象注解"><a href="#创建对象注解" class="headerlink" title="创建对象注解"></a>创建对象注解</h2><ul>
+<li>@Component</li>
+<li>@Controller —— web 层</li>
+<li>@Service  —— 业务层</li>
+<li>@Repository —— 持久层</li>
+</ul>
+<p>以上4个注解 功能是一致的，都是用于创建对象，作用在 <strong>类</strong> 上，只是为了后期方便扩展</p>
+<h2 id="对象的-scope"><a href="#对象的-scope" class="headerlink" title="对象的 scope"></a>对象的 scope</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Scope</span>(scopeName = ConfigurableBeanFactory.SCOPE_PROTOTYPE) <span class="comment">// 默认是 singleton</span></div></pre></td></tr></table></figure>
+<p>可查看源码进行设置</p>
+<h2 id="对象属性注入"><a href="#对象属性注入" class="headerlink" title="对象属性注入"></a>对象属性注入</h2><ul>
+<li>@Autowired：自动装配</li>
+<li>@Resource(name=“userDao”) 指定创建哪种类型的对象</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Component</span>(value = <span class="string">"userDao"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDao</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showUserDao</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"show user dao ..."</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Service</span>(value = <span class="string">"userService"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserService</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// 1. 第一种</span></div><div class="line"><span class="comment">//    @Autowired</span></div><div class="line"><span class="comment">//    private UserDao userDao;// 要使用UserDao的对象，使用自动装配</span></div><div class="line"></div><div class="line">    <span class="comment">// 2. 第二种</span></div><div class="line">    <span class="meta">@Resource</span>(name = <span class="string">"userDao"</span>) <span class="comment">// name 值必须和 UserDao 内的value值必须一样，否则报错：no such bean is defined</span></div><div class="line">    <span class="keyword">private</span> UserDao userDao;<span class="comment">// 这种是明确指定创建哪种类型的对象，比较常用</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showUserService</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"show user service ..."</span>);</div><div class="line">        userDao.showUserDao();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>测试：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/A49E426F-CDC3-4A7E-8AD2-D428586B749D.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p><br></p>
+<blockquote>
+<p>xml 配置注入 和 注解注入 两种可以联合使用，用法和前面一样，不再举例。</p>
+</blockquote>
+<p><br></p>
+<p>附录：<br>demo地址：<br><a href="https://github.com/fenglincanyi/springdemo1" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo1</a><br><a href="https://github.com/fenglincanyi/springdemo2" target="_blank" rel="external">https://github.com/fenglincanyi/springdemo2</a></p>
 
         </div>
 
@@ -238,7 +267,7 @@ setXXX() 方法注入123&amp;lt;bean id=&quot;book&quot; class=&quot;com.geng.at
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2017-02-08T11:58:46.000Z" title="2017-2-8 19:58" itemprop="dateUpdated">2017年2月8日 19:58</time>
+    最后更新时间：<time datetime="2017-03-05T08:02:39.000Z" title="2017-3-5 16:02" itemprop="dateUpdated">2017年3月5日 16:02</time>
 </span><br>
 
 

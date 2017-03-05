@@ -1,744 +1,1330 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+    
+
+    
+
+    
+
+
+
     <meta charset="utf-8">
+    
+    
+    
     <title>tags | fenglincanyi | Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
     <meta name="theme-color" content="#2DBE60">
+    
+    
     <meta name="keywords" content="undefined">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="tags">
-    <meta property="og:url" content="https://fenglincanyi.github.io/tags/index.html">
-    <meta property="og:site_name" content="fenglincanyi">
-    <meta property="og:updated_time" content="2016-12-12T16:17:04.537Z">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="tags">
-    <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+<meta property="og:title" content="tags">
+<meta property="og:url" content="https://fenglincanyi.github.io/tags/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:updated_time" content="2017-01-19T08:20:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tags">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
     <link rel="shortcut icon" href="/img/site_icon.jpg">
     <link rel="stylesheet" href="/css/style.css?v=1.4.2">
-    <script>
-    window.lazyScripts = []
-    </script>
+    <script>window.lazyScripts=[]</script>
 </head>
 
 <body>
     <div id="loading" class="active"></div>
-    <aside id="menu">
-        <div class="inner flex-row-vertical">
-            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
-                <i class="icon icon-lg icon-close"></i>
-            </a>
-            <div class="brand-wrap">
-                <div class="brand">
-                    <a href="/" class="avatar waves-effect waves-circle waves-light">
-                        <img src="/img/me.jpg">
-                    </a>
-                    <hgroup class="introduce">
-                        <h5 class="nickname">fenglincanyi</h5>
-                        <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
-                    </hgroup>
-                </div>
-            </div>
-            <div class="scroll-wrap flex-col">
-                <ul class="nav">
-                    <li class="waves-block waves-effect">
-                        <a href="/">
-                            <i class="icon icon-lg icon-home"></i> Home
-                        </a>
-                    </li>
-                    <li class="waves-block waves-effect">
-                        <a href="/archives">
-                            <i class="icon icon-lg icon-archives"></i> Archives
-                        </a>
-                    </li>
-                    <li class="waves-block waves-effect active">
-                        <a href="/tags">
-                            <i class="icon icon-lg icon-tags"></i> Tags
-                        </a>
-                    </li>
-                    <li class="waves-block waves-effect">
-                        <a href="/categories">
-                            <i class="icon icon-lg icon-th-list"></i> Categories
-                        </a>
-                    </li>
-                    <li class="waves-block waves-effect">
-                        <a href="https://github.com/fenglincanyi" target="_blank">
-                            <i class="icon icon-lg icon-github"></i> Github
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </aside>
+
+    <aside id="menu"  >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect active">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
     <main id="main">
         <header class="top-header" id="header">
-            <div class="flex-row">
-                <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
-                    <i class="icon icon-lg icon-navicon"></i>
-                </a>
-                <div class="flex-col header-title ellipsis">Tags</div>
-                <div class="search-wrap" id="search-wrap">
-                    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
-                        <i class="icon icon-lg icon-chevron-left"></i>
-                    </a>
-                    <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
-                    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
-                        <i class="icon icon-lg icon-search"></i>
-                    </a>
-                </div>
-                <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
-                    <i class="icon icon-lg icon-share-alt"></i>
-                </a>
-            </div>
-        </header>
-        <header class="content-header tags-header">
-            <div class="container fade-scale">
-                <h1 class="title">Tags</h1>
-                <h5 class="subtitle">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Tags</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header tags-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Tags</h1>
+        <h5 class="subtitle">
             
         </h5>
-            </div>
-            <div class="tabs-bar container">
-                <nav class="tags-list">
-                    <a href="/tags" style="-webkit-order:-1;order:-1" class="tags-list-item waves-effect waves-button waves-light
+    </div>
+
+     
+<div class="tabs-bar container">
+    <nav class="tags-list">
+        <a href="/tags" style="-webkit-order:-1;order:-1" class="tags-list-item waves-effect waves-button waves-light
              active">全部</a>
-                    <a href="/tags/SingleTask/" style="-webkit-order:0;order:0" class="tags-list-item waves-effect waves-button waves-light">SingleTask</a>
-                    <a href="/tags/Dalvik/" style="-webkit-order:1;order:1" class="tags-list-item waves-effect waves-button waves-light">Dalvik</a>
-                    <a href="/tags/ART/" style="-webkit-order:2;order:2" class="tags-list-item waves-effect waves-button waves-light">ART</a>
-                    <a href="/tags/JNI/" style="-webkit-order:3;order:3" class="tags-list-item waves-effect waves-button waves-light">JNI</a>
-                    <a href="/tags/NDK/" style="-webkit-order:4;order:4" class="tags-list-item waves-effect waves-button waves-light">NDK</a>
-                    <a href="/tags/Git/" style="-webkit-order:5;order:5" class="tags-list-item waves-effect waves-button waves-light">Git</a>
-                    <a href="/tags/ClassLoader/" style="-webkit-order:6;order:6" class="tags-list-item waves-effect waves-button waves-light">ClassLoader</a>
-                    <a href="/tags/RxJava/" style="-webkit-order:7;order:7" class="tags-list-item waves-effect waves-button waves-light">RxJava</a>
-                    <a href="/tags/Radiobutton/" style="-webkit-order:8;order:8" class="tags-list-item waves-effect waves-button waves-light">Radiobutton</a>
-                    <a href="/tags/Gradle/" style="-webkit-order:9;order:9" class="tags-list-item waves-effect waves-button waves-light">Gradle</a>
-                    <a href="/tags/instant-run/" style="-webkit-order:10;order:10" class="tags-list-item waves-effect waves-button waves-light">instant run</a>
-                    <a href="/tags/加密/" style="-webkit-order:11;order:11" class="tags-list-item waves-effect waves-button waves-light">加密</a>
-                    <a href="/tags/签名/" style="-webkit-order:12;order:12" class="tags-list-item waves-effect waves-button waves-light">签名</a>
-                    <a href="/tags/LRU/" style="-webkit-order:13;order:13" class="tags-list-item waves-effect waves-button waves-light">LRU</a>
-                    <a href="/tags/滑动冲突/" style="-webkit-order:14;order:14" class="tags-list-item waves-effect waves-button waves-light">滑动冲突</a>
-                    <a href="/tags/h5/" style="-webkit-order:15;order:15" class="tags-list-item waves-effect waves-button waves-light">h5</a>
-                    <a href="/tags/Spring/" style="-webkit-order:16;order:16" class="tags-list-item waves-effect waves-button waves-light">Spring</a>
-                    <a href="/tags/Weex/" style="-webkit-order:17;order:17" class="tags-list-item waves-effect waves-button waves-light">Weex</a>
-                    <a href="/tags/Android/" style="-webkit-order:18;order:18" class="tags-list-item waves-effect waves-button waves-light">Android</a>
-                </nav>
-                <!-- PC show more-->
-                <div class="tags-list-more">
-                    <a href="javascript:;" onclick="BLOG.tabBar(this)" class="action tags-list-item waves-effect waves-circle waves-light"><i class="icon icon-ellipsis-h"></i></a>
-                </div>
-            </div>
-        </header>
-        <div class="container body-wrap fade">
+         
+
+            <a href="/tags/SingleTask/" style="-webkit-order:0;order:0" class="tags-list-item waves-effect waves-button waves-light">SingleTask</a>
+
+         
+
+            <a href="/tags/JNI/" style="-webkit-order:1;order:1" class="tags-list-item waves-effect waves-button waves-light">JNI</a>
+
+         
+
+            <a href="/tags/NDK/" style="-webkit-order:2;order:2" class="tags-list-item waves-effect waves-button waves-light">NDK</a>
+
+         
+
+            <a href="/tags/h5/" style="-webkit-order:3;order:3" class="tags-list-item waves-effect waves-button waves-light">h5</a>
+
+         
+
+            <a href="/tags/Dalvik/" style="-webkit-order:4;order:4" class="tags-list-item waves-effect waves-button waves-light">Dalvik</a>
+
+         
+
+            <a href="/tags/ART/" style="-webkit-order:5;order:5" class="tags-list-item waves-effect waves-button waves-light">ART</a>
+
+         
+
+            <a href="/tags/ClassLoader/" style="-webkit-order:6;order:6" class="tags-list-item waves-effect waves-button waves-light">ClassLoader</a>
+
+         
+
+            <a href="/tags/Git/" style="-webkit-order:7;order:7" class="tags-list-item waves-effect waves-button waves-light">Git</a>
+
+         
+
+            <a href="/tags/Gradle/" style="-webkit-order:8;order:8" class="tags-list-item waves-effect waves-button waves-light">Gradle</a>
+
+         
+
+            <a href="/tags/Radiobutton/" style="-webkit-order:9;order:9" class="tags-list-item waves-effect waves-button waves-light">Radiobutton</a>
+
+         
+
+            <a href="/tags/RxJava/" style="-webkit-order:10;order:10" class="tags-list-item waves-effect waves-button waves-light">RxJava</a>
+
+         
+
+            <a href="/tags/Spring/" style="-webkit-order:11;order:11" class="tags-list-item waves-effect waves-button waves-light">Spring</a>
+
+         
+
+            <a href="/tags/Weex/" style="-webkit-order:12;order:12" class="tags-list-item waves-effect waves-button waves-light">Weex</a>
+
+         
+
+            <a href="/tags/Android/" style="-webkit-order:13;order:13" class="tags-list-item waves-effect waves-button waves-light">Android</a>
+
+         
+
+            <a href="/tags/加密/" style="-webkit-order:14;order:14" class="tags-list-item waves-effect waves-button waves-light">加密</a>
+
+         
+
+            <a href="/tags/签名/" style="-webkit-order:15;order:15" class="tags-list-item waves-effect waves-button waves-light">签名</a>
+
+         
+
+            <a href="/tags/instant-run/" style="-webkit-order:16;order:16" class="tags-list-item waves-effect waves-button waves-light">instant run</a>
+
+         
+
+            <a href="/tags/滑动冲突/" style="-webkit-order:17;order:17" class="tags-list-item waves-effect waves-button waves-light">滑动冲突</a>
+
+         
+
+            <a href="/tags/LRU/" style="-webkit-order:18;order:18" class="tags-list-item waves-effect waves-button waves-light">LRU</a>
+
+        
+    </nav>
+    <!-- PC show more-->
+    <div class="tags-list-more">
+        <a href="javascript:;" onclick="BLOG.tabBar(this)" class="action tags-list-item waves-effect waves-circle waves-light"><i class="icon icon-ellipsis-h"></i></a>
+    </div>
+</div>
+
+
+</header>
+
+<div class="container body-wrap fade">
+    
+
             <h3 class="archive-separator" id="tag-SingleTask">SingleTask</h3>
+
             <div class="waterfall">
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-5-16 11:12" datetime="2016-05-16T03:12:00.000Z" itemprop="datePublished">May 16, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-5-16 11:12" datetime="2016-05-16T03:12:00.000Z"  itemprop="datePublished">May 16, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2016/05/16/Android SingleTask 探究/">Android SingleTask 探究</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SingleTask/">SingleTask</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SingleTask/">SingleTask</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
             </div>
-            <h3 class="archive-separator" id="tag-Dalvik">Dalvik</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-11-17 21:08" datetime="2016-11-17T13:08:00.000Z" itemprop="datePublished">Nov 17, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/11/17/Android apk安装过程实例分析/">Android apk安装过程实例分析</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ART/">ART</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dalvik/">Dalvik</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-11-24 13:01" datetime="2016-11-24T05:01:00.000Z" itemprop="datePublished">Nov 24, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/11/24/Dalvik中PreVerify问题/">Dalvik中PreVerify问题</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dalvik/">Dalvik</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-ART">ART</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-11-17 21:08" datetime="2016-11-17T13:08:00.000Z" itemprop="datePublished">Nov 17, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/11/17/Android apk安装过程实例分析/">Android apk安装过程实例分析</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ART/">ART</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dalvik/">Dalvik</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
+        
+
             <h3 class="archive-separator" id="tag-JNI">JNI</h3>
+
             <div class="waterfall">
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-1-16 19:34" datetime="2016-01-16T11:34:00.000Z" itemprop="datePublished">Jan 16, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-1-16 19:34" datetime="2016-01-16T11:34:00.000Z"  itemprop="datePublished">Jan 16, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/">Android Studio NDK开发环境搭建及Demo示例</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JNI/">JNI</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NDK/">NDK</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JNI/">JNI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NDK/">NDK</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
             </div>
+        
+
             <h3 class="archive-separator" id="tag-NDK">NDK</h3>
+
             <div class="waterfall">
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-1-16 19:34" datetime="2016-01-16T11:34:00.000Z" itemprop="datePublished">Jan 16, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-1-16 19:34" datetime="2016-01-16T11:34:00.000Z"  itemprop="datePublished">Jan 16, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/">Android Studio NDK开发环境搭建及Demo示例</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JNI/">JNI</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NDK/">NDK</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JNI/">JNI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NDK/">NDK</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
             </div>
-            <h3 class="archive-separator" id="tag-Git">Git</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-2-19 15:28" datetime="2016-02-19T07:28:00.000Z" itemprop="datePublished">Feb 19, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/工具/">工具</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/02/19/Git学习笔记（一）/">Git学习笔记（一）</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-2-19 16:06" datetime="2016-02-19T08:06:00.000Z" itemprop="datePublished">Feb 19, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/工具/">工具</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/02/19/Git学习笔记（二）/">Git学习笔记（二）</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-ClassLoader">ClassLoader</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-11-17 21:08" datetime="2016-11-17T13:08:00.000Z" itemprop="datePublished">Nov 17, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/11/17/Android 类加载初探/">Android 类加载初探</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ClassLoader/">ClassLoader</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-RxJava">RxJava</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-10-6 0:45" datetime="2016-10-05T16:45:00.000Z" itemprop="datePublished">Oct 6, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/RxJava/">RxJava</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/10/06/RxJava 初探（一）/">RxJava 初探（一）</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RxJava/">RxJava</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-Radiobutton">Radiobutton</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-10-25 10:24" datetime="2016-10-25T02:24:00.000Z" itemprop="datePublished">Oct 25, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/10/25/RadioGroup、RadioButton动态创建并定制icon显示/">RadioGroup、RadioButton动态创建并定制icon显示</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Radiobutton/">Radiobutton</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-Gradle">Gradle</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-9-9 10:36" datetime="2016-09-09T02:36:00.000Z" itemprop="datePublished">Sep 9, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/09/09/Gradle相关配置/">Gradle相关配置</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2017-2-1 15:00" datetime="2017-02-01T07:00:00.000Z" itemprop="datePublished">Feb 1, 2017</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Gradle/">Gradle</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2017/02/01/Gradle实现自动拉取git及压缩文件/">Gradle实现自动拉取git及压缩文件</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-instant run">instant run</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-12-17 13:00" datetime="2016-12-17T05:00:00.000Z" itemprop="datePublished">Dec 17, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/12/17/instant run 相关分析/">instant run 相关分析</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/instant-run/">instant run</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-加密">加密</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-2-28 17:52" datetime="2016-02-28T09:52:00.000Z" itemprop="datePublished">Feb 28, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/网络/">网络</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/02/28/对称、非对称加密技术初探/">对称、非对称加密技术初探</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/加密/">加密</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/签名/">签名</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-签名">签名</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-2-28 17:52" datetime="2016-02-28T09:52:00.000Z" itemprop="datePublished">Feb 28, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/网络/">网络</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/02/28/对称、非对称加密技术初探/">对称、非对称加密技术初探</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/加密/">加密</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/签名/">签名</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-LRU">LRU</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-6-4 19:39" datetime="2016-06-04T11:39:00.000Z" itemprop="datePublished">Jun 4, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/算法/">算法</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/06/04/简单的页面置换算法分析/">简单的页面置换算法分析</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LRU/">LRU</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
-            <h3 class="archive-separator" id="tag-滑动冲突">滑动冲突</h3>
-            <div class="waterfall">
-                <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-8-16 17:14" datetime="2016-08-16T09:14:00.000Z" itemprop="datePublished">Aug 16, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
-      <a class="post-title-link" href="/2016/08/16/滑动冲突之EditText-ScrollView/">滑动冲突之EditText-ScrollView</a>
-    </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/滑动冲突/">滑动冲突</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
-            </div>
+        
+
             <h3 class="archive-separator" id="tag-h5">h5</h3>
+
             <div class="waterfall">
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-12-15 13:29" datetime="2016-12-15T05:29:00.000Z" itemprop="datePublished">Dec 15, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Hybird/">Hybird</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-12-15 13:29" datetime="2016-12-15T05:29:00.000Z"  itemprop="datePublished">Dec 15, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Hybird/">Hybird</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2016/12/15/Android WebView 相关踩坑/">Android WebView 相关踩坑</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/h5/">h5</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/h5/">h5</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
             </div>
-            <h3 class="archive-separator" id="tag-Spring">Spring</h3>
+        
+
+            <h3 class="archive-separator" id="tag-Dalvik">Dalvik</h3>
+
             <div class="waterfall">
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-12-26 14:06" datetime="2016-12-26T06:06:00.000Z" itemprop="datePublished">Dec 26, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-11-17 21:08" datetime="2016-11-17T13:08:00.000Z"  itemprop="datePublished">Nov 17, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/11/17/Android apk安装过程实例分析/">Android apk安装过程实例分析</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ART/">ART</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dalvik/">Dalvik</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-11-24 13:01" datetime="2016-11-24T05:01:00.000Z"  itemprop="datePublished">Nov 24, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/11/24/Dalvik中PreVerify问题/">Dalvik中PreVerify问题</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dalvik/">Dalvik</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-ART">ART</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-11-17 21:08" datetime="2016-11-17T13:08:00.000Z"  itemprop="datePublished">Nov 17, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/11/17/Android apk安装过程实例分析/">Android apk安装过程实例分析</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ART/">ART</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Dalvik/">Dalvik</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-ClassLoader">ClassLoader</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-11-17 21:08" datetime="2016-11-17T13:08:00.000Z"  itemprop="datePublished">Nov 17, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/11/17/Android 类加载初探/">Android 类加载初探</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ClassLoader/">ClassLoader</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-Git">Git</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-2-19 15:28" datetime="2016-02-19T07:28:00.000Z"  itemprop="datePublished">Feb 19, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/工具/">工具</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/02/19/Git学习笔记（一）/">Git学习笔记（一）</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-2-19 16:06" datetime="2016-02-19T08:06:00.000Z"  itemprop="datePublished">Feb 19, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/工具/">工具</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/02/19/Git学习笔记（二）/">Git学习笔记（二）</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-Gradle">Gradle</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2017-2-1 15:00" datetime="2017-02-01T07:00:00.000Z"  itemprop="datePublished">Feb 1, 2017</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Gradle/">Gradle</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2017/02/01/Gradle实现自动拉取git及压缩文件/">Gradle实现自动拉取git及压缩文件</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-9-9 10:36" datetime="2016-09-09T02:36:00.000Z"  itemprop="datePublished">Sep 9, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/09/09/Gradle相关配置/">Gradle相关配置</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Gradle/">Gradle</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-Radiobutton">Radiobutton</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-10-25 10:24" datetime="2016-10-25T02:24:00.000Z"  itemprop="datePublished">Oct 25, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/10/25/RadioGroup、RadioButton动态创建并定制icon显示/">RadioGroup、RadioButton动态创建并定制icon显示</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Radiobutton/">Radiobutton</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-RxJava">RxJava</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-10-6 0:45" datetime="2016-10-05T16:45:00.000Z"  itemprop="datePublished">Oct 6, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/RxJava/">RxJava</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/10/06/RxJava 初探（一）/">RxJava 初探（一）</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RxJava/">RxJava</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-Spring">Spring</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-12-26 14:06" datetime="2016-12-26T06:06:00.000Z"  itemprop="datePublished">Dec 26, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2016/12/26/Spring 学习（一）/">Spring 学习（一）</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2016-12-27 17:01" datetime="2016-12-27T09:01:00.000Z" itemprop="datePublished">Dec 27, 2016</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-12-27 17:01" datetime="2016-12-27T09:01:00.000Z"  itemprop="datePublished">Dec 27, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Java后台/">Java后台</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2016/12/27/Spring 学习（二）/">Spring 学习（二）</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
             </div>
+        
+
             <h3 class="archive-separator" id="tag-Weex">Weex</h3>
+
             <div class="waterfall">
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2017-2-28 15:06" datetime="2017-02-28T07:06:00.000Z" itemprop="datePublished">Feb 28, 2017</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2017-2-28 15:06" datetime="2017-02-28T07:06:00.000Z"  itemprop="datePublished">Feb 28, 2017</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2017/02/28/Weex SDK源码分析（一）/">Weex SDK源码分析（一）</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2017-2-28 19:32" datetime="2017-02-28T11:32:00.000Z" itemprop="datePublished">Feb 28, 2017</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2017-2-28 19:32" datetime="2017-02-28T11:32:00.000Z"  itemprop="datePublished">Feb 28, 2017</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2017/02/28/Weex SDK源码分析（二）/">Weex SDK源码分析（二）</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
             </div>
+        
+
             <h3 class="archive-separator" id="tag-Android">Android</h3>
+
             <div class="waterfall">
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2017-2-28 15:06" datetime="2017-02-28T07:06:00.000Z" itemprop="datePublished">Feb 28, 2017</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2017-2-28 15:06" datetime="2017-02-28T07:06:00.000Z"  itemprop="datePublished">Feb 28, 2017</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2017/02/28/Weex SDK源码分析（一）/">Weex SDK源码分析（一）</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+
                 <div class="waterfall-item">
-                    <article class="article-card archive-article">
-                        <div class="post-meta">
-                            <time class="post-time" title="2017-2-28 19:32" datetime="2017-02-28T11:32:00.000Z" itemprop="datePublished">Feb 28, 2017</time>
-                            <ul class="article-category-list">
-                                <li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li>
-                            </ul>
-                        </div>
-                        <h3 class="post-title" itemprop="name">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2017-2-28 19:32" datetime="2017-02-28T11:32:00.000Z"  itemprop="datePublished">Feb 28, 2017</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Weex/">Weex</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
       <a class="post-title-link" href="/2017/02/28/Weex SDK源码分析（二）/">Weex SDK源码分析（二）</a>
     </h3>
-                        <div class="post-footer">
-                            <ul class="article-tag-list">
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li>
-                                <li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li>
-                            </ul>
-                        </div>
-                    </article>
-                </div>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Weex/">Weex</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
             </div>
-        </div>
+        
+
+            <h3 class="archive-separator" id="tag-加密">加密</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-2-28 17:52" datetime="2016-02-28T09:52:00.000Z"  itemprop="datePublished">Feb 28, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/网络/">网络</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/02/28/对称、非对称加密技术初探/">对称、非对称加密技术初探</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/加密/">加密</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/签名/">签名</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-签名">签名</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-2-28 17:52" datetime="2016-02-28T09:52:00.000Z"  itemprop="datePublished">Feb 28, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/网络/">网络</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/02/28/对称、非对称加密技术初探/">对称、非对称加密技术初探</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/加密/">加密</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/签名/">签名</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-instant run">instant run</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-12-17 13:00" datetime="2016-12-17T05:00:00.000Z"  itemprop="datePublished">Dec 17, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/12/17/instant run 相关分析/">instant run 相关分析</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/instant-run/">instant run</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-滑动冲突">滑动冲突</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-8-16 17:14" datetime="2016-08-16T09:14:00.000Z"  itemprop="datePublished">Aug 16, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/08/16/滑动冲突之EditText-ScrollView/">滑动冲突之EditText-ScrollView</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/滑动冲突/">滑动冲突</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+
+            <h3 class="archive-separator" id="tag-LRU">LRU</h3>
+
+            <div class="waterfall">
+            
+
+                <div class="waterfall-item">
+  <article class="article-card archive-article">
+    <div class="post-meta">
+      <time class="post-time" title="2016-6-4 19:39" datetime="2016-06-04T11:39:00.000Z"  itemprop="datePublished">Jun 4, 2016</time>
+
+      
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/算法/">算法</a></li></ul>
+
+
+
+    </div>
+    
+
+
+  
+    <h3 class="post-title" itemprop="name">
+      <a class="post-title-link" href="/2016/06/04/简单的页面置换算法分析/">简单的页面置换算法分析</a>
+    </h3>
+  
+
+
+
+    
+    <div class="post-footer">
+        
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LRU/">LRU</a></li></ul>
+
+    </div>
+    
+  </article>
+</div>
+
+            
+            </div>
+        
+    
+</div>
+
         <footer class="footer">
-            <div class="top">
-                <p>
-                    <span id="busuanzi_container_site_uv" style='display:none'>
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
         站点总访客数：<span id="busuanzi_value_site_uv"></span>
-                    </span>
-                    <span id="busuanzi_container_site_pv" style='display:none'>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
         站点总访问量：<span id="busuanzi_value_site_pv"></span>
-                    </span>
-                </p>
-                <p>
-                    <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
-                    <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
-                </p>
-            </div>
-            <div class="bottom">
-                <p>
-                    <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
-                    <span>fenglincanyi &copy; 2016 - 2017</span>
-                </p>
-            </div>
-        </footer>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
     </main>
     <div class="mask" id="mask"></div>
-    <a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
-    <div class="global-share" id="globalShare">
-        <ul class="reset share-icons">
-            <li>
-                <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/tags/&title=《tags》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
-                    <i class="icon icon-weibo"></i>
-                </a>
-            </li>
-            <li>
-                <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
-                    <i class="icon icon-weixin"></i>
-                </a>
-            </li>
-            <li>
-                <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/tags/&title=《tags》 — fenglincanyi&source=" data-title=" QQ">
-                    <i class="icon icon-qq"></i>
-                </a>
-            </li>
-            <li>
-                <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/tags/" data-title=" Facebook">
-                    <i class="icon icon-facebook"></i>
-                </a>
-            </li>
-            <li>
-                <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《tags》 — fenglincanyi&url=https://fenglincanyi.github.io/tags/&via=https://fenglincanyi.github.io" data-title=" Twitter">
-                    <i class="icon icon-twitter"></i>
-                </a>
-            </li>
-            <li>
-                <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/tags/" data-title=" Google+">
-                    <i class="icon icon-google-plus"></i>
-                </a>
-            </li>
-        </ul>
-    </div>
-    <div class="page-modal wx-share" id="wxShare">
-        <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
-        <p>扫一扫，分享到微信</p>
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAK4AAACuCAAAAACKZ2kyAAABxklEQVR42u3ay24DIRAEQP//TztSzmHdzayxIxUnyw8ofGjBzD4e8Xj+jtU7yetkztsGLi7umPu8HHuI1fau57/+Di4u7nnuddAsf7xYbPWr9i/AxcX9fu5ke3lQ4uLi/i9uu2QSfLi4uN/MzS8nycLXF5hDdzVcXNwBty2YvuP1G+u7uLi4JfdZjnuLIPXquLi4R7h7l5Y2beal1aLfi4uLO+Ym14y9a8n802WE4eLiHuS2ZYvkm23AvQhWXFzcD3EnsTXZZFRsxcXFPchNHr0q4iYus9ZNF1xc3IPceam0bY20M9etFFxc3AF376GrtiSaF1yibePi4h7n5rj2gDJv3+Li4n6K2x5iJmGXN3RxcXFPcvNYyXH5cSc/3ODi4p7ktqXSaLog+PLZov4PLi7urdx50EwOQ3U7FhcX9yB3L7Da4IvaJNfz4OLiHuTulTX3HuTabKy29VdcXNwBtw2UvYrsXiwWbVdcXNw3cNvwassibUv1xZEIFxf3ILeusw5wbWj+EWS4uLhfw703qvKZN4MMFxf3OLfdQN04Wa2Ci4t7kLt3QMmXzB/euq0sgouLO+C2BdO8PNpeePaKMri4uLdyfwD0c6qhiu0nIwAAAABJRU5ErkJggg==" alt="微信分享二维码">
-    </div>
-    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
-    <script>
-    var BLOG = {
-        ROOT: '/',
-        SHARE: true,
-        REWARD: false
-    };
-    </script>
-    <script src="/js/main.min.js?v=1.4.2"></script>
-    <div class="search-panel" id="search-panel">
-        <ul class="search-result" id="search-result"></ul>
-    </div>
-    <template id="search-tpl">
-        <li class="item">
-            <a href="{path}" class="waves-block waves-effect">
-                <div class="title ellipsis" title="{title}">{title}</div>
-                <div class="flex-row flex-middle">
-                    <div class="tags ellipsis">
-                        {tags}
-                    </div>
-                    <time class="flex-col time">{date}</time>
-                </div>
-            </a>
-        </li>
-    </template>
-    <script src="/js/search.min.js?v=1.4.2" async></script>
-    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-</body>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
 
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/tags/&title=《tags》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/tags/&title=《tags》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/tags/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《tags》 — fenglincanyi&url=https://fenglincanyi.github.io/tags/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/tags/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAK4AAACuCAAAAACKZ2kyAAABxklEQVR42u3ay24DIRAEQP//TztSzmHdzayxIxUnyw8ofGjBzD4e8Xj+jtU7yetkztsGLi7umPu8HHuI1fau57/+Di4u7nnuddAsf7xYbPWr9i/AxcX9fu5ke3lQ4uLi/i9uu2QSfLi4uN/MzS8nycLXF5hDdzVcXNwBty2YvuP1G+u7uLi4JfdZjnuLIPXquLi4R7h7l5Y2beal1aLfi4uLO+Ym14y9a8n802WE4eLiHuS2ZYvkm23AvQhWXFzcD3EnsTXZZFRsxcXFPchNHr0q4iYus9ZNF1xc3IPceam0bY20M9etFFxc3AF376GrtiSaF1yibePi4h7n5rj2gDJv3+Li4n6K2x5iJmGXN3RxcXFPcvNYyXH5cSc/3ODi4p7ktqXSaLog+PLZov4PLi7urdx50EwOQ3U7FhcX9yB3L7Da4IvaJNfz4OLiHuTulTX3HuTabKy29VdcXNwBtw2UvYrsXiwWbVdcXNw3cNvwassibUv1xZEIFxf3ILeusw5wbWj+EWS4uLhfw703qvKZN4MMFxf3OLfdQN04Wa2Ci4t7kLt3QMmXzB/euq0sgouLO+C2BdO8PNpeePaKMri4uLdyfwD0c6qhiu0nIwAAAABJRU5ErkJggg==" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
 </html>
