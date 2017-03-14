@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>常见排序算法（C++实现） | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="排序">
+    <meta name="description" content="一、直接插入排序1234567891011121314151617181920212223242526272829303132333435363738394041424344#include&amp;lt;iostream&amp;gt;using namespace std;/*直接插入排序稳定的排序算法，时间复杂度：O(n^2)*/void insertSort(int a[], int n)&amp;#123;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常见排序算法（C++实现）">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="一、直接插入排序1234567891011121314151617181920212223242526272829303132333435363738394041424344#include&amp;lt;iostream&amp;gt;using namespace std;/*直接插入排序稳定的排序算法，时间复杂度：O(n^2)*/void insertSort(int a[], int n)&amp;#123;">
+<meta property="og:updated_time" content="2017-03-14T12:45:39.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="常见排序算法（C++实现）">
+<meta name="twitter:description" content="一、直接插入排序1234567891011121314151617181920212223242526272829303132333435363738394041424344#include&amp;lt;iostream&amp;gt;using namespace std;/*直接插入排序稳定的排序算法，时间复杂度：O(n^2)*/void insertSort(int a[], int n)&amp;#123;">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">常见排序算法（C++实现）</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">常见排序算法（C++实现）</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-05-24T05:55:00.000Z" itemprop="datePublished" class="page-time">
+  2016-05-24
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/算法/">算法</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#一、直接插入排序"><span class="post-toc-number">1.</span> <span class="post-toc-text">一、直接插入排序</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#二、折半插入排序"><span class="post-toc-number">2.</span> <span class="post-toc-text">二、折半插入排序</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#三、希尔排序"><span class="post-toc-number">3.</span> <span class="post-toc-text">三、希尔排序</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#四、冒泡排序"><span class="post-toc-number">4.</span> <span class="post-toc-text">四、冒泡排序</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#五、快速排序"><span class="post-toc-number">5.</span> <span class="post-toc-text">五、快速排序</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#六、选择排序"><span class="post-toc-number">6.</span> <span class="post-toc-text">六、选择排序</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#七、堆排序"><span class="post-toc-number">7.</span> <span class="post-toc-text">七、堆排序</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#八、归并排序"><span class="post-toc-number">8.</span> <span class="post-toc-text">八、归并排序</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-常见排序算法（C++实现）"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">常见排序算法（C++实现）</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-5-24 13:55" datetime="2016-05-24T05:55:00.000Z"  itemprop="datePublished">2016-05-24</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/算法/">算法</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="一、直接插入排序"><a href="#一、直接插入排序" class="headerlink" title="一、直接插入排序"></a>一、直接插入排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">直接插入排序</div><div class="line">稳定的排序算法，时间复杂度：O(n^2)</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">insertSort</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> temp;<span class="comment">//存储要插入的数</span></div><div class="line">    <span class="keyword">int</span> i, j;<span class="comment">//j:实际上用来记录位置</span></div><div class="line"></div><div class="line"><span class="comment">/*只需要对后面n-1个数排序*/</span></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; n; i++)&#123;</div><div class="line">        temp = a[i];<span class="comment">// 暂时存储要插入的数</span></div><div class="line">        <span class="keyword">if</span> (a[i] &lt; a[i - <span class="number">1</span>])&#123;</div><div class="line">            <span class="keyword">for</span> (j = i - <span class="number">1</span>; j&gt;=<span class="number">0</span> &amp;&amp; temp &lt; a[j]; j--)&#123;<span class="comment">//遍历前面的数，进行比较，寻找插入的位置</span></div><div class="line">                a[j + <span class="number">1</span>] = a[j];<span class="comment">//前面大的数后移</span></div><div class="line">            &#125;</div><div class="line">            a[j + <span class="number">1</span>] = temp;<span class="comment">// j是刚好不满足情况的位置，则 j+1 满足该位置</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i]&lt;&lt;<span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123; <span class="number">3</span>, <span class="number">2</span>, <span class="number">43</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span> &#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="comment">//cout &lt;&lt; n &lt;&lt; endl;</span></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    insertSort(a, n);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="二、折半插入排序"><a href="#二、折半插入排序" class="headerlink" title="二、折半插入排序"></a>二、折半插入排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">折半插入排序：时间复杂度：O(n^2)，稳定</div><div class="line">对直接插入排序 “初步优化”，寻找插入位置更快</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">binaryInsertSort</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> temp;</div><div class="line">    <span class="keyword">int</span> i, j;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; n; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (a[i] &lt; a[i - <span class="number">1</span>]) &#123;</div><div class="line">            temp = a[i];</div><div class="line"></div><div class="line">            <span class="comment">// “二分法”，寻找插入位置，存储到low</span></div><div class="line">            <span class="keyword">int</span> low = <span class="number">0</span>, high = i - <span class="number">1</span>, mid;</div><div class="line">            <span class="keyword">while</span> (low &lt;= high) &#123;</div><div class="line">                mid = (low + high) / <span class="number">2</span>;</div><div class="line">                <span class="keyword">if</span> (temp &lt; a[mid]) &#123;</div><div class="line">                    high = mid - <span class="number">1</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">else</span> &#123;</div><div class="line">                    low = mid + <span class="number">1</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">// 对要插入数之前小的数，整体后移</span></div><div class="line">            <span class="keyword">for</span> (j = i - <span class="number">1</span>; j &gt;= low; j--) &#123;</div><div class="line">                a[j + <span class="number">1</span>] = a[j];</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">// 最后将刚要插入的数放到找到的位置上</span></div><div class="line">            a[low] = temp;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span> </span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123;<span class="number">3</span>, <span class="number">2</span>, <span class="number">488</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span>&#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    binaryInsertSort(a, n);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="三、希尔排序"><a href="#三、希尔排序" class="headerlink" title="三、希尔排序"></a>三、希尔排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">希尔排序：不稳定的排序</div><div class="line">对直接插入排序的 “终极优化”，分组进行直接插入排序</div><div class="line">时间复杂度： O(n^1.3),范围： [O(n^2), O(nlog2(n))]</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">shellSort</span><span class="params">(<span class="keyword">int</span> a[],<span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> d;<span class="comment">// 数之间的间隔</span></div><div class="line">    <span class="keyword">int</span> temp;<span class="comment">// 存储要插入的数</span></div><div class="line">    <span class="keyword">int</span> i, j;</div><div class="line">    <span class="comment">// 先对要排序的数，进行分组,间隔直到1</span></div><div class="line">    <span class="keyword">for</span> (d = n / <span class="number">2</span>; d &gt;= <span class="number">1</span>; d /= <span class="number">2</span>)&#123;</div><div class="line">        <span class="comment">// i++,对每个分组交替执行排序，并不是一整个组排完</span></div><div class="line">        <span class="keyword">for</span> (i = d; i &lt; n; i++)&#123;<span class="comment">// 也是从该组的第二个数开始，和后面的数比较</span></div><div class="line">            temp = a[i];</div><div class="line"></div><div class="line">            <span class="keyword">for</span> (j = i - d; j &gt;= <span class="number">0</span> &amp;&amp; temp &lt; a[j]; j -= d)&#123;</div><div class="line">                a[j + d] = a[j];</div><div class="line">            &#125;</div><div class="line">            a[j + d] = temp;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i]&lt;&lt;<span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123; <span class="number">13</span>, <span class="number">0</span>, <span class="number">43</span>, <span class="number">12</span>, <span class="number">1</span>, <span class="number">23</span> &#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="comment">//cout &lt;&lt; n &lt;&lt; endl;</span></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    shellSort(a, n);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="四、冒泡排序"><a href="#四、冒泡排序" class="headerlink" title="四、冒泡排序"></a>四、冒泡排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"><span class="comment">// 提前声明</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Swap</span><span class="params">(<span class="keyword">int</span> &amp;a, <span class="keyword">int</span> &amp;b)</span></span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">冒泡排序O(n^2)</div><div class="line">稳定的排序</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="comment">// n-1趟</span></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n - <span class="number">1</span>; i++)&#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = i; j &lt; n - <span class="number">1</span> - i; j++)&#123;<span class="comment">// 注意最后两个数</span></div><div class="line">            <span class="keyword">if</span> (a[j]&gt;a[j + <span class="number">1</span>])&#123;</div><div class="line">                Swap(a[j], a[j + <span class="number">1</span>]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*交换两个数*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Swap</span><span class="params">(<span class="keyword">int</span> &amp;a, <span class="keyword">int</span> &amp;b)</span></span>&#123;</div><div class="line">    a = a^b;</div><div class="line">    b = a^b;</div><div class="line">    a = a^b;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123; <span class="number">3</span>, <span class="number">2</span>, <span class="number">28</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span> &#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    bubbleSort(a, n);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="五、快速排序"><a href="#五、快速排序" class="headerlink" title="五、快速排序"></a>五、快速排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">partition</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> p, <span class="keyword">int</span> r)</span></span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">快速排序,对冒泡排序的改进,不稳定</div><div class="line">O(nlog2n),最差情况下：退化为冒泡排序O(n^2)</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">quickSort</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> left,<span class="keyword">int</span> right)</span></span>&#123;</div><div class="line">    <span class="keyword">if</span> (left &lt; right)&#123;</div><div class="line">        <span class="comment">// 递归进行排序</span></div><div class="line">        <span class="keyword">int</span> q = partition(a, left, right);</div><div class="line">        quickSort(a, left, q - <span class="number">1</span>);<span class="comment">//左半边</span></div><div class="line">        quickSort(a, q + <span class="number">1</span>, right);<span class="comment">//右半边</span></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*选取基准元素key，进行划分*/</span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">partition</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> p, <span class="keyword">int</span> r)</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> i = p;</div><div class="line">    <span class="keyword">int</span> j = r;</div><div class="line">    <span class="keyword">int</span> key = a[i];</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (i&lt;j) &#123;</div><div class="line">        <span class="keyword">while</span> (i &lt; j &amp;&amp; key &lt; a[j])&#123;<span class="comment">//右侧扫描</span></div><div class="line">            j--;</div><div class="line">        &#125;</div><div class="line">        a[i] = a[j];</div><div class="line">        <span class="keyword">while</span> (i &lt; j &amp;&amp; a[i] &lt; key)&#123;<span class="comment">//左侧扫描</span></div><div class="line">            i++;</div><div class="line">        &#125;</div><div class="line">        a[j] = a[i];</div><div class="line">    &#125;</div><div class="line">    a[i] = key;<span class="comment">//一轮循环完，找到key的位置</span></div><div class="line">    <span class="keyword">return</span> i;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123; <span class="number">3</span>, <span class="number">2</span>, <span class="number">28</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span> &#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    quickSort(a, <span class="number">0</span>, n<span class="number">-1</span>);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="六、选择排序"><a href="#六、选择排序" class="headerlink" title="六、选择排序"></a>六、选择排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Swap</span><span class="params">(<span class="keyword">int</span> &amp;a,<span class="keyword">int</span> &amp;b)</span></span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">简单选择排序稳定</div><div class="line">时间复杂度：O(n^2)</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">selectionSort</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line"><span class="comment">// n-1趟，每次选出一个最小的放入有序区</span></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n - <span class="number">1</span>; i++)&#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = i+<span class="number">1</span>; j &lt; n; j++)&#123;</div><div class="line">            <span class="keyword">if</span> (a[i]&gt;a[j])&#123;</div><div class="line">                Swap(a[i], a[j]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*交换两个数*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Swap</span><span class="params">(<span class="keyword">int</span> &amp;a, <span class="keyword">int</span> &amp;b)</span></span>&#123;</div><div class="line">    a = a^b;</div><div class="line">    b = a^b;</div><div class="line">    a = a^b;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123; <span class="number">3</span>, <span class="number">2</span>, <span class="number">28</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span> &#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    selectionSort(a, n);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="七、堆排序"><a href="#七、堆排序" class="headerlink" title="七、堆排序"></a>七、堆排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">    堆排序：        所有情况下：O(nlog2n)</div><div class="line">    不稳定，        对选择排序的一种改进</div><div class="line">    （下面采用大根堆方法）</div><div class="line">*/</div><div class="line"></div><div class="line"><span class="comment">/*交换两个数*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Swap</span><span class="params">(<span class="keyword">int</span> &amp;a, <span class="keyword">int</span> &amp;b)</span></span>&#123;</div><div class="line">    a = a^b;</div><div class="line">    b = a^b;</div><div class="line">    a = a^b;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*堆的筛选算法*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">sift</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> start, <span class="keyword">int</span> end)</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> i = start;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">2</span> * i + <span class="number">1</span>; j &lt;= end; j = <span class="number">2</span> * j + <span class="number">1</span>)&#123;<span class="comment">// 重复操作至叶节点</span></div><div class="line">        <span class="keyword">if</span> (j &lt; end &amp;&amp; a[j] &lt; a[j + <span class="number">1</span>])&#123;<span class="comment">// 选出孩子节点最大的，后面来比较</span></div><div class="line">            j++;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (a[i] &gt;= a[j])&#123;<span class="comment">// 已经是堆了，不用调整</span></div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        &#125;<span class="keyword">else</span>&#123;</div><div class="line">            Swap(a[i], a[j]);<span class="comment">// 最大孩子上移至根节点</span></div><div class="line">            i = j;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*堆排序*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">heapSort</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = n / <span class="number">2</span>; i &gt;= <span class="number">0</span>; i--)&#123;<span class="comment">// 初始建堆，完全二叉树，只需从  n/2 中间节点处开始，向上</span></div><div class="line">        sift(a, i, n<span class="number">-1</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = n - <span class="number">1</span>; i &gt; <span class="number">0</span>;i--)&#123;<span class="comment">// 根节点和每次最后一个节点交换</span></div><div class="line">        Swap(a[<span class="number">0</span>], a[i]);</div><div class="line">        sift(a, <span class="number">0</span>, i<span class="number">-1</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123; <span class="number">3</span>, <span class="number">112</span>, <span class="number">28</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span> &#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    heapSort(a, n);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="八、归并排序"><a href="#八、归并排序" class="headerlink" title="八、归并排序"></a>八、归并排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">归并排序任何情况下： O(nlog2n)空间复杂度O(n)</div><div class="line">稳定的排序算法（外排采用）</div><div class="line">*/</div><div class="line"></div><div class="line"><span class="comment">/*一次归并算法*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">merge</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> start, <span class="keyword">int</span> mid, <span class="keyword">int</span> end)</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> i = start;</div><div class="line">    <span class="keyword">int</span> j = mid + <span class="number">1</span>;</div><div class="line">    <span class="keyword">int</span> k = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> *temp = <span class="keyword">new</span> <span class="keyword">int</span>[end - start + <span class="number">1</span>];<span class="comment">//临时存放排好序的数组</span></div><div class="line"></div><div class="line">    <span class="keyword">while</span> (i &lt;= mid &amp;&amp; j &lt;= end)&#123;</div><div class="line">        <span class="keyword">if</span> (a[i] &lt; a[j])&#123;</div><div class="line">            temp[k++] = a[i++];</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span>&#123;</div><div class="line">            temp[k++] = a[j++];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//处理其中一个没有取完的序列</span></div><div class="line">    <span class="keyword">if</span> (i &lt;= mid)&#123;</div><div class="line">        <span class="keyword">while</span> (i &lt;= mid)&#123;</div><div class="line">            temp[k++] = a[i++];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span>&#123;</div><div class="line">        <span class="keyword">while</span> (j &lt;= end)&#123;</div><div class="line">            temp[k++] = a[j++];</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 将临时数组有序数据赋值给原数组</span></div><div class="line">    <span class="keyword">for</span> (i = start,k=<span class="number">0</span>; i &lt;= end; i++,k++)&#123;</div><div class="line">        a[i] = temp[k];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 释放内存空间</span></div><div class="line">    <span class="keyword">delete</span> []temp;<span class="comment">//此处是数组，必须是[]</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*归并排序递归*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">mergeSort</span><span class="params">(<span class="keyword">int</span> arr[], <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (low&lt;high)</div><div class="line">    &#123;</div><div class="line">        <span class="keyword">int</span> mid = (low + high) / <span class="number">2</span>;</div><div class="line">        mergeSort(arr, low, mid);</div><div class="line">        mergeSort(arr, mid + <span class="number">1</span>, high);</div><div class="line">        <span class="comment">// 将最后两个有序的序列合并</span></div><div class="line">        merge(arr, low, mid, high);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123; <span class="number">3</span>, <span class="number">112</span>, <span class="number">0</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span> &#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    mergeSort(a, <span class="number">0</span>, n - <span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-03-14T12:45:39.000Z" title="2017-3-14 20:45" itemprop="dateUpdated">2017年3月14日 20:45</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/05/24/常见排序算法（C++实现）/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序/">排序</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/&title=《常见排序算法（C++实现）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/&title=《常见排序算法（C++实现）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《常见排序算法（C++实现）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/06/04/简单的页面置换算法分析/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">简单的页面置换算法分析</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/05/16/Android SingleTask 探究/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android SingleTask 探究</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="常见排序算法（C++实现）" data-title="常见排序算法（C++实现）" data-url="https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/&title=《常见排序算法（C++实现）》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/&title=《常见排序算法（C++实现）》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《常见排序算法（C++实现）》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACtElEQVR42u3aQY4iMQwFUO5/6ZntSN3A/07cQ0uPFSqKSl4Wicv24xF//nz5fL3++sqz5/z7a3L/Y+ODh4eHdzz1ZNLPnvP6eoJJFiKZMx4eHt42r51WcjAk23rCaOeDh4eH9xt5r/81uxMPDw/v9/Jm6YMkQJ8dEnh4eHj/i3fy6PxK8vxkOVZyLXh4eHhdTiCqIn3O95X6Hh4eHt5xVX2jwH93lDfPwcPDw1vg5RtuPvxJE8B5uIyHh4e3zWvTr3m6IV+UtpyWI/Hw8PB+hpcPn2PyybWtWkVlDw8PD+8qLylEtSWu9qjIF70opOHh4eEt8KKmpTjwzUPnYnMv7yzqeHh4eHgjXhIcz7bmpKzV/redJx4eHt42r32LnyUg2gU96bDCw8PD2+Yl2/etBG7bFtAmfx/JmuHh4eEd8241YM2C4DylW1zBw8PDW+OdJwhOtu8kdTssoeHh4eH9IC8fbFbUT+6fNS4UpwoeHh7eVV4+rTbwzSc6S+l+k4zAw8PDW+C1gfXdREMeiOftWW9yLXh4eHiXeC1sthz59zwQf/ocPDw8vDVeO0we/s6WqR3lTdMVHh4e3lVeW6DKU7FFmWrUXNWG5nh4eHi3eHnAOptQu+nnRbVoEfHw8PAWeLPAN7mznfr5cfX0mXh4eHhrvNlgOXJ2LCVLNnxXwMPDwzvmvR64bngqmwOS0YdLiYeHh7fM20vCHm3u5eJGbwx4eHh4I96tVGmehJ0V2/I2hW86I/Dw8PCu8tpt9xy//X14zODh4eGVvDY5myQIXl/Ji215uP/mjQEPDw9vgVdkL4Kw+CT8bcPi6GDAw8PD+3heMt3ZcVIX2/Dw8PA+jJeHvyeh81GiGQ8PD2+Nl5esTtITdSqhbDt4ejDg4eHhXeUddWyVbVtt2ew8VYGHh4d3lfcXSr3QdXTAXZMAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
