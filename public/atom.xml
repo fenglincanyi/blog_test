@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-02-28T12:58:35.000Z</updated>
+  <updated>2017-05-25T08:23:37.000Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -14,6 +14,320 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Android 增量编译方案总结</title>
+    <link href="https://fenglincanyi.github.io/2017/03/18/Android%20%E5%A2%9E%E9%87%8F%E7%BC%96%E8%AF%91%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93/"/>
+    <id>https://fenglincanyi.github.io/2017/03/18/Android 增量编译方案总结/</id>
+    <published>2017-03-18T12:10:00.000Z</published>
+    <updated>2017-05-25T08:23:37.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>自从去年10月份，使用Freeline 感觉非常不错，开发效率提升数倍。由于工作原因，一直将这篇总结拖到现在。ok，现在好好总结下。。。</p>
+</blockquote>
+<h2 id="前言：Android-开发者之痛"><a href="#前言：Android-开发者之痛" class="headerlink" title="前言：Android 开发者之痛"></a>前言：Android 开发者之痛</h2><p>普通的编译流程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>存在问题：</p>
+<ul>
+<li>存在问题：</li>
+<li>全量编译</li>
+<li>没有缓存机制</li>
+<li>单流程构建流程</li>
+<li>代码和资源越来越多，项目编译越来越慢</li>
+</ul>
+<p>现状：</p>
+<ul>
+<li>Windows: 3.5min</li>
+<li>Mac: 2.5min<br>  提高机器硬件已不能解决开发耗时严重的问题了…</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline2.jpeg" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>如何解决？</p>
+<ol>
+<li>配置Gradle 参数、调整tasks间执行顺序、依赖</li>
+<li>可否实现增量编译</li>
+<li>组件化，独立module开发、维护</li>
+</ol>
+<h2 id="探索之路"><a href="#探索之路" class="headerlink" title="探索之路"></a>探索之路</h2><h3 id="Buck"><a href="#Buck" class="headerlink" title="Buck"></a>Buck</h3><p>—— Facebook</p>
+<ul>
+<li>并发编译，建立多个并发子任务依赖关系，有向拓扑图，通过多线程并发把各个子节点构建出来，充分利用多核优势</li>
+<li><p>BUCK建立了一套完善的依赖规则以及细化的缓存系统来缩减编译时间</p>
+<p>  增量构建的方式：以工程目录为单位进行增量构建，发生变更时候，变更的工程，以及该工程作为父节点或祖先节点的工程，均需要重新构建，构建完这些变更涉及的工程后，Buck需要重新走一次合并各工程DEX,对齐，签名，打包APK的过程,构建完毕后，继续走安装流程</p>
+</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline3.gif" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>缺点：</p>
+<ul>
+<li>增量机制并不完善</li>
+<li>引入工程量大，入侵性强</li>
+<li>Windows平台不支持</li>
+</ul>
+<p>后传：<br><strong>OKBuck</strong><br>    OkBuck 的目标，是通过读取工程的 Gradle 配置，自动生成 BUCK 脚本，免去开发者下载依赖的 jar/aar 文件，编写、维护 BUCK 脚本、处理依赖之间的冲突等繁琐又容易出错的工作。</p>
+<h3 id="LayoutCast"><a href="#LayoutCast" class="headerlink" title="LayoutCast"></a>LayoutCast</h3><p>——屠毅敏（AndroidDynamicLoader ）</p>
+<p>资源文件更改：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline4.gif" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>代码变动：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline5.gif" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>编译速度对比：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p><strong>原理实现</strong>：</p>
+<ul>
+<li>利用反射，将修改的patch dex 插入到 dex Elements[] 最前面 </li>
+<li>资源修改：通过运行时反射,拿到 R.class 字段，得出 ids.xml 和 pubilc.xml（ids: 我们定义的 view 的 id，public：包含ids的信息，及layout、drawable、color、string、dimen、style、attr）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArtUtils</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">overrideClassLoader</span><span class="params">(ClassLoader cl, File dex, File opt)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            ClassLoader bootstrap = cl.getParent();</div><div class="line">            Field fPathList = BaseDexClassLoader.class.getDeclaredField(<span class="string">"pathList"</span>);</div><div class="line">            fPathList.setAccessible(<span class="keyword">true</span>);</div><div class="line">            Object pathList = fPathList.get(cl);</div><div class="line">            Class cDexPathList = bootstrap.loadClass(<span class="string">"dalvik.system.DexPathList"</span>);</div><div class="line">            Field fDexElements = cDexPathList.getDeclaredField(<span class="string">"dexElements"</span>);</div><div class="line">            fDexElements.setAccessible(<span class="keyword">true</span>);</div><div class="line">            Object dexElements = fDexElements.get(pathList);</div><div class="line">            DexClassLoader cl2 = <span class="keyword">new</span> DexClassLoader(dex.getAbsolutePath(), opt.getAbsolutePath(), <span class="keyword">null</span>, bootstrap);</div><div class="line">            Object pathList2 = fPathList.get(cl2);</div><div class="line">            Object dexElements2 = fDexElements.get(pathList2);</div><div class="line">            Object element2 = Array.get(dexElements2, <span class="number">0</span>);</div><div class="line">            <span class="keyword">int</span> n = Array.getLength(dexElements) + <span class="number">1</span>;</div><div class="line">            Object newDexElements = Array.newInstance(fDexElements.getType().getComponentType(), n);</div><div class="line">            Array.set(newDexElements, <span class="number">0</span>, element2); <span class="comment">// 插入到数组最前面</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n - <span class="number">1</span>; i++) &#123;</div><div class="line">                Object element = Array.get(dexElements, i);</div><div class="line">                Array.set(newDexElements, i + <span class="number">1</span>, element);</div><div class="line">                <span class="comment">// 其余 dex 元素依次后移</span></div><div class="line">            &#125;</div><div class="line">            fDexElements.set(pathList, newDexElements);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            Log.e(<span class="string">"lcast"</span>, <span class="string">"fail to override classloader "</span> + cl + <span class="string">" with "</span> + dex, e);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>缺点：</p>
+<ul>
+<li>当前的修改，会把之前的修改一起带进来，一起增量，修改次数多时，速度也会越来越慢（只是针对第一次build后的基线包做的增量修改，修改多次会带上很多的增量文件）</li>
+<li>资源修改是利用反射，项目中资源越来越多时，速度提升并不明显</li>
+<li>不支持Android 5.0以下的设备</li>
+</ul>
+<h3 id="Instant-Run"><a href="#Instant-Run" class="headerlink" title="Instant-Run"></a>Instant-Run</h3><p>原理实现</p>
+<ul>
+<li>第一次编译时，在transform 时通过ASM对每一个方法加入 局部变量 change，更改代码后，会将 更改的类 加上 $override ，将最新类 push 到 手机上。就是通过 hack method 的方式来实现动态代码替换的</li>
+<li>资源的修改更新，通过反射的方式，生成一个 AssetManager，调用 相关外界加载 资源的方法，将最新的资源包加载进来（全量的包），然后修剪删除缓存，刷新UI使之生效</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>资源文件仍然是一个全量的过程，资源文件越大，速度并没有明显提升</li>
+<li>无法debug，因为是 方法的hack，无法追到 堆栈信息</li>
+<li>只支持Android5.0以上</li>
+</ul>
+<h3 id="JRebel-for-Android"><a href="#JRebel-for-Android" class="headerlink" title="JRebel for Android"></a>JRebel for Android</h3><p><a href="https://zeroturnaround.com/software/jrebel-for-android/features/" target="_blank" rel="external">https://zeroturnaround.com/software/jrebel-for-android/features/</a></p>
+<p>缺点</p>
+<ul>
+<li>收费</li>
+<li>Crash 后需要重新全量编译，第一次编译很慢，亲测结果</li>
+</ul>
+<h2 id="神器Freeline——集百家之长"><a href="#神器Freeline——集百家之长" class="headerlink" title="神器Freeline——集百家之长"></a>神器Freeline——集百家之长</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><ul>
+<li>Freeline是蚂蚁金服旗下一站式理财平台蚂蚁聚宝团队在Android平台上的量身定做的一个基于动态替换的编译方案</li>
+<li>Freeline 借鉴了layoutCast、buck, instant run 的思想和方法，在其他增量编译方案上做了各种优化和性能的提升</li>
+</ul>
+<h3 id="Freeline-整体工作流程"><a href="#Freeline-整体工作流程" class="headerlink" title="Freeline 整体工作流程"></a>Freeline 整体工作流程</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p><br></p>
+<ul>
+<li>PC端与手机建立TCP长连接</li>
+<li>扫描各个子工程文件变化</li>
+<li>各个子工程的增量dex构建、增量资源包构建</li>
+<li>合并所有工程dex</li>
+<li>传输增量包</li>
+<li>App 更新代码或资源，刷新或重启</li>
+</ul>
+<h3 id="单个工程流程"><a href="#单个工程流程" class="headerlink" title="单个工程流程"></a>单个工程流程</h3><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h4 id="几个重要的模块"><a href="#几个重要的模块" class="headerlink" title="几个重要的模块"></a>几个重要的模块</h4><h5 id="Python-实现任务调度（调度中心、发号施令）"><a href="#Python-实现任务调度（调度中心、发号施令）" class="headerlink" title="Python 实现任务调度（调度中心、发号施令）"></a>Python 实现任务调度（调度中心、发号施令）</h5><p>build_commands.py   builder.py<br>各种命令, 各种构建</p>
+<p>freeline_build.py  gradle_clean_build.py  gradle_inc_build.py<br>task拓扑序列构建,</p>
+<p>task_engine.py<br>任务并发执行，依赖的模块在进行构建时，当前task.wait()，当其依赖执行结束，再执行此task</p>
+<p>android_tools.py<br>建立连接、安装apk、一些辅助类</p>
+<p>gradle_tools.py<br>Gradle执行的辅助类，扫描各个文件(GradleScanChangedFilesCommand)、资源，是否有变化、存储信息</p>
+<p>sync_client.py<br>将代码、资源同步到手机</p>
+<h5 id="Gradle-Plugin-负责构建任务、代码注入等"><a href="#Gradle-Plugin-负责构建任务、代码注入等" class="headerlink" title="Gradle-Plugin 负责构建任务、代码注入等"></a>Gradle-Plugin 负责构建任务、代码注入等</h5><p>注意：对于低版本的gradle插件，则不能使用 transform 时来进行字节码修改，要通过 preDex 这个 task 进行字节码的修改</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (!it.moduleVersion.startsWith(<span class="string">"1.5"</span>)</div><div class="line">        &amp;&amp; !it.moduleVersion.startsWith(<span class="string">"2"</span>)) &#123;</div><div class="line">    isLowerVersion = <span class="literal">true</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><br></p>
+<h5 id="Freeline-runtime-主要处理-设备连接，增量代码、资源的更新"><a href="#Freeline-runtime-主要处理-设备连接，增量代码、资源的更新" class="headerlink" title="Freeline-runtime  主要处理 设备连接，增量代码、资源的更新"></a>Freeline-runtime  主要处理 设备连接，增量代码、资源的更新</h5><p>具体参考源码查看，此处不再贴</p>
+<h4 id="代码增量实现"><a href="#代码增量实现" class="headerlink" title="代码增量实现"></a>代码增量实现</h4><p>使用 Qzone 的思路进行实现：<br>DexUtils:<br>    分别对 4.0 以上和以下的做兼容，具体看代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">   Object newDexElements;</div><div class="line">   <span class="keyword">int</span> dexLength;</div><div class="line">   <span class="keyword">if</span> (VERSION.SDK_INT &gt;= <span class="number">14</span>) &#123;</div><div class="line">       pathListField = ReflectUtil.fieldGetOrg(classLoader, Class.forName(<span class="string">"dalvik.system.BaseDexClassLoader"</span>), <span class="string">"pathList"</span>);</div><div class="line">       fDexElements = ReflectUtil.fieldGetOrg(pathListField.get(classLoader), <span class="string">"dexElements"</span>);</div><div class="line">       Object e = fDexElements.get(pathListField.get(classLoader));</div><div class="line">       dstObject = e;</div><div class="line">       dexFiles = <span class="keyword">new</span> DexFile[Array.getLength(e)];</div><div class="line">       <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; Array.getLength(e); ++i) &#123;</div><div class="line">           newDexElements = Array.get(e, i);</div><div class="line">           dexFiles[i] = (DexFile) ReflectUtil.fieldGet(newDexElements, <span class="string">"dexFile"</span>);</div><div class="line">       &#125;</div><div class="line">   &#125; <span class="keyword">else</span> &#123;</div><div class="line">       pathListField = ReflectUtil.fieldGetOrg(classLoader, <span class="string">"mDexs"</span>);</div><div class="line">       dstObject = pathListField.get(classLoader);</div><div class="line">       dexFiles = <span class="keyword">new</span> DexFile[Array.getLength(dstObject)];</div><div class="line">       <span class="keyword">for</span> (dexLength = <span class="number">0</span>; dexLength &lt; Array.getLength(dstObject); ++dexLength) &#123;</div><div class="line">           dexFiles[dexLength] = (DexFile) Array.get(dstObject, dexLength);</div><div class="line">       &#125;</div><div class="line">   &#125;</div><div class="line">   dexLength = Array.getLength(dstObject) + <span class="number">1</span>;</div><div class="line">   newDexElements = Array.newInstance(fDexElements.getType().getComponentType(), dexLength);</div><div class="line"></div><div class="line">   DexClassLoader dynamicDex = <span class="keyword">new</span> DexClassLoader(dex.getAbsolutePath(), opt.getAbsolutePath(), <span class="keyword">null</span>, classLoader.getParent());</div><div class="line">   Log.i(TAG, <span class="string">"after opt, dex len:"</span> + dex.length() + <span class="string">"; opt len:"</span> + opt.length());</div><div class="line">   Object pathList = pathListField.get(dynamicDex);</div><div class="line">   Object dexElements = fDexElements.get(pathList);</div><div class="line">   Object firstDexElement = Array.get(dexElements, <span class="number">0</span>);</div><div class="line">   Array.set(newDexElements, <span class="number">0</span>, firstDexElement);</div><div class="line"></div><div class="line">   <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; dexLength - <span class="number">1</span>; ++i) &#123;</div><div class="line">       Object element = Array.get(dstObject, i);</div><div class="line">       Array.set(newDexElements, i + <span class="number">1</span>, element);</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="keyword">if</span> (VERSION.SDK_INT &gt;= <span class="number">14</span>) &#123;</div><div class="line">       fDexElements.set(pathListField.get(classLoader), newDexElements);</div><div class="line">   &#125; <span class="keyword">else</span> &#123;</div><div class="line">       pathListField.set(classLoader, newDexElements);</div><div class="line">   &#125;</div><div class="line">   <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">   Log.e(TAG, <span class="string">"fail to override classloader "</span> + classLoader + <span class="string">" with "</span> + dex.getAbsolutePath(), e);</div><div class="line">   <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><strong>Preverify 过程：</strong><br>dex2opt过程中，若发现当前类中，存在一个直接引用类也和当前类在同一个dex中，则当前类会被打上 verified=true 的标记。下次加载时，则会判断这个类所在的dex是否是同一个dex</p>
+<p><strong>如何避免 preverify 异常？</strong><br>在 dexopt 过程中，Class_isPreverfied 问题：<br>通过在每个类的构造方式，加入一个 另一个dex的 类，让其preverify 失效，这样就可以让增量的class被加载了<br>这也是Google的一个安全策略</p>
+<p>相关知识可参考：<br>直接引用类的定义：<br><a href="https://zhuanlan.zhihu.com/p/20308548" target="_blank" rel="external">https://zhuanlan.zhihu.com/p/20308548</a><br>dex分包过程，dexopt介绍：<br><a href="https://segmentfault.com/a/1190000004053072" target="_blank" rel="external">https://segmentfault.com/a/1190000004053072</a></p>
+<h4 id="资源的更新逻辑"><a href="#资源的更新逻辑" class="headerlink" title="资源的更新逻辑"></a>资源的更新逻辑</h4><p>根据最新的 R.java 文件 拿到 各个资源id  生成 public.xml 和 ids.xml，用于解决资源id 冲突    id-gen-tool 工具<br> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline9.png" alt=""></p>
+<p>对于增量的 资源进行 Freelineaapt 编译，未做过更改的资源，直接使用 backup 中的资源，再打成一个 增量包：inc.pack</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>增量包中，只包含 增量的资源，全量的arsc 和 AndroidManifest.xml</p>
+<p>Resources.arsc 并不一定会打进 pack 中，只有 资源的更改引起 arsc 变化时，才打入包中，arsc 的体积也是占一定比例的</p>
+<p>手机端，资源更新生效：<br>    通过借鉴 instant run的方式，找到 resDir 的路径，将pack解压覆盖至该目录，然后 pruneResourceCaches,刷新UI</p>
+<h2 id="Freeline-使用及相关问题"><a href="#Freeline-使用及相关问题" class="headerlink" title="Freeline 使用及相关问题"></a>Freeline 使用及相关问题</h2><p>不再浪费篇幅，直接贴出我总结的内容：</p>
+<p><a href="https://github.com/fenglincanyi/Study/blob/master/Freeline%E7%9B%B8%E5%85%B3/Freeline_use.md" target="_blank" rel="external">https://github.com/fenglincanyi/Study/blob/master/Freeline%E7%9B%B8%E5%85%B3/Freeline_use.md</a></p>
+<h2 id="实例分析"><a href="#实例分析" class="headerlink" title="实例分析"></a>实例分析</h2><blockquote>
+<p>我们重点关注 项目目录下的 <strong>app/build/freeline</strong></p>
+</blockquote>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>更改代码后，再执行增量编译后，观察此目录：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline12.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>只生成了最新的更改过的文件<br>反编译 dex 目录下的 classes.dex 得出, 此文件里全是更改过的类文件：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline13.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>换个目录看看：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline14.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>对 hackload.dex 反编译：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline15.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>发现这个 hackload.dex 就是插桩时候，使用的单独的dex，里面是用来避免 preverify 问题的类<br>随后，我们看看编译后的apk 文件，解压缩，反编译看看任意一个classes.dex:<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline16.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>发现，确实是在构造方法里插入一个其他dex中的类，来避免打上 verified 的标识，验证了上面的做法。<br><br><br>好，松一口气，代码更新算是说完了…</p>
+<hr>
+
+
+<p>下面，我们看看资源是怎么更新的…</p>
+<p>前面说过：<br>是通过反向对 R.java 文件摘出 资源 id信息，放在 ids.xml 和 public.xml 中，那我们来看看这两个文件：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline17.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p><strong>ids.xml:</strong><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline18.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>里面是压缩过的id信息，就是我们在写布局文件的那些内容</p>
+<p><strong>public.xml:</strong><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline19.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此处只是部分，public.xml 文件记录了 name 和 id 之间的映射</p>
+<p>一个普通的 R.java 文件，包含了以下资源信息<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline20.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>所以，这里的 ids.xml 只存储了 我们自己写的 id 信息，而 public.xml 存储了 R.java 完整信息。<br>ids.xml 是为了处理资源id冲突问题，预先准备的文件</p>
+<p><strong>再来看看 增量资源相关的：</strong></p>
+<p>app.pack 文件压缩了所有的资源文件，包括assets 和 res 目录下的资源文件，和清单文件，资源索引表</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline21.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>解压 app.pack 文件后：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline22.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>扩展一下，看看 resource.arsc 文件：<br>此文件的并不是APP一下子解析加载的，是按需加载，<br>它是一种二进制索引表,对应了app里所有资源name,及id<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline23.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>整个 Freeline 项目的源码很值得研究，里面有好多的实现思路和解决方法都是精益求精的。把增量和优化做到极致。</li>
+<li>充分的借鉴了 layoucast 的代码更新思路，Buck 的并发构建、有向拓扑的规则、instant run的字节码修改、monkeyPatcher的实现方法，另外借助 gradle transform 插件及 preDex task时机进行字节码修改，真的是集百家之长。<br><strong>工作启示：</strong></li>
+<li>解决方法永远会有更优的，只是你暂时没找到</li>
+<li>复杂的工程都是一点一点做出来的</li>
+</ul>
+<h2 id="部分源码注释"><a href="#部分源码注释" class="headerlink" title="部分源码注释"></a>部分源码注释</h2><p>阅读 freeline 的 python模块代码的注释：<br><a href="https://github.com/fenglincanyi/Study/tree/master/Freeline%E7%9B%B8%E5%85%B3/freeline%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E6%B3%A8%E9%87%8A/freeline/freeline/freeline" target="_blank" rel="external">https://github.com/fenglincanyi/Study/tree/master/Freeline%E7%9B%B8%E5%85%B3/freeline%E7%9B%B8%E5%85%B3%E6%BA%90%E7%A0%81%E6%B3%A8%E9%87%8A/freeline/freeline/freeline</a></p>
+<h2 id="补充点"><a href="#补充点" class="headerlink" title="补充点"></a>补充点</h2><p>想说的太多了，自己写个配注。。。</p>
+<ul>
+<li><p>Gradle plugin 模块：<br>负责构建时，做的一些逻辑<br>如：项目描述文件（FreelineInitializer.groovy 执行初始化时，生成项目描述文件）</p>
+</li>
+<li><p>reelineInjector.groovy 里的  hackClass  -&gt; new FreelineClassVisitor -&gt; 进行字节码的注入<br>这个思路借鉴了instant run的做法</p>
+</li>
+<li><p>Freeline-runtime/DexUtils<br>处理dex增量包的逻辑</p>
+</li>
+<li><p>Instant-run-serve 项目下的 monkeyPatcher 被Freeline直接复用了</p>
+</li>
+<li><p>Gradle transform plugin<br>transform 是在java文件编译成class之后，合成dex之前，此期间执行的，来修改class内容</p>
+</li>
+</ul>
+<p>transform 解释：<br><a href="http://blog.csdn.net/sbsujjbcy/article/details/50839263" target="_blank" rel="external">http://blog.csdn.net/sbsujjbcy/article/details/50839263</a><br>源码位置：<br><a href="https://android.googlesource.com/platform/tools/base/+/gradle_2.0.0/build-system/gradle-core/" target="_blank" rel="external">https://android.googlesource.com/platform/tools/base/+/gradle_2.0.0/build-system/gradle-core/</a></p>
+<p>instant run 中涉及到的类：用到了ASM<br>IncrementalChangeVisitor.java<br>IncrementalSupportVisitor.java<br>IncrementalVisitor.java</p>
+<p>使用到，调用 task 命令，传入参数：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">command += <span class="string">' -P freelineBuild=true'</span> <span class="comment"># 使用 gradle 方式，加入了freelineBuild 属性 ，在 FreelinePlugin.groovy 中有体现</span></div></pre></td></tr></table></figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;自从去年10月份，使用Freeline 感觉非常不错，开发效率提升数倍。由于工作原因，一直将这篇总结拖到现在。ok，现在好好总结下。。。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;前言：Android-开发者之痛&quot;&gt;&lt;a href=&quot;#前
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="Freeline" scheme="https://fenglincanyi.github.io/tags/Freeline/"/>
+    
+  </entry>
   
   <entry>
     <title>Weex SDK源码分析（二）</title>
@@ -1242,129 +1556,6 @@ globalSession 一次登陆，任何地方都保存有登录状态
   </entry>
   
   <entry>
-    <title>Android 类加载初探</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
-</blockquote>
-<p>需要关注的类有：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
-<ul>
-<li>BaseDexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>DexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>PathClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
-<p><strong>ClassLoader 相关说明：</strong></p>
-<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
-<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
-<p>DexPathList 构造函数：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>makeDexElements过程：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
-<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
-    
-  </entry>
-  
-  <entry>
     <title>Android apk安装过程实例分析</title>
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
@@ -1485,6 +1676,129 @@ globalSession 一次登陆，任何地方都保存有登录状态
       <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
     
       <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android 类加载初探</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2017-01-19T08:20:55.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
+</blockquote>
+<p>需要关注的类有：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
+<ul>
+<li>BaseDexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>DexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>PathClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
+<p><strong>ClassLoader 相关说明：</strong></p>
+<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
+<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
+<p>DexPathList 构造函数：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>makeDexElements过程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
+<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
     
   </entry>
   
