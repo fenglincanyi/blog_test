@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Android 6.0适配 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="6">
+    <meta name="description" content="Android 权限变更在 Android 6.0 之前，APP 的授权是通过在 manifest.xml 文件中，去注册相关权限，安装时就可以获得所有声明了的权限。而在 6.0 及以后的版本，这种在 manifest.xml 声明权限的做法，已经在一些权限上不适用了。在Android 6.0 及以后的系统中，用户可以自动打开或关闭任何应用的权限（设置 -&amp;gt; 应用权限）
+权限的划分Andro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 6.0适配">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="Android 权限变更在 Android 6.0 之前，APP 的授权是通过在 manifest.xml 文件中，去注册相关权限，安装时就可以获得所有声明了的权限。而在 6.0 及以后的版本，这种在 manifest.xml 声明权限的做法，已经在一些权限上不适用了。在Android 6.0 及以后的系统中，用户可以自动打开或关闭任何应用的权限（设置 -&amp;gt; 应用权限）
+权限的划分Andro">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%80%82%E9%85%8D.png">
+<meta property="og:updated_time" content="2017-06-09T05:31:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 6.0适配">
+<meta name="twitter:description" content="Android 权限变更在 Android 6.0 之前，APP 的授权是通过在 manifest.xml 文件中，去注册相关权限，安装时就可以获得所有声明了的权限。而在 6.0 及以后的版本，这种在 manifest.xml 声明权限的做法，已经在一些权限上不适用了。在Android 6.0 及以后的系统中，用户可以自动打开或关闭任何应用的权限（设置 -&amp;gt; 应用权限）
+权限的划分Andro">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%80%82%E9%85%8D.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Android 6.0适配</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Android 6.0适配</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-04-12T04:40:00.000Z" itemprop="datePublished" class="page-time">
+  2017-04-12
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Android-权限变更"><span class="post-toc-number">1.</span> <span class="post-toc-text">Android 权限变更</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#权限的划分"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">权限的划分</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#不同版本运行，区别对待"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">不同版本运行，区别对待</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#权限处理原则"><span class="post-toc-number">2.</span> <span class="post-toc-text">权限处理原则</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#考虑使用-Intent"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">考虑使用 Intent</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#仅要求APP所需的权限"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">仅要求APP所需的权限</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#不要让用户感到无所适从"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">不要让用户感到无所适从</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#解释需要权限的原因"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">解释需要权限的原因</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6-0-权限适配"><span class="post-toc-number">3.</span> <span class="post-toc-text">6.0 权限适配</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#普通手机适配"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">普通手机适配</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#小米、魅族适配"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">小米、魅族适配</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">4.</span> <span class="post-toc-text">总结</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Android 6.0适配"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Android 6.0适配</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-4-12 12:40" datetime="2017-04-12T04:40:00.000Z"  itemprop="datePublished">2017-04-12</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="Android-权限变更"><a href="#Android-权限变更" class="headerlink" title="Android 权限变更"></a>Android 权限变更</h2><p>在 Android 6.0 之前，APP 的授权是通过在 manifest.xml 文件中，去注册相关权限，安装时就可以获得所有声明了的权限。而在 6.0 及以后的版本，这种在 manifest.xml 声明权限的做法，已经在一些权限上不适用了。<br>在Android 6.0 及以后的系统中，用户可以自动打开或关闭任何应用的权限（设置 -&gt; 应用权限）</p>
+<h3 id="权限的划分"><a href="#权限的划分" class="headerlink" title="权限的划分"></a>权限的划分</h3><p>Android 是基于 Linux 系统的，所以，对于每个文件都有个权限的概念。<br>这次变化，主要将 Android 系统中的权限分为：</p>
+<ul>
+<li>正常权限：如很常见的 访问网络；</li>
+<li>危险权限：如访问手机状态、位置信息；</li>
+<li>特殊权限：如写设置、悬浮窗</li>
+</ul>
+<p>另外，还有一个 <strong>权限组</strong> 的概念：</p>
+<p>  任何权限都可属于一个权限组，包括正常权限和应用定义的权限<br>所以，每个危险权限都属于不同的权限组中，Google已经定义好了这些归属。</p>
+<p>我们主要关注的危险权限和权限组如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">权限组</th>
+<th style="text-align:right">权限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">CALENDAR</td>
+<td style="text-align:right">READ_CALENDAR<br>WRITE_CALENDAR</td>
+</tr>
+<tr>
+<td style="text-align:left">CAMERA</td>
+<td style="text-align:right">CAMERA</td>
+</tr>
+<tr>
+<td style="text-align:left">CONTACTS</td>
+<td style="text-align:right">READ_CONTACTS<br>WRITE_CONTACTS<br>GET_ACCOUNTS</td>
+</tr>
+<tr>
+<td style="text-align:left">LOCATION</td>
+<td style="text-align:right">ACCESS_FINE_LOCATION<br>ACCESS_COARSE_LOCATION</td>
+</tr>
+<tr>
+<td style="text-align:left">MICROPHONE</td>
+<td style="text-align:right">RECORD_AUDIO</td>
+</tr>
+<tr>
+<td style="text-align:left">PHONE</td>
+<td style="text-align:right">READ_PHONE_STATE<br>CALL_PHONE<br>READ_CALL_LOG<br>WRITE_CALL_LOG<br>ADD_VOICEMAIL<br>USE_SIP<br>PROCESS_OUTGOING_CALLS</td>
+</tr>
+<tr>
+<td style="text-align:left">SENSORS</td>
+<td style="text-align:right">BODY_SENSORS</td>
+</tr>
+<tr>
+<td style="text-align:left">SMS</td>
+<td style="text-align:right">SEND_SMS<br>RECEIVE_SMS<br>READ_SMS<br>RECEIVE_WAP_PUSH<br>RECEIVE_MMS</td>
+</tr>
+<tr>
+<td style="text-align:left">STORAGE</td>
+<td style="text-align:right">READ_EXTERNAL_STORAGE<br>WRITE_EXTERNAL_STORAGE</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>如果已经申请到了某个组的某一个权限时，那么也同时拥有了该组的其他权限；只要拥有了同类中的一个，那么就拥有了该组的其他权限</p>
+</blockquote>
+<p>大部分的适配工作就是对以上的权限进行预处理，就OK了。</p>
+<h3 id="不同版本运行，区别对待"><a href="#不同版本运行，区别对待" class="headerlink" title="不同版本运行，区别对待"></a>不同版本运行，区别对待</h3><ul>
+<li>如果你的 targetSdkVersion &lt;= 22，那么安装在 6.0 以上的手机的话，还是以老的授权方式（安装时期）对所有声明了的权限一次性授权。</li>
+<li>如果你的 targetSdkVersion &gt; 22，那么安装在 6.0 以上的手机上，不光要在 manifest.xml 中声明，而且有一部分比较危险或者特殊的权限， 需要在 app 运行时期，来提前申请权限。一旦未申请而直接进行操作的话，会直接崩溃SecurityException。</li>
+</ul>
+<h2 id="权限处理原则"><a href="#权限处理原则" class="headerlink" title="权限处理原则"></a>权限处理原则</h2><p>Google 对权限做了进一步要求之后，作为我们开发者，该如何作何权限的适配呢?<br>官方也给出了几个建议：</p>
+<h3 id="考虑使用-Intent"><a href="#考虑使用-Intent" class="headerlink" title="考虑使用 Intent"></a>考虑使用 Intent</h3><p>我们一般可以使用以下 2 种方法，来执行某个任务：</p>
+<ul>
+<li>要求提供权限才能执行操作</li>
+<li>使用 intent，让其他应用来执行任务</li>
+</ul>
+<p>比如：<br>我们要使用拍照的功能，那么我们可以请求 CAMERA 权限，然后可以直接访问相机，控制相机进行拍照；也可以不用申请 CAMERA 权限，我们通过 ACTION_IMAGE_CAPTURE intent 来请求，系统会提示用户选择相机，拍照后返回 onActivityResult()。</p>
+<p>类似的：打电话、访问用户的联系人 也是同样的做法</p>
+<p>这两种方式各有优缺点：<br>使用权限：</p>
+<ul>
+<li>应用可在您执行操作时完全控制用户体验；不过，如此广泛的控制会增加任务的复杂性，因为您需要设计适当的 UI。</li>
+<li>系统会在运行或安装应用时各提示用户提供一次权限，应用即可执行操作，不再需要用户进行其他交互。不过，如果用户不授予权限（或稍后撤销权限），应用将根本无法执行操作。</li>
+</ul>
+<p>使用 intent:</p>
+<ul>
+<li>无需为操作设计 UI。处理 intent 的应用将提供 UI。不过，这意味着您无法控制用户体验。用户可能从未见过的应用交互。</li>
+<li>如果用户没有适用于操作的默认应用，则系统会提示用户选择一款应用。如果用户未指定默认处理程序，则他们每次执行此操作时都必须处理一个额外对话框。</li>
+</ul>
+<h3 id="仅要求APP所需的权限"><a href="#仅要求APP所需的权限" class="headerlink" title="仅要求APP所需的权限"></a>仅要求APP所需的权限</h3><p>每次您要求权限时，实际上是在强迫用户作出决定。<br>您应尽量减少提出这些请求的次数。</p>
+<h3 id="不要让用户感到无所适从"><a href="#不要让用户感到无所适从" class="headerlink" title="不要让用户感到无所适从"></a>不要让用户感到无所适从</h3><p>某些情况下，一项或多项权限可能是应用所必需的。在这种情况下，合理的做法是，在应用启动之后立即要求提供这些权限。<br>在这种情况下，合理的做法是，在应用启动之后立即要求提供这些权限。例如，如果您运行摄影应用，应用需要访问设备的相机。在用户首次启动应用时，他们不会对提供相机使用权限的要求感到惊讶。</p>
+<h3 id="解释需要权限的原因"><a href="#解释需要权限的原因" class="headerlink" title="解释需要权限的原因"></a>解释需要权限的原因</h3><p>系统在您调用 requestPermissions() 时显示的权限对话框将说明应用需要的权限，但不会解释为何需要这些权限。某些情况下，用户可能会感到困惑。因此，最好在调用 requestPermissions() 之前向用户解释应用需要相应权限的原因。<br>例如，摄影应用可能需要使用位置服务，以便能够为照片添加地理标签。通常，用户可能不了解照片能够包含位置信息，并且对摄影应用想要了解具体位置感到不解。因此在这种情况下，应用最好在调用 requestPermissions() 之前告知用户此功能的相关信息。<br><br><br>以上的准则，我们可以参考 <strong>微信</strong> 或者 <strong>头条</strong> 进行分析，他们是如何处理好与用户的交互的</p>
+<h2 id="6-0-权限适配"><a href="#6-0-权限适配" class="headerlink" title="6.0 权限适配"></a>6.0 权限适配</h2><p>适配工作我们要对市面上常用的手机进行适配，大部分的手机还是遵守这些规则的。但是对部分小米或魅族系统的权限，厂商还是做了自己的定制的，我们需要花点心思来处理。</p>
+<h3 id="普通手机适配"><a href="#普通手机适配" class="headerlink" title="普通手机适配"></a>普通手机适配</h3><p>一般流程我们分为 3步：</p>
+<ul>
+<li>checkPermission</li>
+<li>requestPermission</li>
+<li>handleResult</li>
+</ul>
+<p>如果我们自己实现，就使用 ContextCompat.checkSelfPermission 检查需要的权限；<br>如果不是被授权，则我们需要请求这个权限 ActivityCompat.requestPermissions，可以同时请求一个或多个权限；<br>然后我们重写 Activity 的 onRequestPermissionsResult() 方法，根据用户授权结果，进行相应的结果处理。</p>
+<p>不再造轮子了，我项目中了 RxPermission 开源库，并借鉴了EasyPermission，AndPermission 的思路。<br>代码层面不再展开，实现比较容易。。。</p>
+<p><strong>处理流程：</strong><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%80%82%E9%85%8D.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>我们再来看看 微信 的流程，在第一次安装，启动后，就会要求3个比较重要的权限，一个一个来请求获取，如果一旦有未同意的，就不让进入。<br>这种做法也是比较合理的，这些权限都没同意，后续的操作没法正常进行。</p>
+<h3 id="小米、魅族适配"><a href="#小米、魅族适配" class="headerlink" title="小米、魅族适配"></a>小米、魅族适配</h3><p>适配最头痛的就是 这种 爱搞特殊的手机了，没办法，手机碎片化的问题只能盼着慢慢消磨了。</p>
+<p>小米、魅族手机的话，会出现 checkPermission 时，返回true，但是我们使用的时候实际是 关闭权限的；<br>这时候，我们就不能只 check了，还要 使用 AppOpsManager 来获取相关的操作，看这个操作是否有执行的权限。<br>通过这样双重的检查权限，都通过了，才可以执行操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">hasPermission</span><span class="params">(@NonNull Context context, @NonNull List&lt;String&gt; permissions)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span>(Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.M) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">            <span class="keyword">for</span> (Object permission : permissions) &#123;</div><div class="line">                <span class="comment">// 获取app中 权限关联的操作</span></div><div class="line">                String op = AppOpsManagerCompat.permissionToOp(permission.toString());</div><div class="line">                <span class="keyword">if</span> (!TextUtils.isEmpty(op)) &#123;</div><div class="line">                    <span class="comment">// 查看 操作 是否被允许</span></div><div class="line">                    <span class="keyword">int</span> result = AppOpsManagerCompat.noteProxyOp(context, op, context.getPackageName());</div><div class="line">                    <span class="keyword">if</span> (result == MODE_IGNORED) &#123;</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="comment">// 再次检查，确保有权限</span></div><div class="line">                    result = ContextCompat.checkSelfPermission(context, permission.toString());</div><div class="line">                    <span class="keyword">if</span> (result != PERMISSION_GRANTED) &#123;</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>在小米论坛上，已经有人提到这个问题，解决方法就是再次使用 AppOpsManager 来检查。<br><a href="http://www.miui.com/thread-4498742-1-1.html" target="_blank" rel="external">http://www.miui.com/thread-4498742-1-1.html</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>Android 安全架构的中心设计点是：<strong>在默认情况下任何应用都没有权限执行对其他应用、操作系统或用户有不利影响的任何操作</strong></li>
+<li>可以使用 intent 启动的操作，尽量还是使用intent吧，申请权限毕竟是要弹框阻碍用户操作的，而且如果没同意，还要做相应的操作来配合。</li>
+</ul>
+<hr>
+<p>参考：</p>
+<p><a href="https://developer.android.com/guide/topics/permissions/normal-permissions.html?hl=zh-cn" target="_blank" rel="external">https://developer.android.com/guide/topics/permissions/normal-permissions.html?hl=zh-cn</a><br><a href="https://developer.android.com/training/permissions/best-practices.html?hl=zh-cn#perms-vs-intents" target="_blank" rel="external">https://developer.android.com/training/permissions/best-practices.html?hl=zh-cn#perms-vs-intents</a><br><a href="https://mp.weixin.qq.com/s?__biz=MzIxNzEyMzIzOA==&amp;mid=2652313851&amp;idx=1&amp;sn=a15519b65e7bedefbb566fe6d01935cb&amp;scene=4#wechat_redirect" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MzIxNzEyMzIzOA==&amp;mid=2652313851&amp;idx=1&amp;sn=a15519b65e7bedefbb566fe6d01935cb&amp;scene=4#wechat_redirect</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-06-09T05:31:49.000Z" title="2017-6-9 13:31" itemprop="dateUpdated">2017年6月9日 13:31</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/04/12/Android 6.0适配/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/6/">6</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/&title=《Android 6.0适配》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/&title=《Android 6.0适配》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 6.0适配》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/03/18/Android 增量编译方案总结/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android 增量编译方案总结</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Android 6.0适配" data-title="Android 6.0适配" data-url="https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/&title=《Android 6.0适配》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/&title=《Android 6.0适配》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 6.0适配》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACH0lEQVR42u3aO3LDMAwFwNz/0k6bIlYeADkzApeVxyNLXBUw8fn6itfrx7r+/t0313e+fsptCwMD47GM1+V6d03+4OT6d+xkbxgYGOcwksfnG01+db3RfG8YGBgYvSCYbGjy+jAwMDCS2yVBNk99qwkwBgbGmYzqEa1aGuuF5o/k4hgYGA9k5Jv4/88f6W9gYGA8ivEqrl6AzkPkq7UwMDB2Mybl+6RJ2YNV94OBgXEmo5e+5klmrzxXOL1iYGCsY9y1lbtKaRMwBgbGbkb+gMloRQLL26sYGBgnMKrHvkmBLB+qSFJcDAyMcxh5cExKY/OtlP8lklwcAwPj4YykPXlXea6a7ubhHgMDYzcjT18nEX1yhwIbAwPjAEYvsaymqfmhsFkvxMDAWMeoNgCqAbpXdCsPW2BgYKxmFFLEIj5vAPSGw6LGAAYGxgpGEsiSVDa/vtdmKBTaMDAwljLyLeaNz3m5P3kRv/Q3MDAw1jF6Rbdk65M0uNo0xcDAOIGRBMq8qXlXSa76GQMD42TGZMwiD8GThigGBsY5jPkIVxXQS5v/ONtiYGCsY0wObdXgWE2bC2wMDIzVjF6wa45txcjJQAYGBsZWRrX4VW1t3hsVCz/DwMBYx0hS0Opj8nB5w2vCwMDAaG1iMqhaPoZiYGBgDB5WfQXNMTIMDIwDGNVmQD6o2msSlEdjMTAwVjN6qeNktCsfV81bBRgYGEsZ3765k2G3auQpAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

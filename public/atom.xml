@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-05-25T08:23:37.000Z</updated>
+  <updated>2017-06-09T05:31:49.000Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -16,11 +16,146 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Android 6.0适配</title>
+    <link href="https://fenglincanyi.github.io/2017/04/12/Android%206.0%E9%80%82%E9%85%8D/"/>
+    <id>https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/</id>
+    <published>2017-04-12T04:40:00.000Z</published>
+    <updated>2017-06-09T05:31:49.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Android-权限变更"><a href="#Android-权限变更" class="headerlink" title="Android 权限变更"></a>Android 权限变更</h2><p>在 Android 6.0 之前，APP 的授权是通过在 manifest.xml 文件中，去注册相关权限，安装时就可以获得所有声明了的权限。而在 6.0 及以后的版本，这种在 manifest.xml 声明权限的做法，已经在一些权限上不适用了。<br>在Android 6.0 及以后的系统中，用户可以自动打开或关闭任何应用的权限（设置 -&gt; 应用权限）</p>
+<h3 id="权限的划分"><a href="#权限的划分" class="headerlink" title="权限的划分"></a>权限的划分</h3><p>Android 是基于 Linux 系统的，所以，对于每个文件都有个权限的概念。<br>这次变化，主要将 Android 系统中的权限分为：</p>
+<ul>
+<li>正常权限：如很常见的 访问网络；</li>
+<li>危险权限：如访问手机状态、位置信息；</li>
+<li>特殊权限：如写设置、悬浮窗</li>
+</ul>
+<p>另外，还有一个 <strong>权限组</strong> 的概念：</p>
+<p>  任何权限都可属于一个权限组，包括正常权限和应用定义的权限<br>所以，每个危险权限都属于不同的权限组中，Google已经定义好了这些归属。</p>
+<p>我们主要关注的危险权限和权限组如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">权限组</th>
+<th style="text-align:right">权限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">CALENDAR</td>
+<td style="text-align:right">READ_CALENDAR<br>WRITE_CALENDAR</td>
+</tr>
+<tr>
+<td style="text-align:left">CAMERA</td>
+<td style="text-align:right">CAMERA</td>
+</tr>
+<tr>
+<td style="text-align:left">CONTACTS</td>
+<td style="text-align:right">READ_CONTACTS<br>WRITE_CONTACTS<br>GET_ACCOUNTS</td>
+</tr>
+<tr>
+<td style="text-align:left">LOCATION</td>
+<td style="text-align:right">ACCESS_FINE_LOCATION<br>ACCESS_COARSE_LOCATION</td>
+</tr>
+<tr>
+<td style="text-align:left">MICROPHONE</td>
+<td style="text-align:right">RECORD_AUDIO</td>
+</tr>
+<tr>
+<td style="text-align:left">PHONE</td>
+<td style="text-align:right">READ_PHONE_STATE<br>CALL_PHONE<br>READ_CALL_LOG<br>WRITE_CALL_LOG<br>ADD_VOICEMAIL<br>USE_SIP<br>PROCESS_OUTGOING_CALLS</td>
+</tr>
+<tr>
+<td style="text-align:left">SENSORS</td>
+<td style="text-align:right">BODY_SENSORS</td>
+</tr>
+<tr>
+<td style="text-align:left">SMS</td>
+<td style="text-align:right">SEND_SMS<br>RECEIVE_SMS<br>READ_SMS<br>RECEIVE_WAP_PUSH<br>RECEIVE_MMS</td>
+</tr>
+<tr>
+<td style="text-align:left">STORAGE</td>
+<td style="text-align:right">READ_EXTERNAL_STORAGE<br>WRITE_EXTERNAL_STORAGE</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>如果已经申请到了某个组的某一个权限时，那么也同时拥有了该组的其他权限；只要拥有了同类中的一个，那么就拥有了该组的其他权限</p>
+</blockquote>
+<p>大部分的适配工作就是对以上的权限进行预处理，就OK了。</p>
+<h3 id="不同版本运行，区别对待"><a href="#不同版本运行，区别对待" class="headerlink" title="不同版本运行，区别对待"></a>不同版本运行，区别对待</h3><ul>
+<li>如果你的 targetSdkVersion &lt;= 22，那么安装在 6.0 以上的手机的话，还是以老的授权方式（安装时期）对所有声明了的权限一次性授权。</li>
+<li>如果你的 targetSdkVersion &gt; 22，那么安装在 6.0 以上的手机上，不光要在 manifest.xml 中声明，而且有一部分比较危险或者特殊的权限， 需要在 app 运行时期，来提前申请权限。一旦未申请而直接进行操作的话，会直接崩溃SecurityException。</li>
+</ul>
+<h2 id="权限处理原则"><a href="#权限处理原则" class="headerlink" title="权限处理原则"></a>权限处理原则</h2><p>Google 对权限做了进一步要求之后，作为我们开发者，该如何作何权限的适配呢?<br>官方也给出了几个建议：</p>
+<h3 id="考虑使用-Intent"><a href="#考虑使用-Intent" class="headerlink" title="考虑使用 Intent"></a>考虑使用 Intent</h3><p>我们一般可以使用以下 2 种方法，来执行某个任务：</p>
+<ul>
+<li>要求提供权限才能执行操作</li>
+<li>使用 intent，让其他应用来执行任务</li>
+</ul>
+<p>比如：<br>我们要使用拍照的功能，那么我们可以请求 CAMERA 权限，然后可以直接访问相机，控制相机进行拍照；也可以不用申请 CAMERA 权限，我们通过 ACTION_IMAGE_CAPTURE intent 来请求，系统会提示用户选择相机，拍照后返回 onActivityResult()。</p>
+<p>类似的：打电话、访问用户的联系人 也是同样的做法</p>
+<p>这两种方式各有优缺点：<br>使用权限：</p>
+<ul>
+<li>应用可在您执行操作时完全控制用户体验；不过，如此广泛的控制会增加任务的复杂性，因为您需要设计适当的 UI。</li>
+<li>系统会在运行或安装应用时各提示用户提供一次权限，应用即可执行操作，不再需要用户进行其他交互。不过，如果用户不授予权限（或稍后撤销权限），应用将根本无法执行操作。</li>
+</ul>
+<p>使用 intent:</p>
+<ul>
+<li>无需为操作设计 UI。处理 intent 的应用将提供 UI。不过，这意味着您无法控制用户体验。用户可能从未见过的应用交互。</li>
+<li>如果用户没有适用于操作的默认应用，则系统会提示用户选择一款应用。如果用户未指定默认处理程序，则他们每次执行此操作时都必须处理一个额外对话框。</li>
+</ul>
+<h3 id="仅要求APP所需的权限"><a href="#仅要求APP所需的权限" class="headerlink" title="仅要求APP所需的权限"></a>仅要求APP所需的权限</h3><p>每次您要求权限时，实际上是在强迫用户作出决定。<br>您应尽量减少提出这些请求的次数。</p>
+<h3 id="不要让用户感到无所适从"><a href="#不要让用户感到无所适从" class="headerlink" title="不要让用户感到无所适从"></a>不要让用户感到无所适从</h3><p>某些情况下，一项或多项权限可能是应用所必需的。在这种情况下，合理的做法是，在应用启动之后立即要求提供这些权限。<br>在这种情况下，合理的做法是，在应用启动之后立即要求提供这些权限。例如，如果您运行摄影应用，应用需要访问设备的相机。在用户首次启动应用时，他们不会对提供相机使用权限的要求感到惊讶。</p>
+<h3 id="解释需要权限的原因"><a href="#解释需要权限的原因" class="headerlink" title="解释需要权限的原因"></a>解释需要权限的原因</h3><p>系统在您调用 requestPermissions() 时显示的权限对话框将说明应用需要的权限，但不会解释为何需要这些权限。某些情况下，用户可能会感到困惑。因此，最好在调用 requestPermissions() 之前向用户解释应用需要相应权限的原因。<br>例如，摄影应用可能需要使用位置服务，以便能够为照片添加地理标签。通常，用户可能不了解照片能够包含位置信息，并且对摄影应用想要了解具体位置感到不解。因此在这种情况下，应用最好在调用 requestPermissions() 之前告知用户此功能的相关信息。<br><br><br>以上的准则，我们可以参考 <strong>微信</strong> 或者 <strong>头条</strong> 进行分析，他们是如何处理好与用户的交互的</p>
+<h2 id="6-0-权限适配"><a href="#6-0-权限适配" class="headerlink" title="6.0 权限适配"></a>6.0 权限适配</h2><p>适配工作我们要对市面上常用的手机进行适配，大部分的手机还是遵守这些规则的。但是对部分小米或魅族系统的权限，厂商还是做了自己的定制的，我们需要花点心思来处理。</p>
+<h3 id="普通手机适配"><a href="#普通手机适配" class="headerlink" title="普通手机适配"></a>普通手机适配</h3><p>一般流程我们分为 3步：</p>
+<ul>
+<li>checkPermission</li>
+<li>requestPermission</li>
+<li>handleResult</li>
+</ul>
+<p>如果我们自己实现，就使用 ContextCompat.checkSelfPermission 检查需要的权限；<br>如果不是被授权，则我们需要请求这个权限 ActivityCompat.requestPermissions，可以同时请求一个或多个权限；<br>然后我们重写 Activity 的 onRequestPermissionsResult() 方法，根据用户授权结果，进行相应的结果处理。</p>
+<p>不再造轮子了，我项目中了 RxPermission 开源库，并借鉴了EasyPermission，AndPermission 的思路。<br>代码层面不再展开，实现比较容易。。。</p>
+<p><strong>处理流程：</strong><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%80%82%E9%85%8D.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>我们再来看看 微信 的流程，在第一次安装，启动后，就会要求3个比较重要的权限，一个一个来请求获取，如果一旦有未同意的，就不让进入。<br>这种做法也是比较合理的，这些权限都没同意，后续的操作没法正常进行。</p>
+<h3 id="小米、魅族适配"><a href="#小米、魅族适配" class="headerlink" title="小米、魅族适配"></a>小米、魅族适配</h3><p>适配最头痛的就是 这种 爱搞特殊的手机了，没办法，手机碎片化的问题只能盼着慢慢消磨了。</p>
+<p>小米、魅族手机的话，会出现 checkPermission 时，返回true，但是我们使用的时候实际是 关闭权限的；<br>这时候，我们就不能只 check了，还要 使用 AppOpsManager 来获取相关的操作，看这个操作是否有执行的权限。<br>通过这样双重的检查权限，都通过了，才可以执行操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">hasPermission</span><span class="params">(@NonNull Context context, @NonNull List&lt;String&gt; permissions)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span>(Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.M) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">            <span class="keyword">for</span> (Object permission : permissions) &#123;</div><div class="line">                <span class="comment">// 获取app中 权限关联的操作</span></div><div class="line">                String op = AppOpsManagerCompat.permissionToOp(permission.toString());</div><div class="line">                <span class="keyword">if</span> (!TextUtils.isEmpty(op)) &#123;</div><div class="line">                    <span class="comment">// 查看 操作 是否被允许</span></div><div class="line">                    <span class="keyword">int</span> result = AppOpsManagerCompat.noteProxyOp(context, op, context.getPackageName());</div><div class="line">                    <span class="keyword">if</span> (result == MODE_IGNORED) &#123;</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="comment">// 再次检查，确保有权限</span></div><div class="line">                    result = ContextCompat.checkSelfPermission(context, permission.toString());</div><div class="line">                    <span class="keyword">if</span> (result != PERMISSION_GRANTED) &#123;</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>在小米论坛上，已经有人提到这个问题，解决方法就是再次使用 AppOpsManager 来检查。<br><a href="http://www.miui.com/thread-4498742-1-1.html" target="_blank" rel="external">http://www.miui.com/thread-4498742-1-1.html</a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>Android 安全架构的中心设计点是：<strong>在默认情况下任何应用都没有权限执行对其他应用、操作系统或用户有不利影响的任何操作</strong></li>
+<li>可以使用 intent 启动的操作，尽量还是使用intent吧，申请权限毕竟是要弹框阻碍用户操作的，而且如果没同意，还要做相应的操作来配合。</li>
+</ul>
+<hr>
+<p>参考：</p>
+<p><a href="https://developer.android.com/guide/topics/permissions/normal-permissions.html?hl=zh-cn" target="_blank" rel="external">https://developer.android.com/guide/topics/permissions/normal-permissions.html?hl=zh-cn</a><br><a href="https://developer.android.com/training/permissions/best-practices.html?hl=zh-cn#perms-vs-intents" target="_blank" rel="external">https://developer.android.com/training/permissions/best-practices.html?hl=zh-cn#perms-vs-intents</a><br><a href="https://mp.weixin.qq.com/s?__biz=MzIxNzEyMzIzOA==&amp;mid=2652313851&amp;idx=1&amp;sn=a15519b65e7bedefbb566fe6d01935cb&amp;scene=4#wechat_redirect" target="_blank" rel="external">https://mp.weixin.qq.com/s?__biz=MzIxNzEyMzIzOA==&amp;mid=2652313851&amp;idx=1&amp;sn=a15519b65e7bedefbb566fe6d01935cb&amp;scene=4#wechat_redirect</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Android-权限变更&quot;&gt;&lt;a href=&quot;#Android-权限变更&quot; class=&quot;headerlink&quot; title=&quot;Android 权限变更&quot;&gt;&lt;/a&gt;Android 权限变更&lt;/h2&gt;&lt;p&gt;在 Android 6.0 之前，APP 的授权是通过在 m
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="6" scheme="https://fenglincanyi.github.io/tags/6/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Android 增量编译方案总结</title>
     <link href="https://fenglincanyi.github.io/2017/03/18/Android%20%E5%A2%9E%E9%87%8F%E7%BC%96%E8%AF%91%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93/"/>
     <id>https://fenglincanyi.github.io/2017/03/18/Android 增量编译方案总结/</id>
     <published>2017-03-18T12:10:00.000Z</published>
-    <updated>2017-05-25T08:23:37.000Z</updated>
+    <updated>2017-05-25T08:23:48.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>自从去年10月份，使用Freeline 感觉非常不错，开发效率提升数倍。由于工作原因，一直将这篇总结拖到现在。ok，现在好好总结下。。。</p>
@@ -1556,6 +1691,129 @@ globalSession 一次登陆，任何地方都保存有登录状态
   </entry>
   
   <entry>
+    <title>Android 类加载初探</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2017-01-19T08:20:55.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
+</blockquote>
+<p>需要关注的类有：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
+<ul>
+<li>BaseDexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>DexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>PathClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
+<p><strong>ClassLoader 相关说明：</strong></p>
+<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
+<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
+<p>DexPathList 构造函数：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>makeDexElements过程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
+<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Android apk安装过程实例分析</title>
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
@@ -1676,129 +1934,6 @@ globalSession 一次登陆，任何地方都保存有登录状态
       <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
     
       <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Android 类加载初探</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
-</blockquote>
-<p>需要关注的类有：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
-<ul>
-<li>BaseDexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>DexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>PathClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
-<p><strong>ClassLoader 相关说明：</strong></p>
-<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
-<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
-<p>DexPathList 构造函数：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>makeDexElements过程：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
-<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
     
   </entry>
   
