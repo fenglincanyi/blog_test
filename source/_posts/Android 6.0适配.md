@@ -2,7 +2,7 @@
 title: Android 6.0适配
 date: 2017-04-12 12:40
 categories: Android
-tags: [6.0]
+tags: [6.0适配, 运行时权限]
 ---
 
 ## Android 权限变更
