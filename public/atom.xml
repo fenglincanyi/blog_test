@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-06-09T08:52:45.000Z</updated>
+  <updated>2017-06-09T08:57:24.000Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://fenglincanyi.github.io/2017/06/09/Android%207.0%E9%80%82%E9%85%8D/"/>
     <id>https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/</id>
     <published>2017-06-09T12:10:00.000Z</published>
-    <updated>2017-06-09T08:52:45.000Z</updated>
+    <updated>2017-06-09T08:57:24.000Z</updated>
     
     <content type="html"><![CDATA[<p>Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。</p>
 <p>作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。</p>
@@ -119,6 +119,9 @@
                 <div class="image-caption"></div>
             </figure>
 <p>这是我们可以定制的<br>但是现在的项目比较死，暂时不适用自定义的了<br>暂时使用小米推送的改动小图标的方式，替换上一个透明背景的logo吧，总比灰色的方块强吧。而且其他app也是同样的显示效果，如上面的图标中的百度淘宝和头条。<br>有精力的话，使用透传消息，可以自己控制通知栏的样式和显示。</p>
+<hr>
+<p>参考：</p>
+<p><a href="http://iluhcm.com/2017/03/12/experience-of-adapting-to-android-notifications/" target="_blank" rel="external">http://iluhcm.com/2017/03/12/experience-of-adapting-to-android-notifications/</a><br><a href="http://yifeng.studio/2017/05/03/android-7-0-compat-fileprovider/" target="_blank" rel="external">http://yifeng.studio/2017/05/03/android-7-0-compat-fileprovider/</a></p>
 ]]></content>
     
     <summary type="html">

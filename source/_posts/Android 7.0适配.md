@@ -225,3 +225,11 @@ NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATIO
 但是现在的项目比较死，暂时不适用自定义的了
 暂时使用小米推送的改动小图标的方式，替换上一个透明背景的logo吧，总比灰色的方块强吧。而且其他app也是同样的显示效果，如上面的图标中的百度淘宝和头条。
 有精力的话，使用透传消息，可以自己控制通知栏的样式和显示。
+
+
+-------
+
+参考：
+
+http://iluhcm.com/2017/03/12/experience-of-adapting-to-android-notifications/
+http://yifeng.studio/2017/05/03/android-7-0-compat-fileprovider/
