@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-06-09T05:36:36.000Z</updated>
+  <updated>2017-06-09T08:52:45.000Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -14,6 +14,129 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Android 7.0适配</title>
+    <link href="https://fenglincanyi.github.io/2017/06/09/Android%207.0%E9%80%82%E9%85%8D/"/>
+    <id>https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/</id>
+    <published>2017-06-09T12:10:00.000Z</published>
+    <updated>2017-06-09T08:52:45.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。</p>
+<p>作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。</p>
+<h2 id="分享私有文件的方式"><a href="#分享私有文件的方式" class="headerlink" title="分享私有文件的方式"></a>分享私有文件的方式</h2><p>传递软件包网域外的 file:// URI 可能给接收器留下无法访问的路径。因此，尝试传递 file:// URI 会触发 FileUriExposedException。分享私有文件内容的推荐方法是使用 FileProvider</p>
+<p>此类问题，我们要看 关注 拍照、覆盖安装。<br>原先的拍照，我们一般这样写：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">startCamera</span><span class="params">(Activity tag, String fileName)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!FileUtil.isSDMounted()) &#123;</div><div class="line">            ToastUtil.showShortToast(tag, <span class="string">"未挂载SD卡...."</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        Intent intent = <span class="keyword">new</span> Intent(MediaStore.ACTION_IMAGE_CAPTURE);</div><div class="line">        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(<span class="keyword">new</span> File(</div><div class="line">                getExternalStorageDirectory(), fileName)));</div><div class="line">        tag.startActivityForResult(intent, PHOTO_REQUEST_TAKEPHOTO);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>如果 适配到 7.0以上（targetSdkVersion &gt;= 24），上面就会出错：<strong>FileUriExposedException</strong><br>Google 也是越来越注重安全的升级了，不让使用这种方式。现在要通过 provider 来进行访问，由 FileProvider 统一去访问相关的目录、文件。<br>那具体，我们就看看怎么做：</p>
+<h3 id="定义FileProvider"><a href="#定义FileProvider" class="headerlink" title="定义FileProvider"></a>定义FileProvider</h3><p>在清单文件中，添加 provider：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">provider</span></span></div><div class="line">            <span class="attr">android:name</span>=<span class="string">"android.support.v4.content.FileProvider"</span></div><div class="line">            <span class="attr">android:authorities</span>=<span class="string">"com.chinahr.android.m.fileprovider"</span></div><div class="line">            <span class="attr">android:exported</span>=<span class="string">"false"</span></div><div class="line">            <span class="attr">android:grantUriPermissions</span>=<span class="string">"true"</span>&gt;</div><div class="line">            <span class="comment">&lt;!-- name：一般是固定的，如果你不需要定义自己的 provider; </span></div><div class="line">            如果需要别的特殊逻辑，你需要自定义 provider 去继承 v4 包下的 FileProvider并添加自己的逻辑代码，</div><div class="line">            那么这时候，name 就是你自定义的 provider的全路径了</div><div class="line">            authorities: packageName.fileprovider --&gt;</div><div class="line"></div><div class="line">            <span class="tag">&lt;<span class="name">meta-data</span></span></div><div class="line">                <span class="attr">android:name</span>=<span class="string">"android.support.FILE_PROVIDER_PATHS"</span></div><div class="line">                <span class="attr">android:resource</span>=<span class="string">"@xml/fileprovider"</span> /&gt;<span class="comment">&lt;!-- file path 配置文件的路径 --&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">provider</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="配置路径文件"><a href="#配置路径文件" class="headerlink" title="配置路径文件"></a>配置路径文件</h3><p>在固定的目录下，res/xml 目录下，新建自己的 xml。</p>
+<p>然后我们开始配置，如何配置呢，我们来看看官方文档的要求：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">paths</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 可以配置多个 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">files-path</span> <span class="attr">name</span>=<span class="string">"my_images"</span> <span class="attr">path</span>=<span class="string">"images/"</span>/&gt;</span></div><div class="line">    ...</div><div class="line"><span class="tag">&lt;/<span class="name">paths</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>主要有4种路径：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">path</th>
+<th style="text-align:right">dir</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">files-path</td>
+<td style="text-align:right">Context.getFilesDir()</td>
+</tr>
+<tr>
+<td style="text-align:left">cache-path</td>
+<td style="text-align:right">Context.getCacheDir)</td>
+</tr>
+<tr>
+<td style="text-align:left">external-path name=”name” path=”path”</td>
+<td style="text-align:right">Environment.getExternalStorageDirectory()</td>
+</tr>
+<tr>
+<td style="text-align:left">external-cache-path name=”name” path=”path”</td>
+<td style="text-align:right">Context.getExternalCacheDir()</td>
+</tr>
+</tbody>
+</table>
+<p>那我们来个demo：<br>在 xml 文件中配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">paths</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">external-path</span> <span class="attr">name</span>=<span class="string">"takephoto"</span> <span class="attr">path</span>=<span class="string">"tmp"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">external-path</span> <span class="attr">name</span>=<span class="string">"apk"</span> <span class="attr">path</span>=<span class="string">"Download"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">cache-path</span> <span class="attr">name</span>=<span class="string">"images"</span> <span class="attr">path</span>=<span class="string">"/"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">paths</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>代表的含义就是：<br>在 sd 下的 tmp目录，Download目录下对应 拍照后存储目录、apk下载的目录<br>在 packageName/cache 目录下存放app里的图片</p>
+<p>配置工作，就ok了，现在解决拍照、覆盖安装崩溃的问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">startCameraN</span><span class="params">(Activity tag, String fileName)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!FileUtil.isSDMounted()) &#123;</div><div class="line">            ToastUtil.showShortToast(tag, <span class="string">"未挂载SD卡...."</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// 必须和 xml 配置的 path 一致</span></div><div class="line">        File file = <span class="keyword">new</span> File(getExternalStorageDirectory(), <span class="string">"tmp/"</span>+fileName);</div><div class="line">        Intent intent = <span class="keyword">new</span> Intent(MediaStore.ACTION_IMAGE_CAPTURE);</div><div class="line">        Uri pictureUri;</div><div class="line">        <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.N) &#123;</div><div class="line">            pictureUri = FileProvider.getUriForFile(tag, tag.getPackageName()+<span class="string">".fileprovider"</span>, file);</div><div class="line">            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);<span class="comment">// 加上权限，否则也是要出错的</span></div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            pictureUri = Uri.fromFile(file);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        intent.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri);</div><div class="line">        tag.startActivityForResult(intent, PHOTO_REQUEST_TAKEPHOTO);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>这样，我们就适配结束了</p>
+<p>对于覆盖安装，同样的方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">Intent installIntent = <span class="keyword">new</span> Intent(Intent.ACTION_VIEW);</div><div class="line">                Uri apkUri;</div><div class="line">                <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.N) &#123;</div><div class="line">                    installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);</div><div class="line">                    apkUri = FileProvider.getUriForFile(BaseAppUpdateActivity.<span class="keyword">this</span>, getPackageName()+<span class="string">".fileprovider"</span>, apkFile);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    apkUri = Uri.parse(<span class="string">"file://"</span> + apkFile.toString());</div><div class="line">                &#125;</div><div class="line">                installIntent.setDataAndType(apkUri, <span class="string">"application/vnd.android.package-archive"</span>);</div><div class="line">                startActivity(installIntent);</div><div class="line">                <span class="comment">//退出整个app</span></div><div class="line">                finishAllActivity();</div></pre></td></tr></table></figure>
+<p>具体可以看看文档：<br><a href="https://developer.android.com/reference/android/support/v4/content/FileProvider.html?hl=zh-cn" target="_blank" rel="external">https://developer.android.com/reference/android/support/v4/content/FileProvider.html?hl=zh-cn</a></p>
+<h2 id="使用-NDK-私有链接库的问题"><a href="#使用-NDK-私有链接库的问题" class="headerlink" title="使用 NDK 私有链接库的问题"></a>使用 NDK 私有链接库的问题</h2><p>从 Android 7.0 开始，系统将阻止应用动态链接非公开 NDK 库，这种库可能会导致您的应用崩溃。此行为变更旨在为跨平台更新和不同设备提供统一的应用体验。即使您的代码可能不会链接私有库，但您的应用中的第三方静态库可能会这么做。因此，所有开发者都应进行相应检查，确保他们的应用不会在运行 Android 7.0 的设备上崩溃。如果应用使用原生代码，则只能使用公开 NDK API。</p>
+<p>应用可通过以下三种方式尝试访问私有平台 API：</p>
+<ul>
+<li>应用直接访问私有平台库。应更新应用以添加该应用的库副本，或使用公开 NDK API。</li>
+<li>应用使用一个可访问私有平台库的第三方库。即使您确定应用不会直接访问私有库，您仍应针对此情景测试应用。</li>
+<li>应用引用一个其 APK 中未包含的库。例如，如果尝试使用自己的 OpenSSL 副本，但忘记将它与应用的 APK 进行捆绑，则可能会出现此情况。正常情况下，此应用可在包含 libcrypto.so 的 Android 平台版本上运行。不过，此应用在不包含此库的新版 Android（例如，Android 6.0 和更高的版本）上会崩溃。为修复此问题，请确保 APK 捆绑您的所有非 NDK 库。</li>
+</ul>
+<p>这个问题呢，我们就得依靠别人来解决了，当然，如果有自己的 ndk 使用到了私有库，也是要解决的。</p>
+<p>首先，我先检查下，有哪些库中使用了私有库，我们把 targetSdkVersion 改成 23，运行在 7.0的手机上，APP启动后，我们观察日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">as a workaround for http://b/26394120, note that the access will be removed in future releases of Android.</div><div class="line">06-05 16:10:28.556 4284-4284/com.chinahr.android.m W/linker: library &quot;libcrypto.so&quot; (&quot;/vendor/lib/libcrypto.so&quot;) needed or dlopened by &quot;/data/app/com.chinahr.android.m-1/lib/arm/libgmacs.so&quot; is not accessible for the namespace &quot;classloader-namespace&quot; - the access is temporarily granted as a workaround for http://b/26394120, note that the access will be removed in future releases of Android.</div></pre></td></tr></table></figure>
+<p>发现有两处警告，都是来源于 libgmacs.so 中。联系别的部门做适配…</p>
+<p>还有，此问题，如果项目 targetSdkVersion &lt; 24，则会在 7.0手机上每次启动app时，弹出警告框：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E7%A7%81%E6%9C%89%E5%BA%93.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>但也可以继续正常运行，但是这个很不友好，需要尽快联系提供者解决</p>
+<h2 id="其他-7-0-适配的小问题"><a href="#其他-7-0-适配的小问题" class="headerlink" title="其他 7.0 适配的小问题"></a>其他 7.0 适配的小问题</h2><h3 id="加密方式"><a href="#加密方式" class="headerlink" title="加密方式"></a>加密方式</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">我们在 logcat 中看到：</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  ********** PLEASE READ ************</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  *</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * New versions of the Android SDK no longer support the Crypto provider.</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * If your app was relying on setSeed() to derive keys from strings, you</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * should switch to using SecretKeySpec to load raw key bytes directly OR</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * use a real key derivation function (KDF). See advice here :</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * http://android-developers.blogspot.com/2016/06/security-crypto-provider-deprecated-in.html</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  ***********************************</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  Returning an instance of SecureRandom from the Crypto provider</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  as a temporary measure so that the apps targeting earlier SDKs</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  keep working. Please do not rely on the presence of the Crypto</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  provider in the codebase, as our plan is to delete it</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  completely in the future.</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  ********** PLEASE READ ************</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  *</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * New versions of the Android SDK no longer support the Crypto provider.</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * If your app was relying on setSeed() to derive keys from strings, you</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * should switch to using SecretKeySpec to load raw key bytes directly OR</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * use a real key derivation function (KDF). See advice here :</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * http://android-developers.blogspot.com/2016/06/security-crypto-provider-deprecated-in.html</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  ***********************************</div></pre></td></tr></table></figure>
+<p>发现 google 对加密方式也有了要求。<br>名为 Crypto 的 JCA 提供程序已弃用，因为它仅有的 SHA1PRNG 算法为弱加密。应用无法再使用 SHA1PRNG（不安全地）派生密钥，因为不再提供此提供程序。<br>而且在未来的版本中，如果继续使用Crypto，将会出错。我们以后需要专注。</p>
+<h3 id="通知栏"><a href="#通知栏" class="headerlink" title="通知栏"></a>通知栏</h3><p>Android 各个版本中，貌似对通知栏都有一定的更改，而且现在也变得很丰富<br>7.0 的通知栏，改变了样式，增加了小图标，还可以显示通知数量。</p>
+<p>自己在玩原生7.0 系统时，发现小图标变成灰色的方块了：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-142841.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>然后，发现在 华为 7.0 手机上，小图标显示又是正常的，应该是华为对通知栏显示做了处理<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-195515.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>这时候就比较蹩脚了，暂且这么干吧，我们项目中，使用了小米推送（通知消息），查阅了小米推送的文档：</p>
+<pre><code>* 如果app中同时存在名为mipush_notification和mipush_small_notification的drawable文件，则使用mipush_notification的drawable作为通知的大图标，mipush_small_notification的drawable作为通知的小图标。
+* 如果app中只存在其中一个drawable文件，则使用该drawable作为通知的图标。
+* 如果app中不存在这两个drawable文件，则使用app的icon作为通知的图标。在MIUI中，通知栏图标统一显示为app的icon，不可以定制。
+</code></pre><p>可以添加个小图标，在推送到达时候显示，透明背景的图片，术语叫：带有alpha 通道的图片。</p>
+<p>本来也可以通过 自己控制 NotificationManager 来创建显示，如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);</div><div class="line">        NotificationCompat.Builder builder = <span class="keyword">new</span> NotificationCompat.Builder(<span class="keyword">this</span>);</div><div class="line">        Notification notification = builder</div><div class="line">                .setContentTitle(<span class="string">"这是通知标题"</span>)</div><div class="line">                .setContentText(<span class="string">"这是通知内容这是通知内容这是通知内容这是通知内容这是通知内容这是通知内容这是通知内容这是通知内容"</span>)</div><div class="line">                .setWhen(System.currentTimeMillis())</div><div class="line">                .setSmallIcon(R.mipmap.ic_launcher)</div><div class="line"><span class="comment">//                .setColor(Color.parseColor("#ff0000”))// 设置小图标背景颜色</span></div><div class="line">                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))</div><div class="line">                .build();</div><div class="line">        manager.notify(<span class="number">1</span>, notification);</div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-09-162941.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>这是我们可以定制的<br>但是现在的项目比较死，暂时不适用自定义的了<br>暂时使用小米推送的改动小图标的方式，替换上一个透明背景的logo吧，总比灰色的方块强吧。而且其他app也是同样的显示效果，如上面的图标中的百度淘宝和头条。<br>有精力的话，使用透传消息，可以自己控制通知栏的样式和显示。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。&lt;/p&gt;
+&lt;p&gt;作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。&lt;/p&gt;
+&lt;h2 id=&quot;分享私有文件的方式&quot;&gt;&lt;a href=&quot;#分享私有文
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="7.0适配" scheme="https://fenglincanyi.github.io/tags/7-0%E9%80%82%E9%85%8D/"/>
+    
+      <category term="FileProvider" scheme="https://fenglincanyi.github.io/tags/FileProvider/"/>
+    
+  </entry>
   
   <entry>
     <title>Android 6.0适配</title>

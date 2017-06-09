@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Android 7.0适配 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="7.0适配,FileProvider">
+    <meta name="description" content="Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。
+作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。
+分享私有文件的方式传递软件包网域外的 file:// URI 可能给接收器留下无法访问的路径。因此，尝试传递 file:// URI 会触发 FileUriExposedException。分享私有文件内容的推荐方法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 7.0适配">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。
+作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。
+分享私有文件的方式传递软件包网域外的 file:// URI 可能给接收器留下无法访问的路径。因此，尝试传递 file:// URI 会触发 FileUriExposedException。分享私有文件内容的推荐方法">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E7%A7%81%E6%9C%89%E5%BA%93.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-142841.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-195515.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-09-162941.png">
+<meta property="og:updated_time" content="2017-06-09T08:52:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android 7.0适配">
+<meta name="twitter:description" content="Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。
+作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。
+分享私有文件的方式传递软件包网域外的 file:// URI 可能给接收器留下无法访问的路径。因此，尝试传递 file:// URI 会触发 FileUriExposedException。分享私有文件内容的推荐方法">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E7%A7%81%E6%9C%89%E5%BA%93.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Android 7.0适配</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Android 7.0适配</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-06-09T12:10:00.000Z" itemprop="datePublished" class="page-time">
+  2017-06-09
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#分享私有文件的方式"><span class="post-toc-number">1.</span> <span class="post-toc-text">分享私有文件的方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#定义FileProvider"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">定义FileProvider</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配置路径文件"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">配置路径文件</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#使用-NDK-私有链接库的问题"><span class="post-toc-number">2.</span> <span class="post-toc-text">使用 NDK 私有链接库的问题</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#其他-7-0-适配的小问题"><span class="post-toc-number">3.</span> <span class="post-toc-text">其他 7.0 适配的小问题</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#加密方式"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">加密方式</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#通知栏"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">通知栏</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Android 7.0适配"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Android 7.0适配</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-6-9 20:10" datetime="2017-06-09T12:10:00.000Z"  itemprop="datePublished">2017-06-09</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。</p>
+<p>作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。</p>
+<h2 id="分享私有文件的方式"><a href="#分享私有文件的方式" class="headerlink" title="分享私有文件的方式"></a>分享私有文件的方式</h2><p>传递软件包网域外的 file:// URI 可能给接收器留下无法访问的路径。因此，尝试传递 file:// URI 会触发 FileUriExposedException。分享私有文件内容的推荐方法是使用 FileProvider</p>
+<p>此类问题，我们要看 关注 拍照、覆盖安装。<br>原先的拍照，我们一般这样写：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">startCamera</span><span class="params">(Activity tag, String fileName)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!FileUtil.isSDMounted()) &#123;</div><div class="line">            ToastUtil.showShortToast(tag, <span class="string">"未挂载SD卡...."</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        Intent intent = <span class="keyword">new</span> Intent(MediaStore.ACTION_IMAGE_CAPTURE);</div><div class="line">        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(<span class="keyword">new</span> File(</div><div class="line">                getExternalStorageDirectory(), fileName)));</div><div class="line">        tag.startActivityForResult(intent, PHOTO_REQUEST_TAKEPHOTO);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>如果 适配到 7.0以上（targetSdkVersion &gt;= 24），上面就会出错：<strong>FileUriExposedException</strong><br>Google 也是越来越注重安全的升级了，不让使用这种方式。现在要通过 provider 来进行访问，由 FileProvider 统一去访问相关的目录、文件。<br>那具体，我们就看看怎么做：</p>
+<h3 id="定义FileProvider"><a href="#定义FileProvider" class="headerlink" title="定义FileProvider"></a>定义FileProvider</h3><p>在清单文件中，添加 provider：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">provider</span></span></div><div class="line">            <span class="attr">android:name</span>=<span class="string">"android.support.v4.content.FileProvider"</span></div><div class="line">            <span class="attr">android:authorities</span>=<span class="string">"com.chinahr.android.m.fileprovider"</span></div><div class="line">            <span class="attr">android:exported</span>=<span class="string">"false"</span></div><div class="line">            <span class="attr">android:grantUriPermissions</span>=<span class="string">"true"</span>&gt;</div><div class="line">            <span class="comment">&lt;!-- name：一般是固定的，如果你不需要定义自己的 provider; </span></div><div class="line">            如果需要别的特殊逻辑，你需要自定义 provider 去继承 v4 包下的 FileProvider并添加自己的逻辑代码，</div><div class="line">            那么这时候，name 就是你自定义的 provider的全路径了</div><div class="line">            authorities: packageName.fileprovider --&gt;</div><div class="line"></div><div class="line">            <span class="tag">&lt;<span class="name">meta-data</span></span></div><div class="line">                <span class="attr">android:name</span>=<span class="string">"android.support.FILE_PROVIDER_PATHS"</span></div><div class="line">                <span class="attr">android:resource</span>=<span class="string">"@xml/fileprovider"</span> /&gt;<span class="comment">&lt;!-- file path 配置文件的路径 --&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">provider</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="配置路径文件"><a href="#配置路径文件" class="headerlink" title="配置路径文件"></a>配置路径文件</h3><p>在固定的目录下，res/xml 目录下，新建自己的 xml。</p>
+<p>然后我们开始配置，如何配置呢，我们来看看官方文档的要求：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">paths</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- 可以配置多个 --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">files-path</span> <span class="attr">name</span>=<span class="string">"my_images"</span> <span class="attr">path</span>=<span class="string">"images/"</span>/&gt;</span></div><div class="line">    ...</div><div class="line"><span class="tag">&lt;/<span class="name">paths</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>主要有4种路径：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">path</th>
+<th style="text-align:right">dir</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">files-path</td>
+<td style="text-align:right">Context.getFilesDir()</td>
+</tr>
+<tr>
+<td style="text-align:left">cache-path</td>
+<td style="text-align:right">Context.getCacheDir)</td>
+</tr>
+<tr>
+<td style="text-align:left">external-path name=”name” path=”path”</td>
+<td style="text-align:right">Environment.getExternalStorageDirectory()</td>
+</tr>
+<tr>
+<td style="text-align:left">external-cache-path name=”name” path=”path”</td>
+<td style="text-align:right">Context.getExternalCacheDir()</td>
+</tr>
+</tbody>
+</table>
+<p>那我们来个demo：<br>在 xml 文件中配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">paths</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">external-path</span> <span class="attr">name</span>=<span class="string">"takephoto"</span> <span class="attr">path</span>=<span class="string">"tmp"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">external-path</span> <span class="attr">name</span>=<span class="string">"apk"</span> <span class="attr">path</span>=<span class="string">"Download"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">cache-path</span> <span class="attr">name</span>=<span class="string">"images"</span> <span class="attr">path</span>=<span class="string">"/"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">paths</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>代表的含义就是：<br>在 sd 下的 tmp目录，Download目录下对应 拍照后存储目录、apk下载的目录<br>在 packageName/cache 目录下存放app里的图片</p>
+<p>配置工作，就ok了，现在解决拍照、覆盖安装崩溃的问题：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">startCameraN</span><span class="params">(Activity tag, String fileName)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!FileUtil.isSDMounted()) &#123;</div><div class="line">            ToastUtil.showShortToast(tag, <span class="string">"未挂载SD卡...."</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// 必须和 xml 配置的 path 一致</span></div><div class="line">        File file = <span class="keyword">new</span> File(getExternalStorageDirectory(), <span class="string">"tmp/"</span>+fileName);</div><div class="line">        Intent intent = <span class="keyword">new</span> Intent(MediaStore.ACTION_IMAGE_CAPTURE);</div><div class="line">        Uri pictureUri;</div><div class="line">        <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.N) &#123;</div><div class="line">            pictureUri = FileProvider.getUriForFile(tag, tag.getPackageName()+<span class="string">".fileprovider"</span>, file);</div><div class="line">            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);<span class="comment">// 加上权限，否则也是要出错的</span></div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            pictureUri = Uri.fromFile(file);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        intent.putExtra(MediaStore.EXTRA_OUTPUT, pictureUri);</div><div class="line">        tag.startActivityForResult(intent, PHOTO_REQUEST_TAKEPHOTO);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>这样，我们就适配结束了</p>
+<p>对于覆盖安装，同样的方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">Intent installIntent = <span class="keyword">new</span> Intent(Intent.ACTION_VIEW);</div><div class="line">                Uri apkUri;</div><div class="line">                <span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.N) &#123;</div><div class="line">                    installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);</div><div class="line">                    apkUri = FileProvider.getUriForFile(BaseAppUpdateActivity.<span class="keyword">this</span>, getPackageName()+<span class="string">".fileprovider"</span>, apkFile);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    apkUri = Uri.parse(<span class="string">"file://"</span> + apkFile.toString());</div><div class="line">                &#125;</div><div class="line">                installIntent.setDataAndType(apkUri, <span class="string">"application/vnd.android.package-archive"</span>);</div><div class="line">                startActivity(installIntent);</div><div class="line">                <span class="comment">//退出整个app</span></div><div class="line">                finishAllActivity();</div></pre></td></tr></table></figure>
+<p>具体可以看看文档：<br><a href="https://developer.android.com/reference/android/support/v4/content/FileProvider.html?hl=zh-cn" target="_blank" rel="external">https://developer.android.com/reference/android/support/v4/content/FileProvider.html?hl=zh-cn</a></p>
+<h2 id="使用-NDK-私有链接库的问题"><a href="#使用-NDK-私有链接库的问题" class="headerlink" title="使用 NDK 私有链接库的问题"></a>使用 NDK 私有链接库的问题</h2><p>从 Android 7.0 开始，系统将阻止应用动态链接非公开 NDK 库，这种库可能会导致您的应用崩溃。此行为变更旨在为跨平台更新和不同设备提供统一的应用体验。即使您的代码可能不会链接私有库，但您的应用中的第三方静态库可能会这么做。因此，所有开发者都应进行相应检查，确保他们的应用不会在运行 Android 7.0 的设备上崩溃。如果应用使用原生代码，则只能使用公开 NDK API。</p>
+<p>应用可通过以下三种方式尝试访问私有平台 API：</p>
+<ul>
+<li>应用直接访问私有平台库。应更新应用以添加该应用的库副本，或使用公开 NDK API。</li>
+<li>应用使用一个可访问私有平台库的第三方库。即使您确定应用不会直接访问私有库，您仍应针对此情景测试应用。</li>
+<li>应用引用一个其 APK 中未包含的库。例如，如果尝试使用自己的 OpenSSL 副本，但忘记将它与应用的 APK 进行捆绑，则可能会出现此情况。正常情况下，此应用可在包含 libcrypto.so 的 Android 平台版本上运行。不过，此应用在不包含此库的新版 Android（例如，Android 6.0 和更高的版本）上会崩溃。为修复此问题，请确保 APK 捆绑您的所有非 NDK 库。</li>
+</ul>
+<p>这个问题呢，我们就得依靠别人来解决了，当然，如果有自己的 ndk 使用到了私有库，也是要解决的。</p>
+<p>首先，我先检查下，有哪些库中使用了私有库，我们把 targetSdkVersion 改成 23，运行在 7.0的手机上，APP启动后，我们观察日志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">as a workaround for http://b/26394120, note that the access will be removed in future releases of Android.</div><div class="line">06-05 16:10:28.556 4284-4284/com.chinahr.android.m W/linker: library &quot;libcrypto.so&quot; (&quot;/vendor/lib/libcrypto.so&quot;) needed or dlopened by &quot;/data/app/com.chinahr.android.m-1/lib/arm/libgmacs.so&quot; is not accessible for the namespace &quot;classloader-namespace&quot; - the access is temporarily granted as a workaround for http://b/26394120, note that the access will be removed in future releases of Android.</div></pre></td></tr></table></figure>
+<p>发现有两处警告，都是来源于 libgmacs.so 中。联系别的部门做适配…</p>
+<p>还有，此问题，如果项目 targetSdkVersion &lt; 24，则会在 7.0手机上每次启动app时，弹出警告框：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E7%A7%81%E6%9C%89%E5%BA%93.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>但也可以继续正常运行，但是这个很不友好，需要尽快联系提供者解决</p>
+<h2 id="其他-7-0-适配的小问题"><a href="#其他-7-0-适配的小问题" class="headerlink" title="其他 7.0 适配的小问题"></a>其他 7.0 适配的小问题</h2><h3 id="加密方式"><a href="#加密方式" class="headerlink" title="加密方式"></a>加密方式</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">我们在 logcat 中看到：</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  ********** PLEASE READ ************</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  *</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * New versions of the Android SDK no longer support the Crypto provider.</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * If your app was relying on setSeed() to derive keys from strings, you</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * should switch to using SecretKeySpec to load raw key bytes directly OR</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * use a real key derivation function (KDF). See advice here :</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  * http://android-developers.blogspot.com/2016/06/security-crypto-provider-deprecated-in.html</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  ***********************************</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  Returning an instance of SecureRandom from the Crypto provider</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  as a temporary measure so that the apps targeting earlier SDKs</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  keep working. Please do not rely on the presence of the Crypto</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  provider in the codebase, as our plan is to delete it</div><div class="line">06-05 16:10:28.564 4284-4284/com.chinahr.android.m E/System:  completely in the future.</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  ********** PLEASE READ ************</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  *</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * New versions of the Android SDK no longer support the Crypto provider.</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * If your app was relying on setSeed() to derive keys from strings, you</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * should switch to using SecretKeySpec to load raw key bytes directly OR</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * use a real key derivation function (KDF). See advice here :</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  * http://android-developers.blogspot.com/2016/06/security-crypto-provider-deprecated-in.html</div><div class="line">06-05 16:10:28.566 4284-4284/com.chinahr.android.m E/System:  ***********************************</div></pre></td></tr></table></figure>
+<p>发现 google 对加密方式也有了要求。<br>名为 Crypto 的 JCA 提供程序已弃用，因为它仅有的 SHA1PRNG 算法为弱加密。应用无法再使用 SHA1PRNG（不安全地）派生密钥，因为不再提供此提供程序。<br>而且在未来的版本中，如果继续使用Crypto，将会出错。我们以后需要专注。</p>
+<h3 id="通知栏"><a href="#通知栏" class="headerlink" title="通知栏"></a>通知栏</h3><p>Android 各个版本中，貌似对通知栏都有一定的更改，而且现在也变得很丰富<br>7.0 的通知栏，改变了样式，增加了小图标，还可以显示通知数量。</p>
+<p>自己在玩原生7.0 系统时，发现小图标变成灰色的方块了：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-142841.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>然后，发现在 华为 7.0 手机上，小图标显示又是正常的，应该是华为对通知栏显示做了处理<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-195515.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>这时候就比较蹩脚了，暂且这么干吧，我们项目中，使用了小米推送（通知消息），查阅了小米推送的文档：</p>
+<pre><code>* 如果app中同时存在名为mipush_notification和mipush_small_notification的drawable文件，则使用mipush_notification的drawable作为通知的大图标，mipush_small_notification的drawable作为通知的小图标。
+* 如果app中只存在其中一个drawable文件，则使用该drawable作为通知的图标。
+* 如果app中不存在这两个drawable文件，则使用app的icon作为通知的图标。在MIUI中，通知栏图标统一显示为app的icon，不可以定制。
+</code></pre><p>可以添加个小图标，在推送到达时候显示，透明背景的图片，术语叫：带有alpha 通道的图片。</p>
+<p>本来也可以通过 自己控制 NotificationManager 来创建显示，如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);</div><div class="line">        NotificationCompat.Builder builder = <span class="keyword">new</span> NotificationCompat.Builder(<span class="keyword">this</span>);</div><div class="line">        Notification notification = builder</div><div class="line">                .setContentTitle(<span class="string">"这是通知标题"</span>)</div><div class="line">                .setContentText(<span class="string">"这是通知内容这是通知内容这是通知内容这是通知内容这是通知内容这是通知内容这是通知内容这是通知内容"</span>)</div><div class="line">                .setWhen(System.currentTimeMillis())</div><div class="line">                .setSmallIcon(R.mipmap.ic_launcher)</div><div class="line"><span class="comment">//                .setColor(Color.parseColor("#ff0000”))// 设置小图标背景颜色</span></div><div class="line">                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))</div><div class="line">                .build();</div><div class="line">        manager.notify(<span class="number">1</span>, notification);</div></pre></td></tr></table></figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-09-162941.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>这是我们可以定制的<br>但是现在的项目比较死，暂时不适用自定义的了<br>暂时使用小米推送的改动小图标的方式，替换上一个透明背景的logo吧，总比灰色的方块强吧。而且其他app也是同样的显示效果，如上面的图标中的百度淘宝和头条。<br>有精力的话，使用透传消息，可以自己控制通知栏的样式和显示。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-06-09T08:52:45.000Z" title="2017-6-9 16:52" itemprop="dateUpdated">2017年6月9日 16:52</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/06/09/Android 7.0适配/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/7-0适配/">7.0适配</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/FileProvider/">FileProvider</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/&title=《Android 7.0适配》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/&title=《Android 7.0适配》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 7.0适配》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/04/12/Android 6.0适配/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android 6.0适配</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Android 7.0适配" data-title="Android 7.0适配" data-url="https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/&title=《Android 7.0适配》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/&title=《Android 7.0适配》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Android 7.0适配》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAAAAACs8KCBAAACHElEQVR42u3aUW4CMQwFwN7/0vQAlOW9eKlEMvlCK0gyi2TFdn5+4vF4Gs/Pr59cz/zqtzcPDAyMr2U8Lsf1AsnC+TzX33+1NwwMjHMYyfJJSM1D7fVG871hYGBgrAXBZEPtuhgYGBiT6fLQ3D7HwMDAaANom75OCnYfzMUxMDC+kJFv4v8/f6S/gYGB8VWMRznW2pZ5iHwsDQwMjL0Zk/J90qRcg7X7wcDA2JvRXn24XixPMtfKc81fg4GBsQ9jkkDmQbYtpS2CMTAwDmDkTcq2kdkeGfP2KgYGxgmMUYAbtBvnKS4GBsY5jOSIli8238ok6GNgYOzKuE4780CZH+/mbc4/ZsbAwNia0R7v1kr2kyQ5L+RhYGCcwLj3ekQSym+rF2JgYGzNSKaelNjmB836zggGBsZ2jCg5LF9BW5KbNyEwMDBOYLQhNb9OkQTZqD2ZvGgMDIytGcn1rJzdbrrFvKFiYGBsypgUxZKItxbQ6xeHgYFxDCNPPvOF10py7WcMDIwTGPnCk6Pk2sWL+rIFBgbG1ozJFa4W0DYm36yOgYGxKWNyaGuDY15Wq1NoDAyMrRl3xew8EOet0LULGRgYGLsy2pQ1CaN3RcViNgwMjAMYSQqaHyjbcLmWGGNgYGC0jLxh0Ka4GBgYGJPF1hLR9tAZFfswMDAOYLTNgKSGd1eT4OZyGwYGxhcy1lLHydWue9sDGBgYWzN+AajAIuBWSntzAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
