@@ -71,3 +71,4 @@ webSettings.setAllowFileAccess(false);// 关闭
 ### 补充
 在线加解密、编码解析工具：
 http://tool.oschina.net/encrypt?type=3
+http://www.cnblogs.com/wangsu/articles/2917181.html
