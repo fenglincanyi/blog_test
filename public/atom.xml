@@ -1736,7 +1736,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/12/15/Android%20WebView%20%E7%9B%B8%E5%85%B3%E8%B8%A9%E5%9D%91/"/>
     <id>https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/</id>
     <published>2016-12-15T05:29:00.000Z</published>
-    <updated>2017-02-08T11:53:18.000Z</updated>
+    <updated>2017-08-24T02:25:03.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="url-传参-url-嵌套的问题"><a href="#url-传参-url-嵌套的问题" class="headerlink" title="url 传参 url 嵌套的问题"></a>url 传参 url 嵌套的问题</h3><h4 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h4><p>get请求链接中： 传参中含有url</p>
 <p>“chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;”+INTENT_URL+”=” + <b><font color="red">url</font></b></p>
@@ -1758,7 +1758,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <li>如果访问 /data/data/包名/files/index.html，需要开启文件访问权限（默认是开启的，不要动态设置关闭）<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">webSettings.setAllowFileAccess(<span class="keyword">false</span>);<span class="comment">// 关闭</span></div></pre></td></tr></table></figure>
 </li>
 </ul>
-<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p>在线加解密、编码解析工具：<br><a href="http://tool.oschina.net/encrypt?type=3" target="_blank" rel="external">http://tool.oschina.net/encrypt?type=3</a></p>
+<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p>在线加解密、编码解析工具：<br><a href="http://tool.oschina.net/encrypt?type=3" target="_blank" rel="external">http://tool.oschina.net/encrypt?type=3</a><br><a href="http://www.cnblogs.com/wangsu/articles/2917181.html" target="_blank" rel="external">http://www.cnblogs.com/wangsu/articles/2917181.html</a></p>
 ]]></content>
     
     <summary type="html">
