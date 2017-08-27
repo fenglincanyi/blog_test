@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Vue 从入门到搬砖 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="vue">
+    <meta name="description" content="前言前段时间，捣鼓weex，就想到对vue有所了解。毕竟weex是从vue的基础上扩展而来，诸多特性也是vue的。作为目前前端比较火的框架之一，有所了解，也是有一定好处的，所谓”多不压身”。Vue涵盖的不仅是一种前端框架，而且是前端生态的一系列设计思想、工具、规范。本文直奔主题，什么装环境、hello world 之类的琐事就略过…… 
+几个重要概念构造器每个 Vue.js 应用都是通过构造函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue 从入门到搬砖">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="前言前段时间，捣鼓weex，就想到对vue有所了解。毕竟weex是从vue的基础上扩展而来，诸多特性也是vue的。作为目前前端比较火的框架之一，有所了解，也是有一定好处的，所谓”多不压身”。Vue涵盖的不仅是一种前端框架，而且是前端生态的一系列设计思想、工具、规范。本文直奔主题，什么装环境、hello world 之类的琐事就略过…… 
+几个重要概念构造器每个 Vue.js 应用都是通过构造函数">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/vue_lifecycle.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/props-events.png">
+<meta property="og:updated_time" content="2017-08-27T10:21:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vue 从入门到搬砖">
+<meta name="twitter:description" content="前言前段时间，捣鼓weex，就想到对vue有所了解。毕竟weex是从vue的基础上扩展而来，诸多特性也是vue的。作为目前前端比较火的框架之一，有所了解，也是有一定好处的，所谓”多不压身”。Vue涵盖的不仅是一种前端框架，而且是前端生态的一系列设计思想、工具、规范。本文直奔主题，什么装环境、hello world 之类的琐事就略过…… 
+几个重要概念构造器每个 Vue.js 应用都是通过构造函数">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/vue_lifecycle.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Vue 从入门到搬砖</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Vue 从入门到搬砖</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-07-19T05:10:00.000Z" itemprop="datePublished" class="page-time">
+  2017-07-19
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/前端/">前端</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#前言"><span class="post-toc-number">1.</span> <span class="post-toc-text">前言</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#几个重要概念"><span class="post-toc-number">2.</span> <span class="post-toc-text">几个重要概念</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#构造器"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">构造器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Virtual-DOM"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Virtual DOM</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#数据绑定"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">数据绑定</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#生命周期钩子"><span class="post-toc-number">3.</span> <span class="post-toc-text">生命周期钩子</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#语法概览"><span class="post-toc-number">4.</span> <span class="post-toc-text">语法概览</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#文本"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">文本</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#指令"><span class="post-toc-number">4.2.</span> <span class="post-toc-text">指令</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#过滤器"><span class="post-toc-number">4.3.</span> <span class="post-toc-text">过滤器</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#计算属性"><span class="post-toc-number">4.4.</span> <span class="post-toc-text">计算属性</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#样式绑定"><span class="post-toc-number">4.5.</span> <span class="post-toc-text">样式绑定</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#条件渲染"><span class="post-toc-number">4.6.</span> <span class="post-toc-text">条件渲染</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#列表渲染"><span class="post-toc-number">4.7.</span> <span class="post-toc-text">列表渲染</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#组件"><span class="post-toc-number">4.8.</span> <span class="post-toc-text">组件</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#过渡效果"><span class="post-toc-number">5.</span> <span class="post-toc-text">过渡效果</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#路由：vue-router"><span class="post-toc-number">6.</span> <span class="post-toc-text">路由：vue-router</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#其他推荐"><span class="post-toc-number">7.</span> <span class="post-toc-text">其他推荐</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Vue 从入门到搬砖"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Vue 从入门到搬砖</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-7-19 13:10" datetime="2017-07-19T05:10:00.000Z"  itemprop="datePublished">2017-07-19</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/前端/">前端</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前段时间，捣鼓weex，就想到对vue有所了解。毕竟weex是从vue的基础上扩展而来，诸多特性也是vue的。作为目前前端比较火的框架之一，有所了解，也是有一定好处的，所谓”多不压身”。<br>Vue涵盖的不仅是一种前端框架，而且是前端生态的一系列设计思想、工具、规范。<br>本文直奔主题，什么装环境、hello world 之类的琐事就略过…… </p>
+<h2 id="几个重要概念"><a href="#几个重要概念" class="headerlink" title="几个重要概念"></a>几个重要概念</h2><h3 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h3><p>每个 Vue.js 应用都是通过构造函数 Vue 创建一个 Vue 的根实例 启动的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="comment">// 属性</span></div><div class="line">  <span class="comment">// 方法</span></div><div class="line">  <span class="comment">// 各种选项对象...</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<p>在 vue 实例的基础上，提供了一些扩展的接口：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Vue.extend(&#123;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>定义自己的组件，复用到不同的页面中，自底向上地构建页面应用。</p>
+<h3 id="Virtual-DOM"><a href="#Virtual-DOM" class="headerlink" title="Virtual DOM"></a>Virtual DOM</h3><p>DOM：文档对象模型<br>Virtual DOM 是个什么鬼？<br>初学前端时，我们会直接用 js 去获取 dom 节点，拿到节点的属性和方法进行操作。但是这种操作性能比较差。<br>虚拟DOM：就是在 JS 和 DOM 之间做了一个缓存。可以类比 CPU 和硬盘，既然硬盘这么慢，我们就在它们之间加个缓存：既然 DOM 这么慢，我们就在它们 JS 和 DOM 之间加个缓存。CPU（JS）只操作内存（Virtual DOM），最后的时候再把变更写入硬盘（DOM）。</p>
+<p><strong>大致过程</strong>：</p>
+<ol>
+<li>用 JavaScript 对象结构表示 DOM 树的结构；然后用这个树构建一个真正的 DOM 树，插到文档当中</li>
+<li>当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树进行比较，记录两棵树差异</li>
+<li>把2所记录的差异应用到步骤1所构建的真正的DOM树上，视图就更新了</li>
+</ol>
+<h3 id="数据绑定"><a href="#数据绑定" class="headerlink" title="数据绑定"></a>数据绑定</h3><p>Vue 几乎屏蔽了直接通过操作 dom 更新的方式，更是趋向于 “数据的更新” 来达到 “视图的更新”。<br>Vue 实例的 data 的相关字段更新后，与之使用到的视图中也随之更新，重新渲染。<br>Vue 在不同组件间强制使用单向数据流。父组件通过 prop 向子组件赋值数据，子组件反过来向父组件 emit 发送事件</p>
+<h2 id="生命周期钩子"><a href="#生命周期钩子" class="headerlink" title="生命周期钩子"></a>生命周期钩子</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> LIFECYCLE_HOOKS = [</div><div class="line">  <span class="string">'beforeCreate'</span>,<span class="comment">//el 和 data 并未初始化 </span></div><div class="line">  <span class="string">'created'</span>,<span class="comment">// data 初始化</span></div><div class="line">  <span class="string">'beforeMount'</span>,<span class="comment">// el 初始化 </span></div><div class="line">  <span class="string">'mounted'</span>,<span class="comment">// 完成挂载</span></div><div class="line">  <span class="string">'beforeUpdate'</span>,<span class="comment">// 数据完成更新</span></div><div class="line">  <span class="string">'updated'</span>,<span class="comment">// virtual dom 更新并重新渲染</span></div><div class="line">  <span class="string">'beforeDestroy'</span>,<span class="comment">// vue 实例调用 desotry</span></div><div class="line">  <span class="string">'destroyed'</span>,<span class="comment">// 移除组件、事件、监听</span></div><div class="line">  <span class="string">'activated'</span>,<span class="comment">// 完成激活子组件</span></div><div class="line">  <span class="string">'deactivated'</span><span class="comment">// 停用释放子组件</span></div><div class="line">];</div></pre></td></tr></table></figure>
+<div style="text-align:center"><br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/vue_lifecycle.png" width="400" height="720"><br></div>
+
+<h2 id="语法概览"><a href="#语法概览" class="headerlink" title="语法概览"></a>语法概览</h2><h3 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h3><p>数据绑定，使用 mustache 语法：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">span</span>&gt;</span>Message: &#123;&#123; msg &#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>js 表达式：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123;&#123; number + 1 &#125;&#125;</div><div class="line">&#123;&#123; ok ? 'YES' : 'NO' &#125;&#125;</div></pre></td></tr></table></figure>
+<h3 id="指令"><a href="#指令" class="headerlink" title="指令"></a>指令</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">v-if</span>=<span class="string">"seen"</span>&gt;</span>现在你看到我了<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-on:click</span>=<span class="string">"doSomething"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-bind:href</span>=<span class="string">"url"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;&#123; message | capitalize &#125;&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">filters: &#123;</div><div class="line">    <span class="attr">capitalize</span>: <span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</div><div class="line">      <span class="keyword">if</span> (!value) <span class="keyword">return</span> <span class="string">''</span></div><div class="line">      value = value.toString()</div><div class="line">      <span class="keyword">return</span> value.charAt(<span class="number">0</span>).toUpperCase() + value.slice(<span class="number">1</span>)</div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="计算属性"><a href="#计算属性" class="headerlink" title="计算属性"></a>计算属性</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"example"</span>&gt;</span></div><div class="line">  &#123;&#123; message.split('').reverse().join('') &#125;&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"example"</span>&gt;</span></div><div class="line">  &#123;&#123; reversedMessage &#125;&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#example'</span>,</div><div class="line">  <span class="attr">data</span>: &#123;</div><div class="line">    <span class="attr">message</span>: <span class="string">'Hello'</span></div><div class="line">  &#125;,</div><div class="line">  <span class="attr">computed</span>: &#123;</div><div class="line">    <span class="attr">reversedMessage</span>: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="keyword">return</span> <span class="keyword">this</span>.message.split(<span class="string">''</span>).reverse().join(<span class="string">''</span>)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>计算属性是基于它们的依赖进行缓存的。计算属性只有在它的相关依赖发生改变时才会重新求值。这就意味着只要 message 还没有发生改变，多次访问 reversedMessage 计算属性会立即返回之前的计算结果，而不必再次执行函数。</p>
+<h3 id="样式绑定"><a href="#样式绑定" class="headerlink" title="样式绑定"></a>样式绑定</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123; active: isActive &#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-bind:style</span>=<span class="string">"&#123; color: activeColor, fontSize: fontSize + 'px' &#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>多个样式之间的切换，可以在 data 中定义：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">data: &#123;</div><div class="line">  <span class="attr">activeClass</span>: <span class="string">'active'</span>,</div><div class="line">  <span class="attr">errorClass</span>: <span class="string">'text-danger'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="条件渲染"><a href="#条件渲染" class="headerlink" title="条件渲染"></a>条件渲染</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">v-if</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">v-else</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">v-else-if</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">v-show</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>v-if 是“真正的”条件渲染，因为它会确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建。<br>v-if 也是惰性的：如果在初始渲染时条件为假，则什么也不做——直到条件第一次变为真时，才会开始渲染条件块。<br>v-show 不管初始条件是什么，元素总是会被渲染，并且只是简单地基于 CSS 进行切换。</p>
+<h3 id="列表渲染"><a href="#列表渲染" class="headerlink" title="列表渲染"></a>列表渲染</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">v-for</span>&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>key使用<br>当 Vue.js 用 v-for 正在更新已渲染过的元素列表时，它默认用 “就地复用” 策略<br>如果数据项的顺序被改变，Vue将不是移动 DOM 元素来匹配数据项的顺序， 而是简单复用此处每个元素，并且确保它在特定索引下显示已被渲染过的每个元素<br>建议尽可能使用 v-for 来提供 key ，除非迭代 DOM 内容足够简单，或者你是故意要依赖于默认行为来获得性能提升。</li>
+<li>数组更新检测<br>由于 JavaScript 的限制， Vue 不能检测以下变动的数组：</li>
+</ul>
+<ol>
+<li>当你利用索引直接设置一个项时，例如： vm.items[indexOfItem] = newValue</li>
+<li>当你修改数组的长度时，例如： vm.items.length = newLength<br>解决：<br>Vue.set(example1.items, indexOfItem, newValue) 或 example1.items.splice(indexOfItem, 1, newValue)<br>example1.items.splice(newLength)<h3 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h3></li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 注册</span></div><div class="line">Vue.component(<span class="string">'my-component'</span>, &#123;</div><div class="line">  <span class="attr">template</span>: <span class="string">'&lt;div&gt;A custom component!&lt;/div&gt;'</span></div><div class="line">&#125;)</div><div class="line"><span class="comment">// 创建根实例</span></div><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#example'</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!--使用--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"example"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">my-component</span>&gt;</span><span class="tag">&lt;/<span class="name">my-component</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>组件通信</p>
+<div style="text-align:center"><br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/props-events.png" width="210" height="200"><br></div>
+
+<p><strong>单项数据流</strong><br>prop 是单向绑定的：当父组件的属性变化时，将传导给子组件，但是不会反过来</p>
+<h2 id="过渡效果"><a href="#过渡效果" class="headerlink" title="过渡效果"></a>过渡效果</h2><p>配合 css 实现动画效果，元素的出现和消息过渡动画也是非常有意思的</p>
+<pre><code>v-enter
+v-enter-active
+v-enter-to
+v-leave
+v-leave-active
+v-leave-to
+</code></pre><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">用 包裹 view 动画元素</div><div class="line"><span class="tag">&lt;<span class="name">transition</span> <span class="attr">name</span>=<span class="string">"xxx"</span>&gt;</span><span class="tag">&lt;/<span class="name">transition</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="路由：vue-router"><a href="#路由：vue-router" class="headerlink" title="路由：vue-router"></a>路由：vue-router</h2><p><a href="https://router.vuejs.org/zh-cn/" target="_blank" rel="external">https://router.vuejs.org/zh-cn/</a></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></div><div class="line">  <span class="comment">&lt;!--将来被替换的区域--&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">router-view</span>&gt;</span><span class="tag">&lt;/<span class="name">router-view</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!--点击跳转配置，可传参数--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">router-link</span> <span class="attr">:to</span>=<span class="string">"&#123; name: 'user', params: &#123; userId: 123 &#125;&#125;"</span>&gt;</span>User<span class="tag">&lt;/<span class="name">router-link</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="其他推荐"><a href="#其他推荐" class="headerlink" title="其他推荐"></a>其他推荐</h2><p>饿了么组件库：<br><a href="http://element.eleme.io/#/zh-CN" target="_blank" rel="external">http://element.eleme.io/#/zh-CN</a><br>vue 网络库：<br>axios：<a href="https://github.com/mzabriskie/axios" target="_blank" rel="external">https://github.com/mzabriskie/axios</a></p>
+<hr>
+
+<p>附录<br>Demo:<br><a href="https://github.com/fenglincanyi/VueDemo1" target="_blank" rel="external">https://github.com/fenglincanyi/VueDemo1</a><br><a href="https://github.com/fenglincanyi/VueDemo2" target="_blank" rel="external">https://github.com/fenglincanyi/VueDemo2</a></p>
+<p>参考：<br><a href="https://www.zhihu.com/question/29504639" target="_blank" rel="external">https://www.zhihu.com/question/29504639</a><br><a href="https://segmentfault.com/a/1190000008010666" target="_blank" rel="external">https://segmentfault.com/a/1190000008010666</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-08-27T10:21:53.000Z" title="2017-8-27 18:21" itemprop="dateUpdated">2017年8月27日 18:21</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/07/19/Vue 从入门到搬砖/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/&title=《Vue 从入门到搬砖》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/&title=《Vue 从入门到搬砖》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Vue 从入门到搬砖》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/06/09/Android 7.0适配/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Android 7.0适配</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Vue 从入门到搬砖" data-title="Vue 从入门到搬砖" data-url="https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/&title=《Vue 从入门到搬砖》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/&title=《Vue 从入门到搬砖》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Vue 从入门到搬砖》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACu0lEQVR42u3aUY7CMAwFQO5/afYAQPtenCBWmn4h6KaeVmq8th+P+Hh+OD6d8/p9+/l1tdeVtx14eHh4m0L/dMlktfyb5Ir5r28ixMPDwzvGuw403waub9z1Ofm1kpjx8PDwfo2Xp8jJFpLfJjw8PLz/y0te+tfBJWu2tw8PDw/vm7x86RyZFBEmG8PmWgseHh5ezMu7SL/z+Uh/Dw8PD2/cVc9T2zb5Xmu51evg4eHhHeC1JdccOSm/Toau8PDw8E7z2oDWAGvjU22h5E0MeHh4eF/htQ2wSRBtDaEe6sLDw8M7wEtOzZPd/K+ScCex4eHh4Z3j5S2ltTGCZDu53qiSdaKg8fDw8Dbx2uR4rSnVDiLsaonh4eHhneMlG8baN3laXIc42OTw8PDwJry2qZ+/1idr5rHdVFnw8PDwDvDWkHmqnSfK841kQx0FDw8Pr8xO84GqXQMH7cYwKRDj4eHh7eIlr902rHkfqi1w3DwxPDw8vK28yShAvkm0zbA8UY4eAx4eHt5h3iTctZZVzmgfCR4eHt4JXrv03tJt8lqfXB0PDw/vNG/tYsmL/iaIeMvJU/PH2lwDHh4eXllxTZZuW1x50G1ynxdN8PDw8Pby8orFpH21Vm7IrzVqfeHh4eGVvDZ1bgu1SYhFvXlt38PDw8M7xssv1hYO8mLEZGThZvfDw8PDO8CbLL2Wjie/5g9gWwcPDw8Pb2n4KX/5ThLlJFlfG27Aw8PDO8d7lke+9K5kOt8ebp4bHh4e3ibePC9tX99tk6y9QXh4eHjf4bXt+ckoQPtX7bZRJ9Z4eHh4A95aupzfjrX0en5T8PDw8H6Nlxd5W0yeakcVFzw8PLyf4eWv8jXYpMSMh4eHd5qXj1vlI1l5ELuKHXWXDw8PD2+J1/7Dnw+wJqNXUUEhbqSN+nt4eHh49+f/AYkgfYJfXTO9AAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

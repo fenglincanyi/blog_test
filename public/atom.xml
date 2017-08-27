@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-06-09T08:57:24.000Z</updated>
+  <updated>2017-08-27T10:21:53.000Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -14,6 +14,90 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Vue 从入门到搬砖</title>
+    <link href="https://fenglincanyi.github.io/2017/07/19/Vue%20%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%90%AC%E7%A0%96/"/>
+    <id>https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/</id>
+    <published>2017-07-19T05:10:00.000Z</published>
+    <updated>2017-08-27T10:21:53.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前段时间，捣鼓weex，就想到对vue有所了解。毕竟weex是从vue的基础上扩展而来，诸多特性也是vue的。作为目前前端比较火的框架之一，有所了解，也是有一定好处的，所谓”多不压身”。<br>Vue涵盖的不仅是一种前端框架，而且是前端生态的一系列设计思想、工具、规范。<br>本文直奔主题，什么装环境、hello world 之类的琐事就略过…… </p>
+<h2 id="几个重要概念"><a href="#几个重要概念" class="headerlink" title="几个重要概念"></a>几个重要概念</h2><h3 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h3><p>每个 Vue.js 应用都是通过构造函数 Vue 创建一个 Vue 的根实例 启动的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="comment">// 属性</span></div><div class="line">  <span class="comment">// 方法</span></div><div class="line">  <span class="comment">// 各种选项对象...</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<p>在 vue 实例的基础上，提供了一些扩展的接口：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Vue.extend(&#123;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>定义自己的组件，复用到不同的页面中，自底向上地构建页面应用。</p>
+<h3 id="Virtual-DOM"><a href="#Virtual-DOM" class="headerlink" title="Virtual DOM"></a>Virtual DOM</h3><p>DOM：文档对象模型<br>Virtual DOM 是个什么鬼？<br>初学前端时，我们会直接用 js 去获取 dom 节点，拿到节点的属性和方法进行操作。但是这种操作性能比较差。<br>虚拟DOM：就是在 JS 和 DOM 之间做了一个缓存。可以类比 CPU 和硬盘，既然硬盘这么慢，我们就在它们之间加个缓存：既然 DOM 这么慢，我们就在它们 JS 和 DOM 之间加个缓存。CPU（JS）只操作内存（Virtual DOM），最后的时候再把变更写入硬盘（DOM）。</p>
+<p><strong>大致过程</strong>：</p>
+<ol>
+<li>用 JavaScript 对象结构表示 DOM 树的结构；然后用这个树构建一个真正的 DOM 树，插到文档当中</li>
+<li>当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树进行比较，记录两棵树差异</li>
+<li>把2所记录的差异应用到步骤1所构建的真正的DOM树上，视图就更新了</li>
+</ol>
+<h3 id="数据绑定"><a href="#数据绑定" class="headerlink" title="数据绑定"></a>数据绑定</h3><p>Vue 几乎屏蔽了直接通过操作 dom 更新的方式，更是趋向于 “数据的更新” 来达到 “视图的更新”。<br>Vue 实例的 data 的相关字段更新后，与之使用到的视图中也随之更新，重新渲染。<br>Vue 在不同组件间强制使用单向数据流。父组件通过 prop 向子组件赋值数据，子组件反过来向父组件 emit 发送事件</p>
+<h2 id="生命周期钩子"><a href="#生命周期钩子" class="headerlink" title="生命周期钩子"></a>生命周期钩子</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> LIFECYCLE_HOOKS = [</div><div class="line">  <span class="string">'beforeCreate'</span>,<span class="comment">//el 和 data 并未初始化 </span></div><div class="line">  <span class="string">'created'</span>,<span class="comment">// data 初始化</span></div><div class="line">  <span class="string">'beforeMount'</span>,<span class="comment">// el 初始化 </span></div><div class="line">  <span class="string">'mounted'</span>,<span class="comment">// 完成挂载</span></div><div class="line">  <span class="string">'beforeUpdate'</span>,<span class="comment">// 数据完成更新</span></div><div class="line">  <span class="string">'updated'</span>,<span class="comment">// virtual dom 更新并重新渲染</span></div><div class="line">  <span class="string">'beforeDestroy'</span>,<span class="comment">// vue 实例调用 desotry</span></div><div class="line">  <span class="string">'destroyed'</span>,<span class="comment">// 移除组件、事件、监听</span></div><div class="line">  <span class="string">'activated'</span>,<span class="comment">// 完成激活子组件</span></div><div class="line">  <span class="string">'deactivated'</span><span class="comment">// 停用释放子组件</span></div><div class="line">];</div></pre></td></tr></table></figure>
+<div style="text-align:center"><br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/vue_lifecycle.png" width="400" height="720"><br></div>
+
+<h2 id="语法概览"><a href="#语法概览" class="headerlink" title="语法概览"></a>语法概览</h2><h3 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h3><p>数据绑定，使用 mustache 语法：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">span</span>&gt;</span>Message: &#123;&#123; msg &#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>js 表达式：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123;&#123; number + 1 &#125;&#125;</div><div class="line">&#123;&#123; ok ? 'YES' : 'NO' &#125;&#125;</div></pre></td></tr></table></figure>
+<h3 id="指令"><a href="#指令" class="headerlink" title="指令"></a>指令</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">v-if</span>=<span class="string">"seen"</span>&gt;</span>现在你看到我了<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-on:click</span>=<span class="string">"doSomething"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">v-bind:href</span>=<span class="string">"url"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;&#123; message | capitalize &#125;&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">filters: &#123;</div><div class="line">    <span class="attr">capitalize</span>: <span class="function"><span class="keyword">function</span> (<span class="params">value</span>) </span>&#123;</div><div class="line">      <span class="keyword">if</span> (!value) <span class="keyword">return</span> <span class="string">''</span></div><div class="line">      value = value.toString()</div><div class="line">      <span class="keyword">return</span> value.charAt(<span class="number">0</span>).toUpperCase() + value.slice(<span class="number">1</span>)</div><div class="line">    &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<h3 id="计算属性"><a href="#计算属性" class="headerlink" title="计算属性"></a>计算属性</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"example"</span>&gt;</span></div><div class="line">  &#123;&#123; message.split('').reverse().join('') &#125;&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"example"</span>&gt;</span></div><div class="line">  &#123;&#123; reversedMessage &#125;&#125;</div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#example'</span>,</div><div class="line">  <span class="attr">data</span>: &#123;</div><div class="line">    <span class="attr">message</span>: <span class="string">'Hello'</span></div><div class="line">  &#125;,</div><div class="line">  <span class="attr">computed</span>: &#123;</div><div class="line">    <span class="attr">reversedMessage</span>: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">      <span class="keyword">return</span> <span class="keyword">this</span>.message.split(<span class="string">''</span>).reverse().join(<span class="string">''</span>)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<p>计算属性是基于它们的依赖进行缓存的。计算属性只有在它的相关依赖发生改变时才会重新求值。这就意味着只要 message 还没有发生改变，多次访问 reversedMessage 计算属性会立即返回之前的计算结果，而不必再次执行函数。</p>
+<h3 id="样式绑定"><a href="#样式绑定" class="headerlink" title="样式绑定"></a>样式绑定</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-bind:class</span>=<span class="string">"&#123; active: isActive &#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">v-bind:style</span>=<span class="string">"&#123; color: activeColor, fontSize: fontSize + 'px' &#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>多个样式之间的切换，可以在 data 中定义：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">data: &#123;</div><div class="line">  <span class="attr">activeClass</span>: <span class="string">'active'</span>,</div><div class="line">  <span class="attr">errorClass</span>: <span class="string">'text-danger'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="条件渲染"><a href="#条件渲染" class="headerlink" title="条件渲染"></a>条件渲染</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">v-if</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">v-else</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">v-else-if</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">v-show</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>v-if 是“真正的”条件渲染，因为它会确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建。<br>v-if 也是惰性的：如果在初始渲染时条件为假，则什么也不做——直到条件第一次变为真时，才会开始渲染条件块。<br>v-show 不管初始条件是什么，元素总是会被渲染，并且只是简单地基于 CSS 进行切换。</p>
+<h3 id="列表渲染"><a href="#列表渲染" class="headerlink" title="列表渲染"></a>列表渲染</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">v-for</span>&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>key使用<br>当 Vue.js 用 v-for 正在更新已渲染过的元素列表时，它默认用 “就地复用” 策略<br>如果数据项的顺序被改变，Vue将不是移动 DOM 元素来匹配数据项的顺序， 而是简单复用此处每个元素，并且确保它在特定索引下显示已被渲染过的每个元素<br>建议尽可能使用 v-for 来提供 key ，除非迭代 DOM 内容足够简单，或者你是故意要依赖于默认行为来获得性能提升。</li>
+<li>数组更新检测<br>由于 JavaScript 的限制， Vue 不能检测以下变动的数组：</li>
+</ul>
+<ol>
+<li>当你利用索引直接设置一个项时，例如： vm.items[indexOfItem] = newValue</li>
+<li>当你修改数组的长度时，例如： vm.items.length = newLength<br>解决：<br>Vue.set(example1.items, indexOfItem, newValue) 或 example1.items.splice(indexOfItem, 1, newValue)<br>example1.items.splice(newLength)<h3 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h3></li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 注册</span></div><div class="line">Vue.component(<span class="string">'my-component'</span>, &#123;</div><div class="line">  <span class="attr">template</span>: <span class="string">'&lt;div&gt;A custom component!&lt;/div&gt;'</span></div><div class="line">&#125;)</div><div class="line"><span class="comment">// 创建根实例</span></div><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#example'</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!--使用--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"example"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">my-component</span>&gt;</span><span class="tag">&lt;/<span class="name">my-component</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>组件通信</p>
+<div style="text-align:center"><br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/props-events.png" width="210" height="200"><br></div>
+
+<p><strong>单项数据流</strong><br>prop 是单向绑定的：当父组件的属性变化时，将传导给子组件，但是不会反过来</p>
+<h2 id="过渡效果"><a href="#过渡效果" class="headerlink" title="过渡效果"></a>过渡效果</h2><p>配合 css 实现动画效果，元素的出现和消息过渡动画也是非常有意思的</p>
+<pre><code>v-enter
+v-enter-active
+v-enter-to
+v-leave
+v-leave-active
+v-leave-to
+</code></pre><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">用 包裹 view 动画元素</div><div class="line"><span class="tag">&lt;<span class="name">transition</span> <span class="attr">name</span>=<span class="string">"xxx"</span>&gt;</span><span class="tag">&lt;/<span class="name">transition</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="路由：vue-router"><a href="#路由：vue-router" class="headerlink" title="路由：vue-router"></a>路由：vue-router</h2><p><a href="https://router.vuejs.org/zh-cn/" target="_blank" rel="external">https://router.vuejs.org/zh-cn/</a></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"app"</span>&gt;</span></div><div class="line">  <span class="comment">&lt;!--将来被替换的区域--&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">router-view</span>&gt;</span><span class="tag">&lt;/<span class="name">router-view</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!--点击跳转配置，可传参数--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">router-link</span> <span class="attr">:to</span>=<span class="string">"&#123; name: 'user', params: &#123; userId: 123 &#125;&#125;"</span>&gt;</span>User<span class="tag">&lt;/<span class="name">router-link</span>&gt;</span></div></pre></td></tr></table></figure>
+<h2 id="其他推荐"><a href="#其他推荐" class="headerlink" title="其他推荐"></a>其他推荐</h2><p>饿了么组件库：<br><a href="http://element.eleme.io/#/zh-CN" target="_blank" rel="external">http://element.eleme.io/#/zh-CN</a><br>vue 网络库：<br>axios：<a href="https://github.com/mzabriskie/axios" target="_blank" rel="external">https://github.com/mzabriskie/axios</a></p>
+<hr>
+
+<p>附录<br>Demo:<br><a href="https://github.com/fenglincanyi/VueDemo1" target="_blank" rel="external">https://github.com/fenglincanyi/VueDemo1</a><br><a href="https://github.com/fenglincanyi/VueDemo2" target="_blank" rel="external">https://github.com/fenglincanyi/VueDemo2</a></p>
+<p>参考：<br><a href="https://www.zhihu.com/question/29504639" target="_blank" rel="external">https://www.zhihu.com/question/29504639</a><br><a href="https://segmentfault.com/a/1190000008010666" target="_blank" rel="external">https://segmentfault.com/a/1190000008010666</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;前段时间，捣鼓weex，就想到对vue有所了解。毕竟weex是从vue的基础上扩展而来，诸多特性也是vue的。作为目前前端比较火的框架之一，
+    
+    </summary>
+    
+      <category term="前端" scheme="https://fenglincanyi.github.io/categories/%E5%89%8D%E7%AB%AF/"/>
+    
+    
+      <category term="vue" scheme="https://fenglincanyi.github.io/tags/vue/"/>
+    
+  </entry>
   
   <entry>
     <title>Android 7.0适配</title>
@@ -1819,129 +1903,6 @@ globalSession 一次登陆，任何地方都保存有登录状态
   </entry>
   
   <entry>
-    <title>Android 类加载初探</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
-</blockquote>
-<p>需要关注的类有：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
-<ul>
-<li>BaseDexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>DexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>PathClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
-<p><strong>ClassLoader 相关说明：</strong></p>
-<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
-<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
-<p>DexPathList 构造函数：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>makeDexElements过程：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
-<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
-    
-  </entry>
-  
-  <entry>
     <title>Android apk安装过程实例分析</title>
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
@@ -2062,6 +2023,129 @@ globalSession 一次登陆，任何地方都保存有登录状态
       <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
     
       <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android 类加载初探</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2017-01-19T08:20:55.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
+</blockquote>
+<p>需要关注的类有：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
+<ul>
+<li>BaseDexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>DexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>PathClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
+<p><strong>ClassLoader 相关说明：</strong></p>
+<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
+<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
+<p>DexPathList 构造函数：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>makeDexElements过程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
+<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
     
   </entry>
   
