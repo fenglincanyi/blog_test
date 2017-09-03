@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-08-27T10:21:53.000Z</updated>
+  <updated>2017-09-03T10:31:48.000Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -14,6 +14,184 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>View 测量相关总结</title>
+    <link href="https://fenglincanyi.github.io/2017/08/11/View%20%E6%B5%8B%E9%87%8F%E7%9B%B8%E5%85%B3%E6%80%BB%E7%BB%93/"/>
+    <id>https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/</id>
+    <published>2017-08-11T05:18:00.000Z</published>
+    <updated>2017-09-03T10:31:48.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="ViewGroup的测量过程"><a href="#ViewGroup的测量过程" class="headerlink" title="ViewGroup的测量过程"></a>ViewGroup的测量过程</h2><p><strong>ViewGroup 没有重写 View 的 measure()  和 onMeasure()  方法，沿用的还是View的</strong></p>
+<p>然后在 View 的源码中，我们找到 measure()，它内部调用到 onMeasure()。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * This is called to find out how big a view should be. The parent</div><div class="line"> * supplies constraint information in the width and height parameters.</div><div class="line"> * The actual measurement work of a view is performed in</div><div class="line"> * &#123;<span class="doctag">@link</span> #onMeasure(int, int)&#125;, called by this method. Therefore, only</div><div class="line"> * &#123;<span class="doctag">@link</span> #onMeasure(int, int)&#125; can and must be overridden by subclasses.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> widthMeasureSpec Horizontal space requirements as imposed by the</div><div class="line"> *        parent</div><div class="line"> * <span class="doctag">@param</span> heightMeasureSpec Vertical space requirements as imposed by the</div><div class="line"> *        parent</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">measure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line"></div><div class="line">    ......</div><div class="line"></div><div class="line">    <span class="keyword">long</span> key = (<span class="keyword">long</span>) widthMeasureSpec &lt;&lt; <span class="number">32</span> | (<span class="keyword">long</span>) heightMeasureSpec &amp; <span class="number">0xffffffffL</span>;</div><div class="line">    <span class="keyword">if</span> (mMeasureCache == <span class="keyword">null</span>) mMeasureCache = <span class="keyword">new</span> LongSparseLongArray(<span class="number">2</span>);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> ((mPrivateFlags &amp; PFLAG_FORCE_LAYOUT) == PFLAG_FORCE_LAYOUT ||</div><div class="line">            widthMeasureSpec != mOldWidthMeasureSpec ||</div><div class="line">            heightMeasureSpec != mOldHeightMeasureSpec) &#123;</div><div class="line"></div><div class="line">        <span class="comment">// first clears the measured dimension flag</span></div><div class="line">        mPrivateFlags &amp;= ~PFLAG_MEASURED_DIMENSION_SET;</div><div class="line"></div><div class="line">        <span class="comment">// 解析 layout、padding、drawable 相关参数</span></div><div class="line">        resolveRtlPropertiesIfNeeded();</div><div class="line"></div><div class="line">        <span class="keyword">int</span> cacheIndex = (mPrivateFlags &amp; PFLAG_FORCE_LAYOUT) == PFLAG_FORCE_LAYOUT ? -<span class="number">1</span> :</div><div class="line">                mMeasureCache.indexOfKey(key);</div><div class="line">        <span class="keyword">if</span> (cacheIndex &lt; <span class="number">0</span> || sIgnoreMeasureCache) &#123;</div><div class="line">            <span class="comment">// measure ourselves, this should set the measured dimension flag back</span></div><div class="line">            onMeasure(widthMeasureSpec, heightMeasureSpec);</div><div class="line">            mPrivateFlags3 &amp;= ~PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">long</span> value = mMeasureCache.valueAt(cacheIndex);</div><div class="line">            <span class="comment">// Casting a long to int drops the high 32 bits, no mask needed</span></div><div class="line">            setMeasuredDimensionRaw((<span class="keyword">int</span>) (value &gt;&gt; <span class="number">32</span>), (<span class="keyword">int</span>) value);</div><div class="line">            mPrivateFlags3 |= PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// flag not set, setMeasuredDimension() was not invoked, we raise</span></div><div class="line">        <span class="comment">// an exception to warn the developer</span></div><div class="line">        <span class="keyword">if</span> ((mPrivateFlags &amp; PFLAG_MEASURED_DIMENSION_SET) != PFLAG_MEASURED_DIMENSION_SET) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"View with id "</span> + getId() + <span class="string">": "</span></div><div class="line">                    + getClass().getName() + <span class="string">"#onMeasure() did not set the"</span></div><div class="line">                    + <span class="string">" measured dimension by calling"</span></div><div class="line">                    + <span class="string">" setMeasuredDimension()"</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        mPrivateFlags |= PFLAG_LAYOUT_REQUIRED;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    mOldWidthMeasureSpec = widthMeasureSpec;</div><div class="line">    mOldHeightMeasureSpec = heightMeasureSpec;</div><div class="line"></div><div class="line">    mMeasureCache.put(key, ((<span class="keyword">long</span>) mMeasuredWidth) &lt;&lt; <span class="number">32</span> |</div><div class="line">            (<span class="keyword">long</span>) mMeasuredHeight &amp; <span class="number">0xffffffffL</span>); <span class="comment">// suppress sign extension</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中，方法内传入的2个参数：widthMeasureSpec、heightMeasureSpec 也原封不动的传给 onMeasure() 方法中。 那 widthMeasureSpec，heightMeasureSpec 又是什么东西呢，我们从注释中看到：是 父View提供给子View(当前的view)宽高的约束信息，即：<em>父View根据自己的宽高、内边距信息计算合成的值，提供给子View自己测量时候使用，作为一个建议值</em>，<strong>不是父View的宽高信息</strong><br>从哪里能看出呢？我们找到ViewGroup的源码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">measureChild</span><span class="params">(View child, <span class="keyword">int</span> parentWidthMeasureSpec,</span></span></div><div class="line">            <span class="keyword">int</span> parentHeightMeasureSpec) &#123;</div><div class="line">    <span class="keyword">final</span> LayoutParams lp = child.getLayoutParams();</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,</div><div class="line">            mPaddingLeft + mPaddingRight, lp.width);</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,</div><div class="line">            mPaddingTop + mPaddingBottom, lp.height);</div><div class="line"></div><div class="line">    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>那么，widthMeasureSpec 和 heightMeasureSpec 具体又代表测量信息的什么呢？我们再看看 MeasureSpec(View 中的静态类)，发现，里面有 mode 和 size，mode 是测量模式（3中，不再细说，大家都知道），size 是测量大小，并且提供了 makeMeasureSpec() 和 getMode() ，getSize() 方法。<br><strong>measureSpec</strong> 这个东西是由 mode 和 size 合成的一个值，合成方法就是依靠 makeMeasureSpec() 来做位运算生成的。然后View和ViewGroup 会拿着它作为参数传递的。</p>
+<pre><code>measureSpec 是携带了测量模式和测量大小信息的一个值
+</code></pre><p>getChildMeasureSpec() 是个具有Android View 测量方法论的一个方法，必须要知道。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getChildMeasureSpec</span><span class="params">(<span class="keyword">int</span> spec, <span class="keyword">int</span> padding, <span class="keyword">int</span> childDimension)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> specMode = MeasureSpec.getMode(spec);<span class="comment">// 父View的测量信息</span></div><div class="line">    <span class="keyword">int</span> specSize = MeasureSpec.getSize(spec);</div><div class="line"></div><div class="line">    <span class="keyword">int</span> size = Math.max(<span class="number">0</span>, specSize - padding);</div><div class="line"></div><div class="line">    <span class="keyword">int</span> resultSize = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> resultMode = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (specMode) &#123;</div><div class="line">    <span class="comment">// Parent has imposed an exact size on us</span></div><div class="line">    <span class="keyword">case</span> MeasureSpec.EXACTLY:</div><div class="line">        <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;</div><div class="line">            resultSize = childDimension;</div><div class="line">            resultMode = MeasureSpec.EXACTLY;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;</div><div class="line">            <span class="comment">// Child wants to be our size. So be it.</span></div><div class="line">            resultSize = size;</div><div class="line">            resultMode = MeasureSpec.EXACTLY;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;</div><div class="line">            <span class="comment">// Child wants to determine its own size. It can't be</span></div><div class="line">            <span class="comment">// bigger than us.</span></div><div class="line">            resultSize = size;</div><div class="line">            resultMode = MeasureSpec.AT_MOST;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line"></div><div class="line">    <span class="comment">// Parent has imposed a maximum size on us</span></div><div class="line">    <span class="keyword">case</span> MeasureSpec.AT_MOST:</div><div class="line">        <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;</div><div class="line">            <span class="comment">// Child wants a specific size... so be it</span></div><div class="line">            resultSize = childDimension;</div><div class="line">            resultMode = MeasureSpec.EXACTLY;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;</div><div class="line">            <span class="comment">// Child wants to be our size, but our size is not fixed.</span></div><div class="line">            <span class="comment">// Constrain child to not be bigger than us.</span></div><div class="line">            resultSize = size;</div><div class="line">            resultMode = MeasureSpec.AT_MOST;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;</div><div class="line">            <span class="comment">// Child wants to determine its own size. It can't be</span></div><div class="line">            <span class="comment">// bigger than us.</span></div><div class="line">            resultSize = size;</div><div class="line">            resultMode = MeasureSpec.AT_MOST;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line"></div><div class="line">    <span class="comment">// Parent asked to see how big we want to be</span></div><div class="line">    <span class="keyword">case</span> MeasureSpec.UNSPECIFIED:</div><div class="line">        <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;</div><div class="line">            <span class="comment">// Child wants a specific size... let him have it</span></div><div class="line">            resultSize = childDimension;</div><div class="line">            resultMode = MeasureSpec.EXACTLY;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;</div><div class="line">            <span class="comment">// Child wants to be our size... find out how big it should</span></div><div class="line">            <span class="comment">// be</span></div><div class="line">            resultSize = View.sUseZeroUnspecifiedMeasureSpec ? <span class="number">0</span> : size;</div><div class="line">            resultMode = MeasureSpec.UNSPECIFIED;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;</div><div class="line">            <span class="comment">// Child wants to determine its own size.... find out how</span></div><div class="line">            <span class="comment">// big it should be</span></div><div class="line">            resultSize = View.sUseZeroUnspecifiedMeasureSpec ? <span class="number">0</span> : size;</div><div class="line">            resultMode = MeasureSpec.UNSPECIFIED;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> MeasureSpec.makeMeasureSpec(resultSize, resultMode);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>然后这个方法内，最后一步，也是将 mode 和 size 合成 measureSpec，并返回给 childWidthMeasureSpec。<br>所以，我们在自定义View中可能会重写onMeasure方法时，要想知道 测量模式 mode 和大小，则必须通过getMode()、getSize()来获取。<br>我们再看看View的 onMeasure() ：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">    setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),</div><div class="line">        getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里的 getDefaultSize() 方法，他也是这么做的:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getDefaultSize</span><span class="params">(<span class="keyword">int</span> size, <span class="keyword">int</span> measureSpec)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> result = size;</div><div class="line">    <span class="keyword">int</span> specMode = MeasureSpec.getMode(measureSpec);</div><div class="line">    <span class="keyword">int</span> specSize = MeasureSpec.getSize(measureSpec);</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (specMode) &#123;</div><div class="line">    <span class="keyword">case</span> MeasureSpec.UNSPECIFIED:</div><div class="line">        result = size;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    <span class="keyword">case</span> MeasureSpec.AT_MOST:</div><div class="line">    <span class="keyword">case</span> MeasureSpec.EXACTLY:</div><div class="line">        result = specSize;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line"></div><div class="line">    <span class="comment">// 数值：AT_MOST(-2147483648)  EXACTLY(1073741824)  UNSPECIFIED(0)</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="onMeasure-被重写时，一定要调用-setMeasuredDimension-方法"><a href="#onMeasure-被重写时，一定要调用-setMeasuredDimension-方法" class="headerlink" title="onMeasure() 被重写时，一定要调用 setMeasuredDimension() 方法"></a>onMeasure() 被重写时，一定要调用 setMeasuredDimension() 方法</h2><p>为什么一定要这么做呢，我们先来看看 这个方法干了什么？<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setMeasuredDimensionRaw</span><span class="params">(<span class="keyword">int</span> measuredWidth, <span class="keyword">int</span> measuredHeight)</span> </span>&#123;</div><div class="line">    <span class="comment">// 赋值给测量宽高变量，并设置标志位的值</span></div><div class="line">    mMeasuredWidth = measuredWidth;</div><div class="line">    mMeasuredHeight = measuredHeight;</div><div class="line"></div><div class="line">    mPrivateFlags |= PFLAG_MEASURED_DIMENSION_SET;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>再回到View的measure()方法，发现：如果mPrivateFlags没有被设置的话，会抛出异常。<br>那么，后面的mMeasureCache的put操作也就更新不了里面的值。这个缓存是个比较关键的东西，间接存储了测量的宽高信息。我们知道，一个View的测量操作是需要进行多次的(正常情况下3次measure，2次layout，1次draw)，所以这个存储就记录了当前测量结果的信息，下一次进行测量的时候，也是需要读取上次的信息，再判断如何进行下次测量操作的。<br>从measure()方法中能看到，需要读取到缓存中的值。在重新请求测量View时，也会清空缓存，到测量时自己再创建新的缓存对象。如：requestLayout()方法<br>这个LongSparseLongArray数据结构，使用形式上和map类似，但是它更省内存，也避免了装箱拆箱的操作，也不需要额外的entry。<br>Google 也提倡使用此类的 array 来代替 HashMap 在Android中的使用，其他类似的array大家也都知道</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * LongSparseLongArray:</div><div class="line"> *</div><div class="line"> * Map of &#123;<span class="doctag">@code</span> long&#125; to &#123;<span class="doctag">@code</span> long&#125;. Unlike a normal array of longs, there</div><div class="line"> * can be gaps in the indices. It is intended to be more memory efficient than using a</div><div class="line"> * &#123;<span class="doctag">@code</span> HashMap&#125;, both because it avoids</div><div class="line"> * auto-boxing keys and values and its data structure doesn't rely on an extra entry object</div><div class="line"> * for each mapping.</div><div class="line"> */</div></pre></td></tr></table></figure>
+<h2 id="onMeasure-被重写时，wrap-content-的功能需要自己实现"><a href="#onMeasure-被重写时，wrap-content-的功能需要自己实现" class="headerlink" title="onMeasure()被重写时，wrap_content 的功能需要自己实现"></a>onMeasure()被重写时，wrap_content 的功能需要自己实现</h2><p>如果不单独对 AT_MOST 做处理，在使用的时候设置 wrap_content,效果也就是和 match_parent 等价的。<br>为什么呢? 还是分析 getChildMeasureSpec() 方法:<br>此时 childDimension 为 wrap_content，其测量结果 resultSize = size(specSize - padding, 父View的测量尺寸大小 或 父View剩余可用空间)<br>所以，我们可能按需求要对自定义的View，测量时，AT_MOST情况做处理了，我们可以对其设置一个默认的宽高值。这样写：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">int</span> defaultWidth, defaultHeight;</div><div class="line"></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> widthSpec = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">    <span class="keyword">int</span> heightSpec = MeasureSpec.getMode(heightMeasureSpec);</div><div class="line">    <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line">    <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (widthSpec == MeasureSpec.AT_MOST &amp;&amp; heightSpec == MeasureSpec.AT_MOST) &#123;</div><div class="line">        setMeasuredDimension(defaultWidth, defaultHeight);</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (widthSpec == MeasureSpec.AT_MOST) &#123;</div><div class="line">        setMeasuredDimension(defaultWidth, widthSize);</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (heightSpec == MeasureSpec.AT_MOST) &#123;</div><div class="line">        setMeasuredDimension(widthSize, defaultHeight);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="View-的测量方法是由它的父View发起的"><a href="#View-的测量方法是由它的父View发起的" class="headerlink" title="View 的测量方法是由它的父View发起的"></a>View 的测量方法是由它的父View发起的</h2><p>View 自己并不能主动发起测量，都是由父View或外界调用requestLayout()来调View的测量。<br>ViewGroup会对自己所有的子View调起来测量的过程，父View对所有的子View 测量完毕后，再测量自己</p>
+<h2 id="Android-测量起始由ViewRoot执行开始"><a href="#Android-测量起始由ViewRoot执行开始" class="headerlink" title="Android 测量起始由ViewRoot执行开始"></a>Android 测量起始由ViewRoot执行开始</h2><p>从 ViewRootImpl 的performTraversals 开始，首先调用测量相关方法，ViewRootImpl的performMeasure方法，方法中会调用 ViewGroup measure方法，ViewGroup再对子View进行测量，如此递归下去，知道完成测量</p>
+<p>附：<br><a href="https://developer.android.com/reference/android/view/ViewGroup.html" target="_blank" rel="external">https://developer.android.com/reference/android/view/ViewGroup.html</a><br><a href="http://blog.csdn.net/u012422440/article/details/52972825" target="_blank" rel="external">http://blog.csdn.net/u012422440/article/details/52972825</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;ViewGroup的测量过程&quot;&gt;&lt;a href=&quot;#ViewGroup的测量过程&quot; class=&quot;headerlink&quot; title=&quot;ViewGroup的测量过程&quot;&gt;&lt;/a&gt;ViewGroup的测量过程&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;ViewGroup 没有重写
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="View" scheme="https://fenglincanyi.github.io/tags/View/"/>
+    
+      <category term="Measure" scheme="https://fenglincanyi.github.io/tags/Measure/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>滑动相关 ScrollView &amp; ListView</title>
+    <link href="https://fenglincanyi.github.io/2017/07/30/%E6%BB%91%E5%8A%A8%E7%9B%B8%E5%85%B3%20ScrollView%20&amp;%20ListView/"/>
+    <id>https://fenglincanyi.github.io/2017/07/30/滑动相关 ScrollView &amp; ListView/</id>
+    <published>2017-07-30T03:13:00.000Z</published>
+    <updated>2017-09-03T10:28:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="ScrollView-嵌套-ListView-问题分析"><a href="#ScrollView-嵌套-ListView-问题分析" class="headerlink" title="ScrollView 嵌套 ListView 问题分析"></a>ScrollView 嵌套 ListView 问题分析</h2><p><strong>滑动冲突的问题</strong><br>ScrollView 中嵌套 ListView，ListView 在测量时，高度不论写活还是写死，Listiew 的测量模式都是 不确定模式：unspecified</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>ScrollView 换成 LinearLayout后：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>经过上面的实验，什么原因造成的 heightMeasureSpec的值是 680 呢？</p>
+<p><strong>追踪过程</strong></p>
+<p>在ScrollView 测量时：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>Listview 测量时：heightMeasureSpec = 680</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>再继续向前追溯：<br>ScrollView的 onMeasure() 调用了父类的  onMeasure() 即 FrameLayout 的：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>再仔细观察：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>可以再查看ScrollView 的 measureChild() 方法，也是通过 设置 高度的测量模式：unspecified</p>
+<p>我们对比 未覆盖的  ViewGroup的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">measureChildWithMargins</span><span class="params">(View child,</span></span></div><div class="line">        <span class="keyword">int</span> parentWidthMeasureSpec, <span class="keyword">int</span> widthUsed,</div><div class="line">        <span class="keyword">int</span> parentHeightMeasureSpec, <span class="keyword">int</span> heightUsed) &#123;</div><div class="line">    <span class="keyword">final</span> MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,</div><div class="line">            mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin</div><div class="line">                    + widthUsed, lp.width);</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,</div><div class="line">            mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin</div><div class="line">                    + heightUsed, lp.height);</div><div class="line"></div><div class="line">    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>到最后，传到listview的 onMeasure 中后，我们来分析：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">    <span class="comment">// Sets up mListPadding</span></div><div class="line">    <span class="keyword">super</span>.onMeasure(widthMeasureSpec, heightMeasureSpec);</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);<span class="comment">// heightMeasureSpec：680  计算结果： heightMode：0</span></div><div class="line">    <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line">    <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec);</div><div class="line"></div><div class="line">    <span class="keyword">int</span> childWidth = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> childHeight = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> childState = <span class="number">0</span>;</div><div class="line"></div><div class="line">    mItemCount = mAdapter == <span class="keyword">null</span> ? <span class="number">0</span> : mAdapter.getCount();</div><div class="line">    <span class="keyword">if</span> (mItemCount &gt; <span class="number">0</span> &amp;&amp; (widthMode == MeasureSpec.UNSPECIFIED</div><div class="line">            || heightMode == MeasureSpec.UNSPECIFIED)) &#123;</div><div class="line">        <span class="keyword">final</span> View child = obtainView(<span class="number">0</span>, mIsScrap);</div><div class="line"></div><div class="line">        <span class="comment">// Lay out child directly against the parent measure spec so that</span></div><div class="line">        <span class="comment">// we can obtain exected minimum width and height.</span></div><div class="line">        measureScrapChild(child, <span class="number">0</span>, widthMeasureSpec, heightSize);</div><div class="line"></div><div class="line">        childWidth = child.getMeasuredWidth();</div><div class="line">        childHeight = child.getMeasuredHeight();<span class="comment">// listview 的 item 高度</span></div><div class="line">        childState = combineMeasuredStates(childState, child.getMeasuredState());</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (recycleOnMeasure() &amp;&amp; mRecycler.shouldRecycleViewType(</div><div class="line">                ((LayoutParams) child.getLayoutParams()).viewType)) &#123;</div><div class="line">            mRecycler.addScrapView(child, <span class="number">0</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (widthMode == MeasureSpec.UNSPECIFIED) &#123;</div><div class="line">        widthSize = mListPadding.left + mListPadding.right + childWidth +</div><div class="line">                getVerticalScrollbarWidth();</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        widthSize |= (childState &amp; MEASURED_STATE_MASK);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (heightMode == MeasureSpec.UNSPECIFIED) &#123;<span class="comment">// 符合条件</span></div><div class="line">        heightSize = mListPadding.top + mListPadding.bottom + childHeight +</div><div class="line">                getVerticalFadingEdgeLength() * <span class="number">2</span>;<span class="comment">// 所以 listview 的高度为 item 的高度</span></div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 此种布局下，不管如何调整高度属性， listview 的 高度 测量规格始终都是 unspecified，</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (heightMode == MeasureSpec.AT_MOST) &#123;</div><div class="line">        <span class="comment">// <span class="doctag">TODO:</span> after first layout we should maybe start at the first visible position, not 0</span></div><div class="line">        heightSize = measureHeightOfChildren(widthMeasureSpec, <span class="number">0</span>, NO_POSITION, heightSize, -<span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    setMeasuredDimension(widthSize, heightSize);</div><div class="line"></div><div class="line">    mWidthMeasureSpec = widthMeasureSpec;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>解决高度显示的问题</strong></p>
+<p>方法挺多的，这里给出一种：重写listview的onMesasure<br><a href="https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view" target="_blank" rel="external">https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view</a><br><br><br>对于 ScrollView 的子View ，也不能配置高度属性为 match_parent, 即使设置了，也是按照 wrap_content 的效果走的<br>而且 Android Studio 在lint 检查的时候，已经建议你这样做了</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="ScrollView-的滑动相关"><a href="#ScrollView-的滑动相关" class="headerlink" title="ScrollView 的滑动相关"></a>ScrollView 的滑动相关</h2><p>onTouchEvent 中，move 时：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (mIsBeingDragged) &#123;</div><div class="line">    <span class="comment">// Scroll to follow the motion event</span></div><div class="line">    mLastMotionY = y - mScrollOffset[<span class="number">1</span>];</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> oldY = mScrollY;</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> range = getScrollRange();</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> overscrollMode = getOverScrollMode();</div><div class="line">    <span class="keyword">boolean</span> canOverscroll = overscrollMode == OVER_SCROLL_ALWAYS ||</div><div class="line">            (overscrollMode == OVER_SCROLL_IF_CONTENT_SCROLLS &amp;&amp; range &gt; <span class="number">0</span>);</div><div class="line"></div><div class="line">    <span class="comment">// Calling overScrollBy will call onOverScrolled, which</span></div><div class="line">    <span class="comment">// calls onScrollChanged if applicable.</span></div><div class="line">    <span class="keyword">if</span> (overScrollBy(<span class="number">0</span>, deltaY, <span class="number">0</span>, mScrollY, <span class="number">0</span>, range, <span class="number">0</span>, mOverscrollDistance, <span class="keyword">true</span>)</div><div class="line">            &amp;&amp; !hasNestedScrollingParent()) &#123;</div><div class="line">        <span class="comment">// Break our velocity if we hit a scroll barrier.</span></div><div class="line">        mVelocityTracker.clear();</div><div class="line">    &#125;</div><div class="line">    ... ...</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">getScrollRange</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> scrollRange = <span class="number">0</span>;</div><div class="line">    <span class="keyword">if</span> (getChildCount() &gt; <span class="number">0</span>) &#123;</div><div class="line">        View child = getChildAt(<span class="number">0</span>);</div><div class="line">        scrollRange = Math.max(<span class="number">0</span>,</div><div class="line">                child.getHeight() - (getHeight() - mPaddingBottom - mPaddingTop));</div><div class="line">    <span class="comment">// 可滑动的范围： 子view的高度 - ScrollView 的高度（去掉上下内边距的）</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> scrollRange;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里，曾经遇到过的问题：</p>
+<p>想在 ScrollView 中滑到底部后，多滑动一部分距离来显示上面的距离，因为上层盖有view, 想做出透明的效果，如主页 tab + 列表的呈现方式；<br>这时候可以这样处理：重写 addView() , 并把唯一的子View 添加一个 bottomPadding，就是增大 child.Hegiht.  所以增大了 ScrollRange；</p>
+<p>类比：listview ，可以增加 一个有高度 的footer ,实现这种功能</p>
+<p><strong>滑动冲突的问题</strong></p>
+<p>解决办法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">listView.setOnTouchListener(object : View.OnTouchListener &#123;</div><div class="line">    <span class="function">override fun <span class="title">onTouch</span><span class="params">(v: View, event: MotionEvent)</span>: Boolean </span>&#123;</div><div class="line">        v.parent.parent.requestDisallowInterceptTouchEvent(<span class="keyword">true</span>)</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line">&#125;)</div><div class="line"><span class="comment">// 请求 父view 不允许拦截，则交给 listview 来处理 move 事件</span></div></pre></td></tr></table></figure></p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView9.gif" width="320" height="560"></p>
+<p>另外，ScrollView嵌套RecyclerView也会存在显示不全的问题</p>
+<hr>
+<p><strong>翻开历史新篇章</strong>：</p>
+<p>V4包 中提供了 可支持嵌套滑动的 ScrollView：<br>NestedScrollView</p>
+<p>我们再试试 NestedScrollView + ListView</p>
+<ol>
+<li>Listview 高度：wrap_content  ，和上面的情况一样，listview的高度就是一条 item的gaoud</li>
+<li>Listview 高度：200dp , 则能全部显示出来</li>
+</ol>
+<p>如图：</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView10.png" width="320" height="560">  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView11.png" width="320" height="560"></p>
+<p>我们再换用<br>NestedScrollView嵌套RecyclerView不会存在显示不全的问题; google 已经帮我们处理好了</p>
+<p>继续测试：</p>
+<ol>
+<li>recyclerView  高度：wrap_content</li>
+<li>recyclerView 高度：200dp</li>
+</ol>
+<p>分别如图：<br>wrap_content 时，RecycleView 会全部显示出来</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView12.png" width="320" height="560">  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView13.png" width="320" height="560"></p>
+<p>实现细节，可以看看 NestedScrollView 和 RecyclerView 的 measure 的处理方式</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>ScrollView 嵌套 Listview 存在以下问题：</p>
+<ol>
+<li>Listview 高度显示不全，就是因为 ScrollView 测量子View 的高度时，是 不确定 模式，导致Listview 绘制时候，不能确定高度，所以显示 item 的高度</li>
+<li>滑动冲突，Listview滑动并不能响应，会被ScrollView拦截响应。</li>
+<li>Listview 复用失效，由于Listview的高度不能确定，则会使屏幕内能够显示的 view 数量不能确定，然后就会不停的 getView()，导致所有的 item 都被创建出来了； RecyclerView 也会出现这类问题</li>
+</ol>
+<p><strong>ListView 在使用 父布局的时候，尽量避免使用RelatvieLayout，因为它的测量、布局过程比 LinearLayout 要多进行几次，就是因为，依赖关系的复杂过程的处理</strong></p>
+<p>NestedScrollView 的特性：</p>
+<ol>
+<li>改变了事件传递的性质；原来的事件传递，都是由单个 View 去处理、消费的，而 增加了 嵌套滑动的事件处理机制后，父View和子View就可以同时处理一个事件</li>
+<li>借助于 NestedScrollingParentHelper，NestedScrollingChildHelper 来进行事件的传递调用、信息分发和接收，使得父子view 的滑动信息都能获取到，并做相应的节点处理，控制更加自如</li>
+</ol>
+<hr>
+<p>参考</p>
+<p><a href="https://github.com/android-cn/android-open-project-analysis/tree/master/tech/viewdrawflow" target="_blank" rel="external">https://github.com/android-cn/android-open-project-analysis/tree/master/tech/viewdrawflow</a><br><a href="http://blog.csdn.net/hanhailong726188/article/details/46136569" target="_blank" rel="external">http://blog.csdn.net/hanhailong726188/article/details/46136569</a><br><a href="https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view" target="_blank" rel="external">https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view</a><br><a href="https://www.zhihu.com/question/34015543" target="_blank" rel="external">https://www.zhihu.com/question/34015543</a><br><a href="http://www.chenglong.ren/2016/11/14/android%E4%B8%ADnestedscrollview%E7%9A%84%E4%BD%BF%E7%94%A8/" target="_blank" rel="external">http://www.chenglong.ren/2016/11/14/android%E4%B8%ADnestedscrollview%E7%9A%84%E4%BD%BF%E7%94%A8/</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;ScrollView-嵌套-ListView-问题分析&quot;&gt;&lt;a href=&quot;#ScrollView-嵌套-ListView-问题分析&quot; class=&quot;headerlink&quot; title=&quot;ScrollView 嵌套 ListView 问题分析&quot;&gt;&lt;/a&gt;Scrol
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="滑动" scheme="https://fenglincanyi.github.io/tags/%E6%BB%91%E5%8A%A8/"/>
+    
+      <category term="ScrollView" scheme="https://fenglincanyi.github.io/tags/ScrollView/"/>
+    
+      <category term="ListView" scheme="https://fenglincanyi.github.io/tags/ListView/"/>
+    
+  </entry>
   
   <entry>
     <title>Vue 从入门到搬砖</title>
@@ -1903,6 +2081,129 @@ globalSession 一次登陆，任何地方都保存有登录状态
   </entry>
   
   <entry>
+    <title>Android 类加载初探</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2017-01-19T08:20:55.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
+</blockquote>
+<p>需要关注的类有：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
+<ul>
+<li>BaseDexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>DexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>PathClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
+<p><strong>ClassLoader 相关说明：</strong></p>
+<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
+<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
+<p>DexPathList 构造函数：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>makeDexElements过程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
+<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Android apk安装过程实例分析</title>
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
@@ -2023,129 +2324,6 @@ globalSession 一次登陆，任何地方都保存有登录状态
       <category term="Dalvik" scheme="https://fenglincanyi.github.io/tags/Dalvik/"/>
     
       <category term="ART" scheme="https://fenglincanyi.github.io/tags/ART/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Android 类加载初探</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
-</blockquote>
-<p>需要关注的类有：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
-<ul>
-<li>BaseDexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>DexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>PathClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
-<p><strong>ClassLoader 相关说明：</strong></p>
-<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
-<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
-<p>DexPathList 构造函数：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>makeDexElements过程：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
-<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
     
   </entry>
   

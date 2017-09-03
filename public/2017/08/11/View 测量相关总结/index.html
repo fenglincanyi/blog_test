@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>View 测量相关总结 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="View,Measure">
+    <meta name="description" content="ViewGroup的测量过程ViewGroup 没有重写 View 的 measure()  和 onMeasure()  方法，沿用的还是View的
+然后在 View 的源码中，我们找到 measure()，它内部调用到 onMeasure()。
+123456789101112131415161718192021222324252627282930313233343536373839404142">
+<meta property="og:type" content="article">
+<meta property="og:title" content="View 测量相关总结">
+<meta property="og:url" content="https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="ViewGroup的测量过程ViewGroup 没有重写 View 的 measure()  和 onMeasure()  方法，沿用的还是View的
+然后在 View 的源码中，我们找到 measure()，它内部调用到 onMeasure()。
+123456789101112131415161718192021222324252627282930313233343536373839404142">
+<meta property="og:updated_time" content="2017-09-03T10:31:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="View 测量相关总结">
+<meta name="twitter:description" content="ViewGroup的测量过程ViewGroup 没有重写 View 的 measure()  和 onMeasure()  方法，沿用的还是View的
+然后在 View 的源码中，我们找到 measure()，它内部调用到 onMeasure()。
+123456789101112131415161718192021222324252627282930313233343536373839404142">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">View 测量相关总结</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">View 测量相关总结</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-08-11T05:18:00.000Z" itemprop="datePublished" class="page-time">
+  2017-08-11
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ViewGroup的测量过程"><span class="post-toc-number">1.</span> <span class="post-toc-text">ViewGroup的测量过程</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#onMeasure-被重写时，一定要调用-setMeasuredDimension-方法"><span class="post-toc-number">2.</span> <span class="post-toc-text">onMeasure() 被重写时，一定要调用 setMeasuredDimension() 方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#onMeasure-被重写时，wrap-content-的功能需要自己实现"><span class="post-toc-number">3.</span> <span class="post-toc-text">onMeasure()被重写时，wrap_content 的功能需要自己实现</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#View-的测量方法是由它的父View发起的"><span class="post-toc-number">4.</span> <span class="post-toc-text">View 的测量方法是由它的父View发起的</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Android-测量起始由ViewRoot执行开始"><span class="post-toc-number">5.</span> <span class="post-toc-text">Android 测量起始由ViewRoot执行开始</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-View 测量相关总结"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">View 测量相关总结</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-8-11 13:18" datetime="2017-08-11T05:18:00.000Z"  itemprop="datePublished">2017-08-11</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="ViewGroup的测量过程"><a href="#ViewGroup的测量过程" class="headerlink" title="ViewGroup的测量过程"></a>ViewGroup的测量过程</h2><p><strong>ViewGroup 没有重写 View 的 measure()  和 onMeasure()  方法，沿用的还是View的</strong></p>
+<p>然后在 View 的源码中，我们找到 measure()，它内部调用到 onMeasure()。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * This is called to find out how big a view should be. The parent</div><div class="line"> * supplies constraint information in the width and height parameters.</div><div class="line"> * The actual measurement work of a view is performed in</div><div class="line"> * &#123;<span class="doctag">@link</span> #onMeasure(int, int)&#125;, called by this method. Therefore, only</div><div class="line"> * &#123;<span class="doctag">@link</span> #onMeasure(int, int)&#125; can and must be overridden by subclasses.</div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> widthMeasureSpec Horizontal space requirements as imposed by the</div><div class="line"> *        parent</div><div class="line"> * <span class="doctag">@param</span> heightMeasureSpec Vertical space requirements as imposed by the</div><div class="line"> *        parent</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">measure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line"></div><div class="line">    ......</div><div class="line"></div><div class="line">    <span class="keyword">long</span> key = (<span class="keyword">long</span>) widthMeasureSpec &lt;&lt; <span class="number">32</span> | (<span class="keyword">long</span>) heightMeasureSpec &amp; <span class="number">0xffffffffL</span>;</div><div class="line">    <span class="keyword">if</span> (mMeasureCache == <span class="keyword">null</span>) mMeasureCache = <span class="keyword">new</span> LongSparseLongArray(<span class="number">2</span>);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> ((mPrivateFlags &amp; PFLAG_FORCE_LAYOUT) == PFLAG_FORCE_LAYOUT ||</div><div class="line">            widthMeasureSpec != mOldWidthMeasureSpec ||</div><div class="line">            heightMeasureSpec != mOldHeightMeasureSpec) &#123;</div><div class="line"></div><div class="line">        <span class="comment">// first clears the measured dimension flag</span></div><div class="line">        mPrivateFlags &amp;= ~PFLAG_MEASURED_DIMENSION_SET;</div><div class="line"></div><div class="line">        <span class="comment">// 解析 layout、padding、drawable 相关参数</span></div><div class="line">        resolveRtlPropertiesIfNeeded();</div><div class="line"></div><div class="line">        <span class="keyword">int</span> cacheIndex = (mPrivateFlags &amp; PFLAG_FORCE_LAYOUT) == PFLAG_FORCE_LAYOUT ? -<span class="number">1</span> :</div><div class="line">                mMeasureCache.indexOfKey(key);</div><div class="line">        <span class="keyword">if</span> (cacheIndex &lt; <span class="number">0</span> || sIgnoreMeasureCache) &#123;</div><div class="line">            <span class="comment">// measure ourselves, this should set the measured dimension flag back</span></div><div class="line">            onMeasure(widthMeasureSpec, heightMeasureSpec);</div><div class="line">            mPrivateFlags3 &amp;= ~PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">long</span> value = mMeasureCache.valueAt(cacheIndex);</div><div class="line">            <span class="comment">// Casting a long to int drops the high 32 bits, no mask needed</span></div><div class="line">            setMeasuredDimensionRaw((<span class="keyword">int</span>) (value &gt;&gt; <span class="number">32</span>), (<span class="keyword">int</span>) value);</div><div class="line">            mPrivateFlags3 |= PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// flag not set, setMeasuredDimension() was not invoked, we raise</span></div><div class="line">        <span class="comment">// an exception to warn the developer</span></div><div class="line">        <span class="keyword">if</span> ((mPrivateFlags &amp; PFLAG_MEASURED_DIMENSION_SET) != PFLAG_MEASURED_DIMENSION_SET) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"View with id "</span> + getId() + <span class="string">": "</span></div><div class="line">                    + getClass().getName() + <span class="string">"#onMeasure() did not set the"</span></div><div class="line">                    + <span class="string">" measured dimension by calling"</span></div><div class="line">                    + <span class="string">" setMeasuredDimension()"</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        mPrivateFlags |= PFLAG_LAYOUT_REQUIRED;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    mOldWidthMeasureSpec = widthMeasureSpec;</div><div class="line">    mOldHeightMeasureSpec = heightMeasureSpec;</div><div class="line"></div><div class="line">    mMeasureCache.put(key, ((<span class="keyword">long</span>) mMeasuredWidth) &lt;&lt; <span class="number">32</span> |</div><div class="line">            (<span class="keyword">long</span>) mMeasuredHeight &amp; <span class="number">0xffffffffL</span>); <span class="comment">// suppress sign extension</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中，方法内传入的2个参数：widthMeasureSpec、heightMeasureSpec 也原封不动的传给 onMeasure() 方法中。 那 widthMeasureSpec，heightMeasureSpec 又是什么东西呢，我们从注释中看到：是 父View提供给子View(当前的view)宽高的约束信息，即：<em>父View根据自己的宽高、内边距信息计算合成的值，提供给子View自己测量时候使用，作为一个建议值</em>，<strong>不是父View的宽高信息</strong><br>从哪里能看出呢？我们找到ViewGroup的源码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">measureChild</span><span class="params">(View child, <span class="keyword">int</span> parentWidthMeasureSpec,</span></span></div><div class="line">            <span class="keyword">int</span> parentHeightMeasureSpec) &#123;</div><div class="line">    <span class="keyword">final</span> LayoutParams lp = child.getLayoutParams();</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,</div><div class="line">            mPaddingLeft + mPaddingRight, lp.width);</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,</div><div class="line">            mPaddingTop + mPaddingBottom, lp.height);</div><div class="line"></div><div class="line">    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>那么，widthMeasureSpec 和 heightMeasureSpec 具体又代表测量信息的什么呢？我们再看看 MeasureSpec(View 中的静态类)，发现，里面有 mode 和 size，mode 是测量模式（3中，不再细说，大家都知道），size 是测量大小，并且提供了 makeMeasureSpec() 和 getMode() ，getSize() 方法。<br><strong>measureSpec</strong> 这个东西是由 mode 和 size 合成的一个值，合成方法就是依靠 makeMeasureSpec() 来做位运算生成的。然后View和ViewGroup 会拿着它作为参数传递的。</p>
+<pre><code>measureSpec 是携带了测量模式和测量大小信息的一个值
+</code></pre><p>getChildMeasureSpec() 是个具有Android View 测量方法论的一个方法，必须要知道。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getChildMeasureSpec</span><span class="params">(<span class="keyword">int</span> spec, <span class="keyword">int</span> padding, <span class="keyword">int</span> childDimension)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> specMode = MeasureSpec.getMode(spec);<span class="comment">// 父View的测量信息</span></div><div class="line">    <span class="keyword">int</span> specSize = MeasureSpec.getSize(spec);</div><div class="line"></div><div class="line">    <span class="keyword">int</span> size = Math.max(<span class="number">0</span>, specSize - padding);</div><div class="line"></div><div class="line">    <span class="keyword">int</span> resultSize = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> resultMode = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (specMode) &#123;</div><div class="line">    <span class="comment">// Parent has imposed an exact size on us</span></div><div class="line">    <span class="keyword">case</span> MeasureSpec.EXACTLY:</div><div class="line">        <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;</div><div class="line">            resultSize = childDimension;</div><div class="line">            resultMode = MeasureSpec.EXACTLY;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;</div><div class="line">            <span class="comment">// Child wants to be our size. So be it.</span></div><div class="line">            resultSize = size;</div><div class="line">            resultMode = MeasureSpec.EXACTLY;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;</div><div class="line">            <span class="comment">// Child wants to determine its own size. It can't be</span></div><div class="line">            <span class="comment">// bigger than us.</span></div><div class="line">            resultSize = size;</div><div class="line">            resultMode = MeasureSpec.AT_MOST;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line"></div><div class="line">    <span class="comment">// Parent has imposed a maximum size on us</span></div><div class="line">    <span class="keyword">case</span> MeasureSpec.AT_MOST:</div><div class="line">        <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;</div><div class="line">            <span class="comment">// Child wants a specific size... so be it</span></div><div class="line">            resultSize = childDimension;</div><div class="line">            resultMode = MeasureSpec.EXACTLY;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;</div><div class="line">            <span class="comment">// Child wants to be our size, but our size is not fixed.</span></div><div class="line">            <span class="comment">// Constrain child to not be bigger than us.</span></div><div class="line">            resultSize = size;</div><div class="line">            resultMode = MeasureSpec.AT_MOST;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;</div><div class="line">            <span class="comment">// Child wants to determine its own size. It can't be</span></div><div class="line">            <span class="comment">// bigger than us.</span></div><div class="line">            resultSize = size;</div><div class="line">            resultMode = MeasureSpec.AT_MOST;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line"></div><div class="line">    <span class="comment">// Parent asked to see how big we want to be</span></div><div class="line">    <span class="keyword">case</span> MeasureSpec.UNSPECIFIED:</div><div class="line">        <span class="keyword">if</span> (childDimension &gt;= <span class="number">0</span>) &#123;</div><div class="line">            <span class="comment">// Child wants a specific size... let him have it</span></div><div class="line">            resultSize = childDimension;</div><div class="line">            resultMode = MeasureSpec.EXACTLY;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.MATCH_PARENT) &#123;</div><div class="line">            <span class="comment">// Child wants to be our size... find out how big it should</span></div><div class="line">            <span class="comment">// be</span></div><div class="line">            resultSize = View.sUseZeroUnspecifiedMeasureSpec ? <span class="number">0</span> : size;</div><div class="line">            resultMode = MeasureSpec.UNSPECIFIED;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (childDimension == LayoutParams.WRAP_CONTENT) &#123;</div><div class="line">            <span class="comment">// Child wants to determine its own size.... find out how</span></div><div class="line">            <span class="comment">// big it should be</span></div><div class="line">            resultSize = View.sUseZeroUnspecifiedMeasureSpec ? <span class="number">0</span> : size;</div><div class="line">            resultMode = MeasureSpec.UNSPECIFIED;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> MeasureSpec.makeMeasureSpec(resultSize, resultMode);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>然后这个方法内，最后一步，也是将 mode 和 size 合成 measureSpec，并返回给 childWidthMeasureSpec。<br>所以，我们在自定义View中可能会重写onMeasure方法时，要想知道 测量模式 mode 和大小，则必须通过getMode()、getSize()来获取。<br>我们再看看View的 onMeasure() ：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">    setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),</div><div class="line">        getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里的 getDefaultSize() 方法，他也是这么做的:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getDefaultSize</span><span class="params">(<span class="keyword">int</span> size, <span class="keyword">int</span> measureSpec)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> result = size;</div><div class="line">    <span class="keyword">int</span> specMode = MeasureSpec.getMode(measureSpec);</div><div class="line">    <span class="keyword">int</span> specSize = MeasureSpec.getSize(measureSpec);</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (specMode) &#123;</div><div class="line">    <span class="keyword">case</span> MeasureSpec.UNSPECIFIED:</div><div class="line">        result = size;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    <span class="keyword">case</span> MeasureSpec.AT_MOST:</div><div class="line">    <span class="keyword">case</span> MeasureSpec.EXACTLY:</div><div class="line">        result = specSize;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line"></div><div class="line">    <span class="comment">// 数值：AT_MOST(-2147483648)  EXACTLY(1073741824)  UNSPECIFIED(0)</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="onMeasure-被重写时，一定要调用-setMeasuredDimension-方法"><a href="#onMeasure-被重写时，一定要调用-setMeasuredDimension-方法" class="headerlink" title="onMeasure() 被重写时，一定要调用 setMeasuredDimension() 方法"></a>onMeasure() 被重写时，一定要调用 setMeasuredDimension() 方法</h2><p>为什么一定要这么做呢，我们先来看看 这个方法干了什么？<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setMeasuredDimensionRaw</span><span class="params">(<span class="keyword">int</span> measuredWidth, <span class="keyword">int</span> measuredHeight)</span> </span>&#123;</div><div class="line">    <span class="comment">// 赋值给测量宽高变量，并设置标志位的值</span></div><div class="line">    mMeasuredWidth = measuredWidth;</div><div class="line">    mMeasuredHeight = measuredHeight;</div><div class="line"></div><div class="line">    mPrivateFlags |= PFLAG_MEASURED_DIMENSION_SET;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>再回到View的measure()方法，发现：如果mPrivateFlags没有被设置的话，会抛出异常。<br>那么，后面的mMeasureCache的put操作也就更新不了里面的值。这个缓存是个比较关键的东西，间接存储了测量的宽高信息。我们知道，一个View的测量操作是需要进行多次的(正常情况下3次measure，2次layout，1次draw)，所以这个存储就记录了当前测量结果的信息，下一次进行测量的时候，也是需要读取上次的信息，再判断如何进行下次测量操作的。<br>从measure()方法中能看到，需要读取到缓存中的值。在重新请求测量View时，也会清空缓存，到测量时自己再创建新的缓存对象。如：requestLayout()方法<br>这个LongSparseLongArray数据结构，使用形式上和map类似，但是它更省内存，也避免了装箱拆箱的操作，也不需要额外的entry。<br>Google 也提倡使用此类的 array 来代替 HashMap 在Android中的使用，其他类似的array大家也都知道</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * LongSparseLongArray:</div><div class="line"> *</div><div class="line"> * Map of &#123;<span class="doctag">@code</span> long&#125; to &#123;<span class="doctag">@code</span> long&#125;. Unlike a normal array of longs, there</div><div class="line"> * can be gaps in the indices. It is intended to be more memory efficient than using a</div><div class="line"> * &#123;<span class="doctag">@code</span> HashMap&#125;, both because it avoids</div><div class="line"> * auto-boxing keys and values and its data structure doesn't rely on an extra entry object</div><div class="line"> * for each mapping.</div><div class="line"> */</div></pre></td></tr></table></figure>
+<h2 id="onMeasure-被重写时，wrap-content-的功能需要自己实现"><a href="#onMeasure-被重写时，wrap-content-的功能需要自己实现" class="headerlink" title="onMeasure()被重写时，wrap_content 的功能需要自己实现"></a>onMeasure()被重写时，wrap_content 的功能需要自己实现</h2><p>如果不单独对 AT_MOST 做处理，在使用的时候设置 wrap_content,效果也就是和 match_parent 等价的。<br>为什么呢? 还是分析 getChildMeasureSpec() 方法:<br>此时 childDimension 为 wrap_content，其测量结果 resultSize = size(specSize - padding, 父View的测量尺寸大小 或 父View剩余可用空间)<br>所以，我们可能按需求要对自定义的View，测量时，AT_MOST情况做处理了，我们可以对其设置一个默认的宽高值。这样写：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">int</span> defaultWidth, defaultHeight;</div><div class="line"></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> widthSpec = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">    <span class="keyword">int</span> heightSpec = MeasureSpec.getMode(heightMeasureSpec);</div><div class="line">    <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line">    <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (widthSpec == MeasureSpec.AT_MOST &amp;&amp; heightSpec == MeasureSpec.AT_MOST) &#123;</div><div class="line">        setMeasuredDimension(defaultWidth, defaultHeight);</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (widthSpec == MeasureSpec.AT_MOST) &#123;</div><div class="line">        setMeasuredDimension(defaultWidth, widthSize);</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (heightSpec == MeasureSpec.AT_MOST) &#123;</div><div class="line">        setMeasuredDimension(widthSize, defaultHeight);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="View-的测量方法是由它的父View发起的"><a href="#View-的测量方法是由它的父View发起的" class="headerlink" title="View 的测量方法是由它的父View发起的"></a>View 的测量方法是由它的父View发起的</h2><p>View 自己并不能主动发起测量，都是由父View或外界调用requestLayout()来调View的测量。<br>ViewGroup会对自己所有的子View调起来测量的过程，父View对所有的子View 测量完毕后，再测量自己</p>
+<h2 id="Android-测量起始由ViewRoot执行开始"><a href="#Android-测量起始由ViewRoot执行开始" class="headerlink" title="Android 测量起始由ViewRoot执行开始"></a>Android 测量起始由ViewRoot执行开始</h2><p>从 ViewRootImpl 的performTraversals 开始，首先调用测量相关方法，ViewRootImpl的performMeasure方法，方法中会调用 ViewGroup measure方法，ViewGroup再对子View进行测量，如此递归下去，知道完成测量</p>
+<p>附：<br><a href="https://developer.android.com/reference/android/view/ViewGroup.html" target="_blank" rel="external">https://developer.android.com/reference/android/view/ViewGroup.html</a><br><a href="http://blog.csdn.net/u012422440/article/details/52972825" target="_blank" rel="external">http://blog.csdn.net/u012422440/article/details/52972825</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-09-03T10:31:48.000Z" title="2017-9-3 18:31" itemprop="dateUpdated">2017年9月3日 18:31</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2017/08/11/View 测量相关总结/" target="_blank" rel="external">https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Measure/">Measure</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/View/">View</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/&title=《View 测量相关总结》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/&title=《View 测量相关总结》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《View 测量相关总结》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/07/30/滑动相关 ScrollView & ListView/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">滑动相关 ScrollView &amp; ListView</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="View 测量相关总结" data-title="View 测量相关总结" data-url="https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/&title=《View 测量相关总结》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/&title=《View 测量相关总结》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《View 测量相关总结》 — fenglincanyi&url=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2017/08/11/View 测量相关总结/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACtUlEQVR42u3aQXKkQAwEQP//096rHRswVRLt4JCcJjwMdHJA7ZK+vuLj+8fx8y/3n///bX5c/fbrxIGHh4e3WHpymyvG/dXu8bMHen8vPDw8vNO8qxvk57Rl4H7RT60HDw8P7w28ltousS0SeHh4eO/nzRb67HYcDw8P7w28WYhwHwQkgWz724NZCx4eHl7Myze17/l8pL+Hh4eHt+6q5+38TawwKw/RavHw8PAO8Noood345hFDHk/U68TDw8N7lJcHuLOm/qxx1Y58XX6Lh4eHd4D3VCsreXHPQuHkmh/OxMPDw3uU1zaoNtvlzcZ9uEI8PDy8Y7z29u1WeHa19r7TsoiHh4c34e1fwUU7anSdJKS47O/h4eHhPcrLt7bt500msB8Lq+cX8PDw8GJeG63mwcGmALQPsYhx8fDw8Na8vFW/WdaswZZv0z+sHA8PD+/PebOC0RaJdltfnImHh4f3KC/Zqm5uNgthZxv34ZwXHh4e3iLAbQvDZvSqDRfaNeDh4eGd4822xW3zbPYQNyv8taXGw8PDe5TX7j/zvtJm+CD5tg1Q8PDw8J7ibf7JT6KE/BU/ezTF0BUeHh7eo7zZK34WGbRZa8K4XC0eHh7eAd7mFT979eeRxGbw64EKhoeHhxdHD7Phqtng1GwQoR4Fw8PDwzvGaxtXJ6YYckb+gPDw8PBO8zZNqVkjPwHk2+5o9AoPDw/vGK8FR9FAPhq1DoLx8PDwTvC+y2PTjmpbaEXckI8O4OHh4a157Qt3Ez20UcI+AsbDw8M7x8tf5bPodjZSkA8ZfADj4eHhHePlTa+8YOShw6aCfShOeHh4eC/gzeKAWcyRr+3yfDw8PLwX8DaR62xQoH00eHh4eH/Da8ebZlFvWwzaIlR3+fDw8PBGvPYf/jyQfapgtOEvHh4e3jHePwKru2Bkd5F3AAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
