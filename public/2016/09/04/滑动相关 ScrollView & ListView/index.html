@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>滑动相关 ScrollView &amp; ListView | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="滑动,ScrollView,ListView">
+    <meta name="description" content="ScrollView 嵌套 ListView 问题分析滑动冲突的问题ScrollView 中嵌套 ListView，ListView 在测量时，高度不论写活还是写死，Listiew 的测量模式都是 不确定模式：unspecified">
+<meta property="og:type" content="article">
+<meta property="og:title" content="滑动相关 ScrollView & ListView">
+<meta property="og:url" content="https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="ScrollView 嵌套 ListView 问题分析滑动冲突的问题ScrollView 中嵌套 ListView，ListView 在测量时，高度不论写活还是写死，Listiew 的测量模式都是 不确定模式：unspecified">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView1.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView2.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView3.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView4.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView5.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView6.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView7.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView8.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView9.gif">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView10.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView11.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView12.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView13.png">
+<meta property="og:updated_time" content="2017-09-09T10:41:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="滑动相关 ScrollView & ListView">
+<meta name="twitter:description" content="ScrollView 嵌套 ListView 问题分析滑动冲突的问题ScrollView 中嵌套 ListView，ListView 在测量时，高度不论写活还是写死，Listiew 的测量模式都是 不确定模式：unspecified">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView1.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">滑动相关 ScrollView &amp; ListView</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">滑动相关 ScrollView &amp; ListView</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-09-04T03:13:00.000Z" itemprop="datePublished" class="page-time">
+  2016-09-04
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ScrollView-嵌套-ListView-问题分析"><span class="post-toc-number">1.</span> <span class="post-toc-text">ScrollView 嵌套 ListView 问题分析</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#ScrollView-的滑动相关"><span class="post-toc-number">2.</span> <span class="post-toc-text">ScrollView 的滑动相关</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#总结"><span class="post-toc-number">3.</span> <span class="post-toc-text">总结</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-滑动相关 ScrollView &amp; ListView"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">滑动相关 ScrollView & ListView</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-9-4 11:13" datetime="2016-09-04T03:13:00.000Z"  itemprop="datePublished">2016-09-04</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Android/">Android</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="ScrollView-嵌套-ListView-问题分析"><a href="#ScrollView-嵌套-ListView-问题分析" class="headerlink" title="ScrollView 嵌套 ListView 问题分析"></a>ScrollView 嵌套 ListView 问题分析</h2><p><strong>滑动冲突的问题</strong><br>ScrollView 中嵌套 ListView，ListView 在测量时，高度不论写活还是写死，Listiew 的测量模式都是 不确定模式：unspecified</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>ScrollView 换成 LinearLayout后：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>经过上面的实验，什么原因造成的 heightMeasureSpec的值是 680 呢？</p>
+<p><strong>追踪过程</strong></p>
+<p>在ScrollView 测量时：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>Listview 测量时：heightMeasureSpec = 680</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>再继续向前追溯：<br>ScrollView的 onMeasure() 调用了父类的  onMeasure() 即 FrameLayout 的：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>再仔细观察：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>可以再查看ScrollView 的 measureChild() 方法，也是通过 设置 高度的测量模式：unspecified</p>
+<p>我们对比 未覆盖的  ViewGroup的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">measureChildWithMargins</span><span class="params">(View child,</span></span></div><div class="line">        <span class="keyword">int</span> parentWidthMeasureSpec, <span class="keyword">int</span> widthUsed,</div><div class="line">        <span class="keyword">int</span> parentHeightMeasureSpec, <span class="keyword">int</span> heightUsed) &#123;</div><div class="line">    <span class="keyword">final</span> MarginLayoutParams lp = (MarginLayoutParams) child.getLayoutParams();</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> childWidthMeasureSpec = getChildMeasureSpec(parentWidthMeasureSpec,</div><div class="line">            mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin</div><div class="line">                    + widthUsed, lp.width);</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> childHeightMeasureSpec = getChildMeasureSpec(parentHeightMeasureSpec,</div><div class="line">            mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin</div><div class="line">                    + heightUsed, lp.height);</div><div class="line"></div><div class="line">    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>到最后，传到listview的 onMeasure 中后，我们来分析：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</div><div class="line">    <span class="comment">// Sets up mListPadding</span></div><div class="line">    <span class="keyword">super</span>.onMeasure(widthMeasureSpec, heightMeasureSpec);</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);<span class="comment">// heightMeasureSpec：680  计算结果： heightMode：0</span></div><div class="line">    <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</div><div class="line">    <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec);</div><div class="line"></div><div class="line">    <span class="keyword">int</span> childWidth = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> childHeight = <span class="number">0</span>;</div><div class="line">    <span class="keyword">int</span> childState = <span class="number">0</span>;</div><div class="line"></div><div class="line">    mItemCount = mAdapter == <span class="keyword">null</span> ? <span class="number">0</span> : mAdapter.getCount();</div><div class="line">    <span class="keyword">if</span> (mItemCount &gt; <span class="number">0</span> &amp;&amp; (widthMode == MeasureSpec.UNSPECIFIED</div><div class="line">            || heightMode == MeasureSpec.UNSPECIFIED)) &#123;</div><div class="line">        <span class="keyword">final</span> View child = obtainView(<span class="number">0</span>, mIsScrap);</div><div class="line"></div><div class="line">        <span class="comment">// Lay out child directly against the parent measure spec so that</span></div><div class="line">        <span class="comment">// we can obtain exected minimum width and height.</span></div><div class="line">        measureScrapChild(child, <span class="number">0</span>, widthMeasureSpec, heightSize);</div><div class="line"></div><div class="line">        childWidth = child.getMeasuredWidth();</div><div class="line">        childHeight = child.getMeasuredHeight();<span class="comment">// listview 的 item 高度</span></div><div class="line">        childState = combineMeasuredStates(childState, child.getMeasuredState());</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (recycleOnMeasure() &amp;&amp; mRecycler.shouldRecycleViewType(</div><div class="line">                ((LayoutParams) child.getLayoutParams()).viewType)) &#123;</div><div class="line">            mRecycler.addScrapView(child, <span class="number">0</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (widthMode == MeasureSpec.UNSPECIFIED) &#123;</div><div class="line">        widthSize = mListPadding.left + mListPadding.right + childWidth +</div><div class="line">                getVerticalScrollbarWidth();</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        widthSize |= (childState &amp; MEASURED_STATE_MASK);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (heightMode == MeasureSpec.UNSPECIFIED) &#123;<span class="comment">// 符合条件</span></div><div class="line">        heightSize = mListPadding.top + mListPadding.bottom + childHeight +</div><div class="line">                getVerticalFadingEdgeLength() * <span class="number">2</span>;<span class="comment">// 所以 listview 的高度为 item 的高度</span></div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 此种布局下，不管如何调整高度属性， listview 的 高度 测量规格始终都是 unspecified，</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (heightMode == MeasureSpec.AT_MOST) &#123;</div><div class="line">        <span class="comment">// <span class="doctag">TODO:</span> after first layout we should maybe start at the first visible position, not 0</span></div><div class="line">        heightSize = measureHeightOfChildren(widthMeasureSpec, <span class="number">0</span>, NO_POSITION, heightSize, -<span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    setMeasuredDimension(widthSize, heightSize);</div><div class="line"></div><div class="line">    mWidthMeasureSpec = widthMeasureSpec;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><strong>解决高度显示的问题</strong></p>
+<p>方法挺多的，这里给出一种：重写listview的onMesasure<br><a href="https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view" target="_blank" rel="external">https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view</a><br><br><br>对于 ScrollView 的子View ，也不能配置高度属性为 match_parent, 即使设置了，也是按照 wrap_content 的效果走的<br>而且 Android Studio 在lint 检查的时候，已经建议你这样做了</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="ScrollView-的滑动相关"><a href="#ScrollView-的滑动相关" class="headerlink" title="ScrollView 的滑动相关"></a>ScrollView 的滑动相关</h2><p>onTouchEvent 中，move 时：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (mIsBeingDragged) &#123;</div><div class="line">    <span class="comment">// Scroll to follow the motion event</span></div><div class="line">    mLastMotionY = y - mScrollOffset[<span class="number">1</span>];</div><div class="line"></div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> oldY = mScrollY;</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> range = getScrollRange();</div><div class="line">    <span class="keyword">final</span> <span class="keyword">int</span> overscrollMode = getOverScrollMode();</div><div class="line">    <span class="keyword">boolean</span> canOverscroll = overscrollMode == OVER_SCROLL_ALWAYS ||</div><div class="line">            (overscrollMode == OVER_SCROLL_IF_CONTENT_SCROLLS &amp;&amp; range &gt; <span class="number">0</span>);</div><div class="line"></div><div class="line">    <span class="comment">// Calling overScrollBy will call onOverScrolled, which</span></div><div class="line">    <span class="comment">// calls onScrollChanged if applicable.</span></div><div class="line">    <span class="keyword">if</span> (overScrollBy(<span class="number">0</span>, deltaY, <span class="number">0</span>, mScrollY, <span class="number">0</span>, range, <span class="number">0</span>, mOverscrollDistance, <span class="keyword">true</span>)</div><div class="line">            &amp;&amp; !hasNestedScrollingParent()) &#123;</div><div class="line">        <span class="comment">// Break our velocity if we hit a scroll barrier.</span></div><div class="line">        mVelocityTracker.clear();</div><div class="line">    &#125;</div><div class="line">    ... ...</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">getScrollRange</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> scrollRange = <span class="number">0</span>;</div><div class="line">    <span class="keyword">if</span> (getChildCount() &gt; <span class="number">0</span>) &#123;</div><div class="line">        View child = getChildAt(<span class="number">0</span>);</div><div class="line">        scrollRange = Math.max(<span class="number">0</span>,</div><div class="line">                child.getHeight() - (getHeight() - mPaddingBottom - mPaddingTop));</div><div class="line">    <span class="comment">// 可滑动的范围： 子view的高度 - ScrollView 的高度（去掉上下内边距的）</span></div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> scrollRange;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里，曾经遇到过的问题：</p>
+<p>想在 ScrollView 中滑到底部后，多滑动一部分距离来显示上面的距离，因为上层盖有view, 想做出透明的效果，如主页 tab + 列表的呈现方式；<br>这时候可以这样处理：重写 addView() , 并把唯一的子View 添加一个 bottomPadding，就是增大 child.Hegiht.  所以增大了 ScrollRange；</p>
+<p>类比：listview ，可以增加 一个有高度 的footer ,实现这种功能</p>
+<p><strong>滑动冲突的问题</strong></p>
+<p>解决办法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">listView.setOnTouchListener(object : View.OnTouchListener &#123;</div><div class="line">    <span class="function">override fun <span class="title">onTouch</span><span class="params">(v: View, event: MotionEvent)</span>: Boolean </span>&#123;</div><div class="line">        v.parent.parent.requestDisallowInterceptTouchEvent(<span class="keyword">true</span>)</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line">&#125;)</div><div class="line"><span class="comment">// 请求 父view 不允许拦截，则交给 listview 来处理 move 事件</span></div></pre></td></tr></table></figure></p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView9.gif" width="320" height="560"></p>
+<p>另外，ScrollView嵌套RecyclerView也会存在显示不全的问题</p>
+<hr>
+<p><strong>翻开历史新篇章</strong>：</p>
+<p>V4包 中提供了 可支持嵌套滑动的 ScrollView：<br>NestedScrollView</p>
+<p>我们再试试 NestedScrollView + ListView</p>
+<ol>
+<li>Listview 高度：wrap_content  ，和上面的情况一样，listview的高度就是一条 item的gaoud</li>
+<li>Listview 高度：200dp , 则能全部显示出来</li>
+</ol>
+<p>如图：</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView10.png" width="320" height="560">  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView11.png" width="320" height="560"></p>
+<p>我们再换用<br>NestedScrollView嵌套RecyclerView不会存在显示不全的问题; google 已经帮我们处理好了</p>
+<p>继续测试：</p>
+<ol>
+<li>recyclerView  高度：wrap_content</li>
+<li>recyclerView 高度：200dp</li>
+</ol>
+<p>分别如图：<br>wrap_content 时，RecycleView 会全部显示出来</p>
+<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView12.png" width="320" height="560">  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView13.png" width="320" height="560"></p>
+<p>实现细节，可以看看 NestedScrollView 和 RecyclerView 的 measure 的处理方式</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>ScrollView 嵌套 Listview 存在以下问题：</p>
+<ol>
+<li>Listview 高度显示不全，就是因为 ScrollView 测量子View 的高度时，是 不确定 模式，导致Listview 绘制时候，不能确定高度，所以显示 item 的高度</li>
+<li>滑动冲突，Listview滑动并不能响应，会被ScrollView拦截响应。</li>
+<li>Listview 复用失效，由于Listview的高度不能确定，则会使屏幕内能够显示的 view 数量不能确定，然后就会不停的 getView()，导致所有的 item 都被创建出来了； RecyclerView 也会出现这类问题</li>
+</ol>
+<p><strong>ListView 在使用 父布局的时候，尽量避免使用RelatvieLayout，因为它的测量、布局过程比 LinearLayout 要多进行几次，就是因为，依赖关系的复杂过程的处理</strong></p>
+<p>NestedScrollView 的特性：</p>
+<ol>
+<li>改变了事件传递的性质；原来的事件传递，都是由单个 View 去处理、消费的，而 增加了 嵌套滑动的事件处理机制后，父View和子View就可以同时处理一个事件</li>
+<li>借助于 NestedScrollingParentHelper，NestedScrollingChildHelper 来进行事件的传递调用、信息分发和接收，使得父子view 的滑动信息都能获取到，并做相应的节点处理，控制更加自如</li>
+</ol>
+<hr>
+<p>参考</p>
+<p><a href="https://github.com/android-cn/android-open-project-analysis/tree/master/tech/viewdrawflow" target="_blank" rel="external">https://github.com/android-cn/android-open-project-analysis/tree/master/tech/viewdrawflow</a><br><a href="http://blog.csdn.net/hanhailong726188/article/details/46136569" target="_blank" rel="external">http://blog.csdn.net/hanhailong726188/article/details/46136569</a><br><a href="https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view" target="_blank" rel="external">https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view</a><br><a href="https://www.zhihu.com/question/34015543" target="_blank" rel="external">https://www.zhihu.com/question/34015543</a><br><a href="http://www.chenglong.ren/2016/11/14/android%E4%B8%ADnestedscrollview%E7%9A%84%E4%BD%BF%E7%94%A8/" target="_blank" rel="external">http://www.chenglong.ren/2016/11/14/android%E4%B8%ADnestedscrollview%E7%9A%84%E4%BD%BF%E7%94%A8/</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-09-09T10:41:32.000Z" title="2017-9-9 18:41" itemprop="dateUpdated">2017年9月9日 18:41</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2016/09/04/滑动相关 ScrollView &amp; ListView/" target="_blank" rel="external">https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView &amp; ListView/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ListView/">ListView</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ScrollView/">ScrollView</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/滑动/">滑动</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/&title=《滑动相关 ScrollView & ListView》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/&title=《滑动相关 ScrollView & ListView》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《滑动相关 ScrollView & ListView》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2016/09/22/View 测量相关总结/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">View 测量相关总结</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2016/08/16/滑动冲突之EditText-ScrollView/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">滑动冲突之EditText-ScrollView</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="滑动相关 ScrollView & ListView" data-title="滑动相关 ScrollView & ListView" data-url="https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2017</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/&title=《滑动相关 ScrollView & ListView》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/&title=《滑动相关 ScrollView & ListView》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《滑动相关 ScrollView & ListView》 — fenglincanyi&url=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView & ListView/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACrklEQVR42u3aQW7DMAwEwPz/0+21aBp1SYpFCoxPARLHGh0kecnHI74+Xlxfvz3fe/635NvzU0YXHh4e3qWhP//1hJH/5vmX5/GcJwsPDw9vj3cebvOvg6mpMvIx4+Hh4b0PL1/Qq1OWnIrx8PDw/iMvP4Lnk5VvEnh4eHjvw8uHW40kksNxb2O4nLXg4eHh1RKDqIr0Pp9X6nt4eHh446p6spRPfl9tSiiPFg8PD2+Bly+4SZvUpD2rFyVHxTY8PDy8q7zkZf5uc0C1VSuPLX6YCDw8PLxl3nxYefBaLX3lOcPirOPh4eHFpfrzcTlf0P+mTeHluwIeHh7eVV4vLDjflccWvS0qKobh4eHhrfHyZqm7B+i83NXbqPDw8PD2eL2X/2pgMQ+LyyU6PDw8vAVedYlPDsr5UKobwPzFAA8PD+8Wr7coTw7Q+bOqk/uypwwPDw/vKm8vC80B1eV+spHg4eHhTXiT6LZ6V++wPnouHh4e3gJvvgQnBf5qy9Qk/oh6cvHw8PDGvMki3jyntyr71anEw8PD2+BNWqOq20DSRpBHtNFmhoeHh7fAq5KqCXEOmLcmlJuu8PDw8Fq8HNCLd+eNAr2n4OHh4e3xbj0giTCqYUe+zZT7IPDw8PDGvOpxNg8dEuTk6Bx9i4eHh7fGy8vwewHuKKLNq2d4eHh4l3jVASUFqmRA1a2lTMXDw8Nb4/Uaoaolq9FAe1sdHh4e3lXeR/GahALVAlu+PfzSOoCHh4d3lTd/o+9tJPmAqhN0ObDAw8PDOx6pq0Hq5bB1IRbBw8PD2+bli3J+LK62DlxIVvDw8PDekldtCJhM2bytAQ8PD+9/8Xr39sLll9sMHh4e3hovDwLyA3Ee9Sb/3It08fDw8DZ4kxf+6mJdLZhVj9qX8ww8PDy879cnbtw1yn/NIhkAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>
