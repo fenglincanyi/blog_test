@@ -2635,7 +2635,7 @@ adb shell dumpsys activity | grep mFocusedActivity  获取处于栈顶的Activit
     <link href="https://fenglincanyi.github.io/2016/02/28/%E5%AF%B9%E7%A7%B0%E3%80%81%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF%E5%88%9D%E6%8E%A2/"/>
     <id>https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/</id>
     <published>2016-02-28T09:52:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
+    <updated>2017-09-10T04:58:43.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="一、对称加密"><a href="#一、对称加密" class="headerlink" title="一、对称加密"></a>一、对称加密</h3><ol>
 <li><p><strong>对称加密简介</strong></p>
@@ -2756,6 +2756,8 @@ M: 变长的消息，H(M)是定长的 Hash值
 </ul>
 </li>
 </ol>
+<hr>
+<p>附(https,http2相关)：<br><a href="http://www.cnblogs.com/zhuqil/archive/2012/07/23/2604572.html" target="_blank" rel="external">http://www.cnblogs.com/zhuqil/archive/2012/07/23/2604572.html</a><br><a href="https://segmentfault.com/a/1190000007219256" target="_blank" rel="external">https://segmentfault.com/a/1190000007219256</a></p>
 ]]></content>
     
     <summary type="html">
