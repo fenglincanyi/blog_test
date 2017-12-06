@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-12-06T16:35:33.897Z</updated>
+  <updated>2017-12-06T16:41:53.003Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://fenglincanyi.github.io/2017/12/02/%E6%B3%A8%E8%A7%A3%E5%9F%BA%E7%A1%80%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%BA%94%E7%94%A8/"/>
     <id>https://fenglincanyi.github.io/2017/12/02/注解基础及相关应用/</id>
     <published>2017-12-02T10:21:00.000Z</published>
-    <updated>2017-12-06T16:35:33.897Z</updated>
+    <updated>2017-12-06T16:41:53.003Z</updated>
     
     <content type="html"><![CDATA[<h3 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h3><p>作为Java / Android 开发者，我们平时开发中经常用到注解，有的方便了我们开发，动态的添加代码，减少我们的开发量；有的编译时能友好的提示我们，帮我们纠错。<br>现在我们就回炉，看看注解相关的问题</p>
 <h3 id="注解基础"><a href="#注解基础" class="headerlink" title="注解基础"></a>注解基础</h3><h4 id="Java-内置注解"><a href="#Java-内置注解" class="headerlink" title="Java 内置注解"></a>Java 内置注解</h4><p>Java 在jdk中，定义了一套注解，我们最常见的有：</p>
@@ -203,7 +203,7 @@
     
     </summary>
     
-      <category term="Android, Java" scheme="https://fenglincanyi.github.io/categories/Android-Java/"/>
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
     
     
       <category term="注解" scheme="https://fenglincanyi.github.io/tags/%E6%B3%A8%E8%A7%A3/"/>
