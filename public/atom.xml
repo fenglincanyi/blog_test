@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-12-06T16:41:53.003Z</updated>
+  <updated>2017-12-06T16:47:37.324Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://fenglincanyi.github.io/2017/12/02/%E6%B3%A8%E8%A7%A3%E5%9F%BA%E7%A1%80%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%BA%94%E7%94%A8/"/>
     <id>https://fenglincanyi.github.io/2017/12/02/注解基础及相关应用/</id>
     <published>2017-12-02T10:21:00.000Z</published>
-    <updated>2017-12-06T16:41:53.003Z</updated>
+    <updated>2017-12-06T16:47:37.324Z</updated>
     
     <content type="html"><![CDATA[<h3 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h3><p>作为Java / Android 开发者，我们平时开发中经常用到注解，有的方便了我们开发，动态的添加代码，减少我们的开发量；有的编译时能友好的提示我们，帮我们纠错。<br>现在我们就回炉，看看注解相关的问题</p>
 <h3 id="注解基础"><a href="#注解基础" class="headerlink" title="注解基础"></a>注解基础</h3><h4 id="Java-内置注解"><a href="#Java-内置注解" class="headerlink" title="Java 内置注解"></a>Java 内置注解</h4><p>Java 在jdk中，定义了一套注解，我们最常见的有：</p>
@@ -89,20 +89,17 @@
 <h4 id="自定义AnnotationProcessor"><a href="#自定义AnnotationProcessor" class="headerlink" title="自定义AnnotationProcessor"></a>自定义AnnotationProcessor</h4><h5 id="项目搭建"><a href="#项目搭建" class="headerlink" title="项目搭建"></a>项目搭建</h5><ol>
 <li>建立2个Java Library，分别为：setting_annotation，setting_annotation_processor</li>
 <li>setting_annotation 中定义注解，不需要添加特别的依赖库</li>
-<li>setting_annotation_processor 中定义自己的的AnnotaitionProcessor，实现下注解处理逻辑。build.gradle中需要添加：<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">implementation <span class="string">'com.google.guava:guava:22.0-android'</span></div><div class="line">implementation <span class="string">'com.squareup:javapoet:1.9.0'</span><span class="comment">// javapoet也要引用到guava</span></div><div class="line">implementation <span class="string">'com.google.auto.service:auto-service:1.0-rc2'</span></div></pre></td></tr></table></figure>
-</li>
+<li>setting_annotation_processor 中定义自己的的AnnotaitionProcessor，实现下注解处理逻辑。build.gradle中需要添加：</li>
 </ol>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">implementation <span class="string">'com.google.guava:guava:22.0-android'</span></div><div class="line">implementation <span class="string">'com.squareup:javapoet:1.9.0'</span><span class="comment">// javapoet也要引用到guava</span></div><div class="line">implementation <span class="string">'com.google.auto.service:auto-service:1.0-rc2'</span></div></pre></td></tr></table></figure>
 <p>用于我们后面使用。</p>
-<ol>
-<li>项目依赖是这样的：<figure class="image-bubble">
+<p>4.项目依赖是这样的：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
                     <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
-            </figure>
-贴上 具体的配置，不多说了。<br>app 的 gradle 配置：</li>
-</ol>
+            </figure><br>贴上 具体的配置，不多说了。<br>app 的 gradle 配置：</p>
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">implementation <span class="keyword">project</span>(<span class="string">':setting_annotation'</span>)</div><div class="line">annotationProcessor <span class="keyword">project</span>(<span class="string">':setting_annotation_processor'</span>)</div></pre></td></tr></table></figure>
 <p>setting_annotation_processor的gradle配置：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">implementation <span class="string">'com.google.guava:guava:22.0-android'</span></div><div class="line">implementation <span class="string">'com.squareup:javapoet:1.9.0'</span><span class="comment">// 用于自动生成java代码</span></div><div class="line">implementation <span class="string">'com.google.auto.service:auto-service:1.0-rc2'</span><span class="comment">// 方便注解处理相关配置</span></div><div class="line">implementation <span class="keyword">project</span>(<span class="string">':setting_annotation'</span>)</div></pre></td></tr></table></figure></p>
 <h5 id="Demo-示例"><a href="#Demo-示例" class="headerlink" title="Demo 示例"></a>Demo 示例</h5><p>我们来实现一个 自动生成 JavaBean 的例子：</p>
