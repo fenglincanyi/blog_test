@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2017-10-31T13:20:53.000Z</updated>
+  <updated>2017-12-06T16:35:33.897Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -14,6 +14,201 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>注解基础及相关应用</title>
+    <link href="https://fenglincanyi.github.io/2017/12/02/%E6%B3%A8%E8%A7%A3%E5%9F%BA%E7%A1%80%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%BA%94%E7%94%A8/"/>
+    <id>https://fenglincanyi.github.io/2017/12/02/注解基础及相关应用/</id>
+    <published>2017-12-02T10:21:00.000Z</published>
+    <updated>2017-12-06T16:35:33.897Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h3><p>作为Java / Android 开发者，我们平时开发中经常用到注解，有的方便了我们开发，动态的添加代码，减少我们的开发量；有的编译时能友好的提示我们，帮我们纠错。<br>现在我们就回炉，看看注解相关的问题</p>
+<h3 id="注解基础"><a href="#注解基础" class="headerlink" title="注解基础"></a>注解基础</h3><h4 id="Java-内置注解"><a href="#Java-内置注解" class="headerlink" title="Java 内置注解"></a>Java 内置注解</h4><p>Java 在jdk中，定义了一套注解，我们最常见的有：</p>
+<ul>
+<li>@Override </li>
+<li>@Deprecated</li>
+<li>@SuppressWarnings</li>
+</ul>
+<p>这3个就不用多说了，一看都懂。<br>那么，他们是分别什么时候起作用呢，这就要说说注解的保留策略了（RetentionPolicy）<br>我们来看看源码中是怎么定义的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">enum</span> RetentionPolicy &#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Annotations are to be discarded by the compiler.</div><div class="line">     */</div><div class="line">    SOURCE,</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Annotations are to be recorded in the class file by the compiler</div><div class="line">     * but need not be retained by the VM at run time.  This is the default</div><div class="line">     * behavior.</div><div class="line">     */</div><div class="line">    CLASS,</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Annotations are to be recorded in the class file by the compiler and</div><div class="line">     * retained by the VM at run time, so they may be read reflectively.</div><div class="line">     *</div><div class="line">     * <span class="doctag">@see</span> java.lang.reflect.AnnotatedElement</div><div class="line">     */</div><div class="line">    RUNTIME</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>分别是 源码级、编译时、运行时 三种策略：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">RetentionPolicy</th>
+<th style="text-align:right">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">SOURCE</td>
+<td style="text-align:right">仅存在Java源文件，经过编译器后便丢弃相应的注解</td>
+</tr>
+<tr>
+<td style="text-align:left">CLASS</td>
+<td style="text-align:right">存在Java源文件，以及经编译器后生成的Class字节码文件，但在运行时VM不再保留注释</td>
+</tr>
+<tr>
+<td style="text-align:left">RUNTIME</td>
+<td style="text-align:right">存在源文件、编译生成的Class字节码文件，以及保留在运行时VM中，可通过反射性地读取注解</td>
+</tr>
+</tbody>
+</table>
+<p>然后，我们也知道源码级框架是在javac编译源码时,生成框架代码或文件。源码级别框架发生过程是在编译期间，并不会过多影响到运行效率</p>
+<p>上面提到的3个最常见的注解，前两个是源码级注解，开发过程中提示我们，后一个是运行时注解，告诉VM忽略警告</p>
+<h4 id="元注解"><a href="#元注解" class="headerlink" title="元注解"></a>元注解</h4><p>Java 中的元注解，也就是 注解的注解，有4个：</p>
+<ul>
+<li>@Retention - 上面提到的保留策略</li>
+<li>@Documented - 标记这些注解是否包含在用户文档中。</li>
+<li>@Target - 修饰对象范围：对象、方法。。。</li>
+<li>@Inherited - 也是一个标记注解，@Inherited阐述了某个被标注的类型是被继承的</li>
+</ul>
+<p>我们再看看 @Target, 它的定义里，value元素是一个枚举：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">enum</span> ElementType &#123;</div><div class="line">    <span class="comment">/** Class, interface (including annotation type), or enum declaration */</span></div><div class="line">    TYPE,</div><div class="line"></div><div class="line">    <span class="comment">/** Field declaration (includes enum constants) */</span></div><div class="line">    FIELD,</div><div class="line"></div><div class="line">    <span class="comment">/** Method declaration */</span></div><div class="line">    METHOD,</div><div class="line"></div><div class="line">    <span class="comment">/** Formal parameter declaration */</span></div><div class="line">    PARAMETER,</div><div class="line"></div><div class="line">    <span class="comment">/** Constructor declaration */</span></div><div class="line">    CONSTRUCTOR,</div><div class="line"></div><div class="line">    <span class="comment">/** Local variable declaration */</span></div><div class="line">    LOCAL_VARIABLE,</div><div class="line"></div><div class="line">    <span class="comment">/** Annotation type declaration */</span></div><div class="line">    ANNOTATION_TYPE,</div><div class="line"></div><div class="line">    <span class="comment">/** Package declaration */</span></div><div class="line">    PACKAGE,</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Type parameter declaration</div><div class="line">     *</div><div class="line">     * <span class="doctag">@since</span> 1.8</div><div class="line">     */</div><div class="line">    TYPE_PARAMETER,</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Use of a type</div><div class="line">     *</div><div class="line">     * <span class="doctag">@since</span> 1.8</div><div class="line">     */</div><div class="line">    TYPE_USE</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>通过这个 @Target, 来标识注解作用在什么类型上</p>
+<p>我们在定义一个注解时，就会用到元注解。像jdk提供给我们的注解，也是由他们而来的</p>
+<h3 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h3><p>在自定义个注解时，会自动继承java.lang.annotation.Annotation接口。<br>我们可以看到：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>实现一个简单的注解demo：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@Target(&#123;ElementType.TYPE&#125;)</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">public @interface Setting &#123;</div><div class="line">    String value() default &quot;&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>定义起来也比较简单易懂。其中有一些规则，我们要清楚：</p>
+<p>注解参数的可支持数据类型：</p>
+<ul>
+<li>所有基本数据类型（int,float,boolean,byte,double,char,long,short)</li>
+<li>String类型</li>
+<li>Class类型</li>
+<li>enum类型</li>
+<li>Annotation类型</li>
+<li>以上所有类型的数组</li>
+</ul>
+<p>定义一个注解的工作就完成了，那谁来读取、处理注解呢，下面就来看看注解处理器</p>
+<h3 id="注解处理器"><a href="#注解处理器" class="headerlink" title="注解处理器"></a>注解处理器</h3><p>JDK 提供一些相关的api, 如： AnnotatedElement，通过反射也可以获取注解相关的内容，进行一些操作</p>
+<h4 id="APT-amp-AnnotationProcessor"><a href="#APT-amp-AnnotationProcessor" class="headerlink" title="APT &amp; AnnotationProcessor"></a>APT &amp; AnnotationProcessor</h4><p>APT（Annotation Processing Tool）是一个命令行工具，它对源代码文件进行检测找出其中的annotation后，使用annotation processors来处理annotation。<br>APT 也经过了几个版本的迭代，现在也不需要单独运行apt这样的命令行工具，Java编译器本身就可以完成对注解的处理。<br>直接继承于javax.annotation.processing.AbstractProcessor进行相应的实现。<br>对应Android开发者来说，apt 也被out了，Android Studio Gradle 2.2 版本以上，建议用 AnnotaitionProcessor。Gradle 也支持了annotationProcessor</p>
+<h4 id="自定义AnnotationProcessor"><a href="#自定义AnnotationProcessor" class="headerlink" title="自定义AnnotationProcessor"></a>自定义AnnotationProcessor</h4><h5 id="项目搭建"><a href="#项目搭建" class="headerlink" title="项目搭建"></a>项目搭建</h5><ol>
+<li>建立2个Java Library，分别为：setting_annotation，setting_annotation_processor</li>
+<li>setting_annotation 中定义注解，不需要添加特别的依赖库</li>
+<li>setting_annotation_processor 中定义自己的的AnnotaitionProcessor，实现下注解处理逻辑。build.gradle中需要添加：<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">implementation <span class="string">'com.google.guava:guava:22.0-android'</span></div><div class="line">implementation <span class="string">'com.squareup:javapoet:1.9.0'</span><span class="comment">// javapoet也要引用到guava</span></div><div class="line">implementation <span class="string">'com.google.auto.service:auto-service:1.0-rc2'</span></div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>用于我们后面使用。</p>
+<ol>
+<li>项目依赖是这样的：<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+贴上 具体的配置，不多说了。<br>app 的 gradle 配置：</li>
+</ol>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">implementation <span class="keyword">project</span>(<span class="string">':setting_annotation'</span>)</div><div class="line">annotationProcessor <span class="keyword">project</span>(<span class="string">':setting_annotation_processor'</span>)</div></pre></td></tr></table></figure>
+<p>setting_annotation_processor的gradle配置：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">implementation <span class="string">'com.google.guava:guava:22.0-android'</span></div><div class="line">implementation <span class="string">'com.squareup:javapoet:1.9.0'</span><span class="comment">// 用于自动生成java代码</span></div><div class="line">implementation <span class="string">'com.google.auto.service:auto-service:1.0-rc2'</span><span class="comment">// 方便注解处理相关配置</span></div><div class="line">implementation <span class="keyword">project</span>(<span class="string">':setting_annotation'</span>)</div></pre></td></tr></table></figure></p>
+<h5 id="Demo-示例"><a href="#Demo-示例" class="headerlink" title="Demo 示例"></a>Demo 示例</h5><p>我们来实现一个 自动生成 JavaBean 的例子：</p>
+<ul>
+<li>注解定义（setting_annotation 中）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Target</span>(ElementType.TYPE)</div><div class="line"><span class="meta">@Retention</span>(RetentionPolicy.CLASS)</div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Bean &#123;</div><div class="line"></div><div class="line">    <span class="keyword">enum</span> AttType &#123;</div><div class="line">        INT, FLOAT, DOUBLE, STRING</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function">String <span class="title">clzName</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</div><div class="line">    String[] attName() <span class="keyword">default</span> &#123;<span class="string">""</span>&#125;;</div><div class="line">    AttType[] typeName() <span class="keyword">default</span> &#123;STRING&#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>注解使用（app 中）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Bean</span>(clzName = <span class="string">"PeopleBean"</span>,</div><div class="line">        attName = &#123;<span class="string">"name"</span>, <span class="string">"age"</span>, <span class="string">"sex"</span>&#125;,</div><div class="line">        typeName = &#123;Bean.AttType.STRING, Bean.AttType.INT, Bean.AttType.STRING&#125;)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanTest</span> </span>&#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>注解处理（setting_annotation_processor 中）<br>主要实现 AbstractProcessor 的 init()、process()、getSupportedAnnotationTypes()方法<br>主要思路，在init()中拿到messager、filer相关的工具类，process()中是真正实现注解处理的地方，这里会使用到javapoet的工具类，方便操作Java代码的生成。getSupportedAnnotationTypes()描述注解处理器需要处理的注解，我们新建一个set添加我们的注解即可。<br>javaopet的操作可以查阅 <a href="https://github.com/square/javapoet" target="_blank" rel="external">https://github.com/square/javapoet</a><br>完成这些内容后，我们需要配置 processor 在META-INF/services中，我们就不麻烦了，直接用 google 提供的工具类，自动生成，也是一个注解 @AutoService 标记到类上：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@AutoService</span>(Processor.class)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SettingProcessor</span> <span class="keyword">extends</span> <span class="title">AbstractProcessor</span></span></div></pre></td></tr></table></figure>
+<ul>
+<li>验证<br>我们 run 起来，首先观察，setting_annotation_processor 这个module下的产物：</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>META-INF下的文件自动生成了<br>我们再看看，app module 下：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>PeopleBean 自动生成了。<br>OK，大功告成。</p>
+<pre><code>说明：注解处理器是运行它自己的虚拟机JVM中。javac启动一个完整Java虚拟机来运行注解处理器。
+所以可以使用任何你在其他java应用中使用的东西。可以使用 guava 中的方便的api，处理注解操作
+</code></pre><p>那么类自动生成了，那我们就可以动态的在代码中 去加载，应用了。ButterKnife 不就是这种思路吗？</p>
+<h3 id="如何debug注解处理器"><a href="#如何debug注解处理器" class="headerlink" title="如何debug注解处理器"></a>如何debug注解处理器</h3><p>前面介绍了大部分过程，再讲一个小技巧，debug注解处理器。<br>开发过程中少了debug，岂不是很麻烦了，光靠打日志比较浪费时间。Annotation Processor  debug 起来还是有点特殊的。</p>
+<h4 id="配置远程调试"><a href="#配置远程调试" class="headerlink" title="配置远程调试"></a>配置远程调试</h4><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h4 id="配置gradle-properties"><a href="#配置gradle-properties" class="headerlink" title="配置gradle.properties"></a>配置gradle.properties</h4><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">org.gradle.daemon=<span class="keyword">true</span></div><div class="line">org.gradle.jvmargs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=<span class="number">5005</span></div></pre></td></tr></table></figure>
+<h4 id="开启守护进程"><a href="#开启守护进程" class="headerlink" title="开启守护进程"></a>开启守护进程</h4><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h4 id="开始debug"><a href="#开始debug" class="headerlink" title="开始debug"></a>开始debug</h4><ol>
+<li>执行一次 clean project（每次debug前，clean下项目）</li>
+<li><p>打断点，并点击debug按钮</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+<li><p>最后，make或者rebuild下，就可以进入 debug 状态了</p>
+</li>
+</ol>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<pre><code>注意：如果守护task 执行失败，建议重启 stuido 试试
+</code></pre><h3 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h3><p>Demo地址：<br><a href="https://github.com/fenglincanyi/AndroidProject/tree/master/AnnoationProcessorDemo" target="_blank" rel="external">https://github.com/fenglincanyi/AndroidProject/tree/master/AnnoationProcessorDemo</a></p>
+<p>Android 注解库：<br><a href="http://mp.weixin.qq.com/s?__biz=MzI0MjE3OTYwMg==&amp;mid=2649548684&amp;idx=1&amp;sn=e2c0b5bd10552beb6a8af59a350e268d&amp;chksm=f1180cf1c66f85e77eaae2729da5d550af6b068143c851dd9d8e09014cf8de0d8e01472c9873&amp;mpshare=1&amp;scene=23&amp;srcid=0314lppg3Lze1sjX40feRMOD%23rd" target="_blank" rel="external">http://mp.weixin.qq.com/s?__biz=MzI0MjE3OTYwMg==&amp;mid=2649548684&amp;idx=1&amp;sn=e2c0b5bd10552beb6a8af59a350e268d&amp;chksm=f1180cf1c66f85e77eaae2729da5d550af6b068143c851dd9d8e09014cf8de0d8e01472c9873&amp;mpshare=1&amp;scene=23&amp;srcid=0314lppg3Lze1sjX40feRMOD%23rd</a></p>
+<p>注解：<br><a href="http://linbinghe.com/2017/ac8515d0.html" target="_blank" rel="external">http://linbinghe.com/2017/ac8515d0.html</a></p>
+<p>注解处理器：<br><a href="https://medium.com/@iammert/annotation-processing-dont-repeat-yourself-generate-your-code-8425e60c6657" target="_blank" rel="external">https://medium.com/@iammert/annotation-processing-dont-repeat-yourself-generate-your-code-8425e60c6657</a><br><a href="https://gist.github.com/iammert/c9da4150a5b5faa4b7bd8fe7915d6e6b" target="_blank" rel="external">https://gist.github.com/iammert/c9da4150a5b5faa4b7bd8fe7915d6e6b</a><br><a href="https://www.race604.com/annotation-processing/" target="_blank" rel="external">https://www.race604.com/annotation-processing/</a></p>
+<p>javaPoet:<br><a href="https://juejin.im/entry/58fefebf8d6d810058a610de" target="_blank" rel="external">https://juejin.im/entry/58fefebf8d6d810058a610de</a><br><a href="https://xsfelvis.github.io/2016/11/06/%E7%BC%96%E8%AF%91%E6%9C%9F%E6%B3%A8%E8%A7%A3%E4%B9%8BJavaPoet/" target="_blank" rel="external">https://xsfelvis.github.io/2016/11/06/%E7%BC%96%E8%AF%91%E6%9C%9F%E6%B3%A8%E8%A7%A3%E4%B9%8BJavaPoet/</a></p>
+<p>Debug annoation processor<br><a href="http://www.jianshu.com/p/80a14bc35000" target="_blank" rel="external">http://www.jianshu.com/p/80a14bc35000</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;引子&quot;&gt;&lt;a href=&quot;#引子&quot; class=&quot;headerlink&quot; title=&quot;引子&quot;&gt;&lt;/a&gt;引子&lt;/h3&gt;&lt;p&gt;作为Java / Android 开发者，我们平时开发中经常用到注解，有的方便了我们开发，动态的添加代码，减少我们的开发量；有的编译时能友好
+    
+    </summary>
+    
+      <category term="Android, Java" scheme="https://fenglincanyi.github.io/categories/Android-Java/"/>
+    
+    
+      <category term="注解" scheme="https://fenglincanyi.github.io/tags/%E6%B3%A8%E8%A7%A3/"/>
+    
+  </entry>
   
   <entry>
     <title>RePlugin插件化方案分析（一）</title>
