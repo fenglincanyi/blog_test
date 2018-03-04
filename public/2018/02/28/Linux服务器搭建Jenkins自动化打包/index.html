@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>Linux服务器搭建Jenkins自动化打包 | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="Android,Jenkins">
+    <meta name="description" content="本文作为一次折腾服务器自动化配置的一次“纪念帖”… …
+
+Jenkins Install安装Jenkins之前，需要安装jdk，此处就不细说，不会请google
+yum 安装 Jenkinsyum的repos中默认是没有Jenkins的，需要先将Jenkins存储库添加到yum repos123sudo wget -O /etc/yum.repos.d/jenkins.repo https://">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux服务器搭建Jenkins自动化打包">
+<meta property="og:url" content="https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="本文作为一次折腾服务器自动化配置的一次“纪念帖”… …
+
+Jenkins Install安装Jenkins之前，需要安装jdk，此处就不细说，不会请google
+yum 安装 Jenkinsyum的repos中默认是没有Jenkins的，需要先将Jenkins存储库添加到yum repos123sudo wget -O /etc/yum.repos.d/jenkins.repo https://">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins1.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins2.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins3.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins4.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins5.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins6.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins7.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins8.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins9.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins10.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins11.png">
+<meta property="og:updated_time" content="2018-03-04T10:22:14.596Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux服务器搭建Jenkins自动化打包">
+<meta name="twitter:description" content="本文作为一次折腾服务器自动化配置的一次“纪念帖”… …
+
+Jenkins Install安装Jenkins之前，需要安装jdk，此处就不细说，不会请google
+yum 安装 Jenkinsyum的repos中默认是没有Jenkins的，需要先将Jenkins存储库添加到yum repos123sudo wget -O /etc/yum.repos.d/jenkins.repo https://">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins1.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Linux服务器搭建Jenkins自动化打包</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Linux服务器搭建Jenkins自动化打包</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-02-28T14:38:00.000Z" itemprop="datePublished" class="page-time">
+  2018-02-28
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Jenkins/">Jenkins</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Jenkins-Install"><span class="post-toc-number">1.</span> <span class="post-toc-text">Jenkins Install</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#yum-安装-Jenkins"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">yum 安装 Jenkins</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#安装Jenkins"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">安装Jenkins</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Jenkins-Setting"><span class="post-toc-number">2.</span> <span class="post-toc-text">Jenkins Setting</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#第一进入，需要密码"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">第一进入，需要密码</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#插件安装：Install-suggested-plugins"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">插件安装：Install suggested plugins</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#全局配置"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">全局配置</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#New-Task"><span class="post-toc-number">3.</span> <span class="post-toc-text">New Task</span></a></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-Linux服务器搭建Jenkins自动化打包"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Linux服务器搭建Jenkins自动化打包</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-2-28 22:38" datetime="2018-02-28T14:38:00.000Z"  itemprop="datePublished">2018-02-28</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Jenkins/">Jenkins</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本文作为一次折腾服务器自动化配置的一次“纪念帖”… …</p>
+</blockquote>
+<h2 id="Jenkins-Install"><a href="#Jenkins-Install" class="headerlink" title="Jenkins Install"></a>Jenkins Install</h2><p>安装Jenkins之前，需要安装jdk，此处就不细说，不会请google</p>
+<h3 id="yum-安装-Jenkins"><a href="#yum-安装-Jenkins" class="headerlink" title="yum 安装 Jenkins"></a>yum 安装 Jenkins</h3><p>yum的repos中默认是没有Jenkins的，需要先将Jenkins存储库添加到yum repos<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo</div><div class="line"></div><div class="line">sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key</div></pre></td></tr></table></figure></p>
+<h3 id="安装Jenkins"><a href="#安装Jenkins" class="headerlink" title="安装Jenkins"></a>安装Jenkins</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install jenkins</div></pre></td></tr></table></figure>
+<p>Jenkins安装好之后，需要修改一下默认配置。默认情况是Jenkins是使用Jenkins用户启动的，但这个用户目前系统并没有赋予权限，这里我们将启动用户修改为root；另外Jenkins默认端口是8080，这个跟tomcat的默认端口冲突，我们也修改一下默认端口。<br>输入命令进入Jenkins配置文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/jenkins</div></pre></td></tr></table></figure></p>
+<p>找到相关属性，配置：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">JENKINS_USER=<span class="string">"root"</span></div><div class="line">JENKINS_PORT=<span class="string">"8081"</span></div></pre></td></tr></table></figure></p>
+<p>保存退出 wq<br>然后，启动Jenkins：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">service jenkins start</div></pre></td></tr></table></figure></p>
+<p>如图，启动成功<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h2 id="Jenkins-Setting"><a href="#Jenkins-Setting" class="headerlink" title="Jenkins Setting"></a>Jenkins Setting</h2><p>打开浏览器，输入服务器的域名，端口8081，go ~</p>
+<h3 id="第一进入，需要密码"><a href="#第一进入，需要密码" class="headerlink" title="第一进入，需要密码"></a>第一进入，需要密码</h3><p>进入登录页面后，Jenkins提示我们需要输入超级管理员密码进行解锁。根据提示，我们可以在/var/lib/jenkins/secrets/initialAdminPassword文件里找到密码<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tail /var/lib/jenkins/secrets/initialAdminPassword</div></pre></td></tr></table></figure></p>
+<p>复制，粘贴，go ~</p>
+<h3 id="插件安装：Install-suggested-plugins"><a href="#插件安装：Install-suggested-plugins" class="headerlink" title="插件安装：Install suggested plugins"></a>插件安装：Install suggested plugins</h3><p>后面的过程比较简单，略过，进入到Jenkins主页</p>
+<h3 id="全局配置"><a href="#全局配置" class="headerlink" title="全局配置"></a>全局配置</h3><p>侧边栏：系统管理 -&gt; 全局工具配置</p>
+<ul>
+<li>JDK<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>Git<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>Gradle<br>gradle 使我们自己下载的，可以将本地的gradle zip 用 scp 直接上传至服务器，解压至相应目录<br>此处，我们配置多个gradle版本，4.1 和 3.5<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+</ul>
+<blockquote>
+<p>我们可能会忘记 以上配置的路径，在这里备用下命令</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">which</span> java</div><div class="line"><span class="built_in">which</span> git</div></pre></td></tr></table></figure>
+<h2 id="New-Task"><a href="#New-Task" class="headerlink" title="New Task"></a>New Task</h2><p>上面配置完基本的设置后，我们开始配置Android打包的任务</p>
+<ul>
+<li>新建任务<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>配置项目url<br>这里选择github的项目为例子：<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>配置git url<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>配置gradle<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>配置构建后操作<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+配置结束，save, 我们执行下:<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+打包结果，输出apk，mapping:<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+</ul>
+<p>参考：<br><a href="https://www.jianshu.com/p/c517f09df025" target="_blank" rel="external">https://www.jianshu.com/p/c517f09df025</a><br><a href="https://www.jianshu.com/p/eb3cbb34be97" target="_blank" rel="external">https://www.jianshu.com/p/eb3cbb34be97</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-03-04T10:22:14.596Z" title="2018-3-4 18:22" itemprop="dateUpdated">2018年3月4日 18:22</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2018/02/28/Linux服务器搭建Jenkins自动化打包/" target="_blank" rel="external">https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jenkins/">Jenkins</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/&title=《Linux服务器搭建Jenkins自动化打包》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/&title=《Linux服务器搭建Jenkins自动化打包》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Linux服务器搭建Jenkins自动化打包》 — fenglincanyi&url=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2017/12/28/Android进程间通信实践/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">回炉：Android进程间通信实践</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="Linux服务器搭建Jenkins自动化打包" data-title="Linux服务器搭建Jenkins自动化打包" data-url="https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/&title=《Linux服务器搭建Jenkins自动化打包》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/&title=《Linux服务器搭建Jenkins自动化打包》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Linux服务器搭建Jenkins自动化打包》 — fenglincanyi&url=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPYAAAD2CAAAAADAeSUUAAADLElEQVR42u3awY7iQAwEUP7/p9nrSiOYKjtIpOflhFAI/TqHku1+POLr+d/18/tX3/z8/PM5yf3JnY9PXNjY2Ng3YT/fXu/vyRexX3S+ie9Xi42NjX0qO19oEjbJ0q9F5hZsbGxs7KRE+XT5gY2NjY19LbsuA8pQ/NIAw8bGxv4ydts2el9U5Pe3mFnzCxsbG/ts9qzF852fPzLfxsbGxv5i9rO8kgjJ20ltmOVB9YsCGxsb+yB2HgCzTclbSJvjPu36sbGxsc9jt+HRtpba9lNLSoLzsc9MbGxs7C9m5wHQRlS+lNl4IN+4Yr6NjY2NfUP28Adl8yjHt5GZ/y82Njb2eezkb/LiIQmYPDj3ZczL+7GxsbEPYifN+nbQm5QN7WbNnlCMB7CxsbFvy26HAW1o7dv9bavr4qoLGxsb++vZmx/vN2gWmUmBEb1ObGxs7CPYecsmHwknAZY0gPKtrEsgbGxs7EPZm+HrJk7aCGwbSatdxMbGxr4hO2/97BtJm2M9q9IIGxsb+zj2bKTaFiSzbdq3k4o3ho2NjX1D9lXhtIHl1UE+rhi+MGxsbOwbsvNbZ0dwZts0GwwXIw1sbGzs49j5oLTdjk1c5YOK+lfY2NjYx7HrAFgPemez12dwRYd4sLGxsY9jt+B2JHxVaOUB+cud2NjY2Mex2x/nB2XyYmZTDrXbhI2NjX0eOz/gMtuCfKHtsCEfQkQPwsbGxj6I3Q5ok/iZtfvbF3PBVAQbGxv7Vuy8DdQG1YyabGjernrMLmxsbOzbsvOgypv+edsoWXry5DrwsLGxsY9gt8vNx7H7Dbr2ZWBjY2P/BXZx8GVdDORj5tlhnV/+BRsbG/s4dt7EmTWh2q1MjuC068HGxsY+j/0sr3Z40MZYW97kA+Oi9sLGxsa+FfuqAW3e3Hn/ud2a5Mn1kR1sbGzsG7JnA9okZpJYyu+cHfd5+b/Y2NjYx7HzYJj9WdtymhU2xdACGxsb+w+zN+2bpFG1idIiOLGxsbGxR+GUb9y+IRU1lbCxsbEPYiexMfu+jbRZKdJuJTY2NvZJ7E2DpmjHL5pE+UYXAYaNjY19AvsfPoI1AA3SReYAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

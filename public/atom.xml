@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2018-01-04T09:03:50.933Z</updated>
+  <updated>2018-03-04T10:22:14.596Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -14,6 +14,136 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Linux服务器搭建Jenkins自动化打包</title>
+    <link href="https://fenglincanyi.github.io/2018/02/28/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%90%AD%E5%BB%BAJenkins%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85/"/>
+    <id>https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/</id>
+    <published>2018-02-28T14:38:00.000Z</published>
+    <updated>2018-03-04T10:22:14.596Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>本文作为一次折腾服务器自动化配置的一次“纪念帖”… …</p>
+</blockquote>
+<h2 id="Jenkins-Install"><a href="#Jenkins-Install" class="headerlink" title="Jenkins Install"></a>Jenkins Install</h2><p>安装Jenkins之前，需要安装jdk，此处就不细说，不会请google</p>
+<h3 id="yum-安装-Jenkins"><a href="#yum-安装-Jenkins" class="headerlink" title="yum 安装 Jenkins"></a>yum 安装 Jenkins</h3><p>yum的repos中默认是没有Jenkins的，需要先将Jenkins存储库添加到yum repos<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo</div><div class="line"></div><div class="line">sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key</div></pre></td></tr></table></figure></p>
+<h3 id="安装Jenkins"><a href="#安装Jenkins" class="headerlink" title="安装Jenkins"></a>安装Jenkins</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install jenkins</div></pre></td></tr></table></figure>
+<p>Jenkins安装好之后，需要修改一下默认配置。默认情况是Jenkins是使用Jenkins用户启动的，但这个用户目前系统并没有赋予权限，这里我们将启动用户修改为root；另外Jenkins默认端口是8080，这个跟tomcat的默认端口冲突，我们也修改一下默认端口。<br>输入命令进入Jenkins配置文件：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vi /etc/sysconfig/jenkins</div></pre></td></tr></table></figure></p>
+<p>找到相关属性，配置：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">JENKINS_USER=<span class="string">"root"</span></div><div class="line">JENKINS_PORT=<span class="string">"8081"</span></div></pre></td></tr></table></figure></p>
+<p>保存退出 wq<br>然后，启动Jenkins：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">service jenkins start</div></pre></td></tr></table></figure></p>
+<p>如图，启动成功<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h2 id="Jenkins-Setting"><a href="#Jenkins-Setting" class="headerlink" title="Jenkins Setting"></a>Jenkins Setting</h2><p>打开浏览器，输入服务器的域名，端口8081，go ~</p>
+<h3 id="第一进入，需要密码"><a href="#第一进入，需要密码" class="headerlink" title="第一进入，需要密码"></a>第一进入，需要密码</h3><p>进入登录页面后，Jenkins提示我们需要输入超级管理员密码进行解锁。根据提示，我们可以在/var/lib/jenkins/secrets/initialAdminPassword文件里找到密码<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tail /var/lib/jenkins/secrets/initialAdminPassword</div></pre></td></tr></table></figure></p>
+<p>复制，粘贴，go ~</p>
+<h3 id="插件安装：Install-suggested-plugins"><a href="#插件安装：Install-suggested-plugins" class="headerlink" title="插件安装：Install suggested plugins"></a>插件安装：Install suggested plugins</h3><p>后面的过程比较简单，略过，进入到Jenkins主页</p>
+<h3 id="全局配置"><a href="#全局配置" class="headerlink" title="全局配置"></a>全局配置</h3><p>侧边栏：系统管理 -&gt; 全局工具配置</p>
+<ul>
+<li>JDK<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>Git<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>Gradle<br>gradle 使我们自己下载的，可以将本地的gradle zip 用 scp 直接上传至服务器，解压至相应目录<br>此处，我们配置多个gradle版本，4.1 和 3.5<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+</ul>
+<blockquote>
+<p>我们可能会忘记 以上配置的路径，在这里备用下命令</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">which</span> java</div><div class="line"><span class="built_in">which</span> git</div></pre></td></tr></table></figure>
+<h2 id="New-Task"><a href="#New-Task" class="headerlink" title="New Task"></a>New Task</h2><p>上面配置完基本的设置后，我们开始配置Android打包的任务</p>
+<ul>
+<li>新建任务<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>配置项目url<br>这里选择github的项目为例子：<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>配置git url<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>配置gradle<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>配置构建后操作<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+配置结束，save, 我们执行下:<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+打包结果，输出apk，mapping:<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+</ul>
+<p>参考：<br><a href="https://www.jianshu.com/p/c517f09df025" target="_blank" rel="external">https://www.jianshu.com/p/c517f09df025</a><br><a href="https://www.jianshu.com/p/eb3cbb34be97" target="_blank" rel="external">https://www.jianshu.com/p/eb3cbb34be97</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;本文作为一次折腾服务器自动化配置的一次“纪念帖”… …&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;Jenkins-Install&quot;&gt;&lt;a href=&quot;#Jenkins-Install&quot; class=&quot;headerlink&quot; title=&quot;
+    
+    </summary>
+    
+      <category term="Jenkins" scheme="https://fenglincanyi.github.io/categories/Jenkins/"/>
+    
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/tags/Android/"/>
+    
+      <category term="Jenkins" scheme="https://fenglincanyi.github.io/tags/Jenkins/"/>
+    
+  </entry>
   
   <entry>
     <title>回炉：Android进程间通信实践</title>
