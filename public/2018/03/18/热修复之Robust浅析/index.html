@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>No title | fenglincanyi | Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#2DBE60">
+    
+    
+    <meta name="keywords" content="">
+    <meta name="description" content="热修复之Robust浅析引言热修复在前几年来说，是个比较热的词；按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …各自的技术角度也是各有不同，也可以叫做流派不同。从dex、class加载的角度，方法hook角度，代码插桩角度 … ….作为一个Android 开发者来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="No title">
+<meta property="og:url" content="https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/index.html">
+<meta property="og:site_name" content="fenglincanyi">
+<meta property="og:description" content="热修复之Robust浅析引言热修复在前几年来说，是个比较热的词；按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …各自的技术角度也是各有不同，也可以叫做流派不同。从dex、class加载的角度，方法hook角度，代码插桩角度 … ….作为一个Android 开发者来">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png">
+<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/robust2.png">
+<meta property="og:updated_time" content="2018-03-18T15:40:59.505Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="No title">
+<meta name="twitter:description" content="热修复之Robust浅析引言热修复在前几年来说，是个比较热的词；按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …各自的技术角度也是各有不同，也可以叫做流派不同。从dex、class加载的角度，方法hook角度，代码插桩角度 … ….作为一个Android 开发者来">
+<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png">
+    
+        <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
+    
+    <link rel="shortcut icon" href="/img/site_icon.jpg">
+    <link rel="stylesheet" href="/css/style.css?v=1.4.2">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/me.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">fenglincanyi</h5>
+          <a href="mailto:canyifenglin@gmail.com" title="canyifenglin@gmail.com" class="mail">canyifenglin@gmail.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                Home
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                Categories
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/fenglincanyi" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">No title</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">No title</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-03-18T15:40:59.505Z" itemprop="datePublished" class="page-time">
+  2018-03-18
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#热修复之Robust浅析"><span class="post-toc-number">1.</span> <span class="post-toc-text">热修复之Robust浅析</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#引言"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">引言</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#基本原理"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">基本原理</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#主要的流程"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">主要的流程</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#编译期插桩"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">编译期插桩</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#打patch包"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">打patch包</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#patch下发及加载"><span class="post-toc-number">1.3.3.</span> <span class="post-toc-text">patch下发及加载</span></a></li></ol></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#坑点"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">坑点</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#使用注意点"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">使用注意点</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#接入"><span class="post-toc-number">1.5.1.</span> <span class="post-toc-text">接入</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#配置"><span class="post-toc-number">1.5.2.</span> <span class="post-toc-text">配置</span></a></li><li class="post-toc-item post-toc-level-4"><a class="post-toc-link" href="#统计、监控"><span class="post-toc-number">1.5.3.</span> <span class="post-toc-text">统计、监控</span></a></li></ol></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-热修复之Robust浅析"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">No title</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-3-18 23:40" datetime="2018-03-18T15:40:59.505Z"  itemprop="datePublished">2018-03-18</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+            
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h2 id="热修复之Robust浅析"><a href="#热修复之Robust浅析" class="headerlink" title="热修复之Robust浅析"></a>热修复之Robust浅析</h2><h3 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h3><p>热修复在前几年来说，是个比较热的词；<br>按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …<br>各自的技术角度也是各有不同，也可以叫做流派不同。<br>从dex、class加载的角度，方法hook角度，代码插桩角度 … ….<br>作为一个Android 开发者来说，这么多技术方案的实现，真的是很不错的一个学习机会。无论热修复的能力好或坏，是否成熟与稳定，都可以给我们提供各种解决问题的思路和角度，十分有借鉴意义。<br>Robust 是借鉴了 Google instant run 的思路，将其作为热修复实现方案来改进演变而成的，从修复能力、兼容性、稳定性来讲，也算是性价比较高的。</p>
+<h3 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h3><p>Robust 的热修复思路，是在方法执行之前，判断是否需要热修复(flag)，如果是，则执行patch类的方法，如果不是，则执行原来的内容。<br>——这就是热修复所要做到的效果<br>具体实现呢，我们再来说：<br>根据以上的需求，主要就需要这2点：</p>
+<ol>
+<li>每个类中，需要一个字段来标识是否需要热修复</li>
+<li>在每个方法前插入判断逻辑，需要热修复，则走patch的新逻辑<h3 id="主要的流程"><a href="#主要的流程" class="headerlink" title="主要的流程"></a>主要的流程</h3><h4 id="编译期插桩"><a href="#编译期插桩" class="headerlink" title="编译期插桩"></a>编译期插桩</h4>要做到插入代码，自然想到通过gradle plugin 来搞事情了，毕竟Google为我们已经提供好了接口（instant run 也是这么干的）<br>Robust 自定义 Gradle Plugin：<strong>gradle-plugin</strong><br>在transform时期，加入自己的处理逻辑:<br><code>RobustTransform.groovy#transform</code><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 拿到所有的类，放入到list中</span></div><div class="line"><span class="keyword">def</span> box = ConvertUtils.toCtClasses(inputs, classPool)</div><div class="line"><span class="keyword">if</span>(useASM)&#123;</div><div class="line">    <span class="comment">// 用ASM工具来直接修改 class</span></div><div class="line">    insertcodeStrategy=<span class="keyword">new</span> AsmInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    insertcodeStrategy=<span class="keyword">new</span> JavaAssistInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);</div><div class="line">&#125;</div><div class="line"><span class="comment">// 插入代码，输出jar</span></div><div class="line">insertcodeStrategy.insertCode(box, jarFile);</div><div class="line"><span class="comment">// 记录类的method信息，保存</span></div><div class="line">writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>主要的代码路径：<br>AsmInsertImpl.insertCode() -&gt;<br>AsmInsertImpl.transformCode() -&gt;<br>InsertMethodBodyAdapter.visitMethod() -&gt;<br>// 插入static field &amp; 方法体插入代码<br>classWriter.visitField() &amp;<br>MethodBodyInsertor.visitCode() -&gt; RobustAsmUtils.createInsertCode()</p>
+<p>这些操作执行结束后，所有的class内容已经完备了，那么放入产物main.jar中，等待proguard和转成dex<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>另外记录操作过的method的信息（methodMap<methodname, id="">), 存储字节流到methodMap.robust中,并gzip压缩<br>后续编译操作，都与正常的流程一样了<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br>从这里也能看出来，robust的缺点就是各处都插入了代码，对包体积是有影响的</methodname,></p>
+<h4 id="打patch包"><a href="#打patch包" class="headerlink" title="打patch包"></a>打patch包</h4><p>打包之后产生的 mapping.txt, methodMap.robust,需要我们保存下来，用于打patch包<br>生成patch包，是在上次正常打包的代码基础上，也就是相同的代码条件下，来进行操作<br>自然的，patch打包，也是自动化通过gradle plugin来生成<br>Robust 自定义 Gradle Plugin：<strong>auto-patch-plugin</strong><br><code>AutoPatchTransform..groovy#transform</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">ReadAnnotation.readAnnotation(box, logger);</div><div class="line"><span class="keyword">if</span>(Config.supportProGuard) &#123;</div><div class="line">    ReadMapping.getInstance().initMappingInfo();</div><div class="line">&#125;</div><div class="line">generatPatch(box,patchPatch()</div><div class="line"></div><div class="line">zipPatchClassesFile()</div><div class="line">executeCommand(jar2DexCommand)</div><div class="line">executeCommand(dex2SmaliCommand)</div><div class="line">SmaliTool.getInstance().dealObscureInSmali();</div><div class="line">executeCommand(smali2DexCommand)</div><div class="line"><span class="comment">//package patch.dex to patch.jar</span></div><div class="line">packagePatchDex2Jar()</div><div class="line">``</div><div class="line">扫描新增的类、方法、修改的方法，并分别添加到newlyAddedClassNameList, newlyAddedMethodSet, modifiedClassNameList, patchMethodSignatureSet中`</div><div class="line">```groovy</div><div class="line"><span class="keyword">boolean</span> isNewlyAddClass = scanClassForAddClassAnnotation(ctclass);</div><div class="line"><span class="comment">//newly add class donnot need scann for modify</span></div><div class="line"><span class="keyword">if</span> (!isNewlyAddClass) &#123;</div><div class="line">    patchMethodSignureSet.addAll(scanClassForModifyMethod(ctclass));</div><div class="line">    scanClassForAddMethodAnnotation(ctclass);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>mapping读取：</p>
+<ul>
+<li>initConfig()时会读取methodMap.robust的数据并将method信息存入methodMap中</li>
+<li>initMappingInfo()读取mapping.txt, 并存入usedInModifiedClassMappingInfo中</li>
+</ul>
+<p>以上操作，准备工作已经就绪，开始生成patch操作：<br>InlineClassFactory, PatchesFactory, PatchesControlFactory, PatchesInfoFactor开始进行复杂的patch相关类的生成<br>将所有patch需要的类压缩至jar(meituan.jar), 执行命令去 jar -&gt; dex, dex -&gt; smali<br>转成smali后，是为了处理混淆的问题，这也是auto-patch的难点<br>美团技术团队，探究了各种方案，最后通过smali层面进行混淆问题的处理。<br>SmaliTool.groovy 进行一行一行的混淆问题处理，类的调用关系，混淆映射，修改好最终的smali文件；<br>然后再从smali还原到dex,生成最后的patch.jar<br>关于混淆处理的smali操作，由于本人能力有限，就不展开讲了… …</p>
+<h4 id="patch下发及加载"><a href="#patch下发及加载" class="headerlink" title="patch下发及加载"></a>patch下发及加载</h4><p>patch.jar 制作好之后，按道理来说，我们是需要一个热修复后台的。<br>在app启动之后，请求接口，下拉patch包。<br>由前面的步骤，我们知道，下发的其实就是个 dex, 所以app启动后，是需要加载dex里的类，<br>这时候借助 DexClassLoader将PatchesInfoImpl先的加载处来，读取patchsInfoClass，拿到PatchedClassInfo列表<br>读取</p>
+<h3 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h3><ul>
+<li><p>对于匿名对象使用，有时候patch打包支持的不是很好</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> Thread() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// ......这里的内容，可能会丢失</span></div><div class="line">    &#125;</div><div class="line">&#125;.start();</div></pre></td></tr></table></figure>
+</li>
+<li><p>内部类的构造方法是private（private会生成一个匿名的构造函数）时，需要在制作补丁过程中手动修改构造方法的访问域为public</p>
+</li>
+<li>对kotlin的兼容性没有Java稳定，因为编译指令可能有所改变，所以要谨慎<h3 id="使用注意点"><a href="#使用注意点" class="headerlink" title="使用注意点"></a>使用注意点</h3><h4 id="接入"><a href="#接入" class="headerlink" title="接入"></a>接入</h4>这里只说一点，gradle 配置plugin时，可以动态控制,在local.properties中加入配置：<br>  robust_insert=fasle<br>  build_patch=fasle</li>
+</ul>
+<p><code>app/build.gradle</code><br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Properties localProperties = <span class="keyword">new</span> Properties()</div><div class="line"><span class="keyword">File</span> localFile = <span class="keyword">project</span>.rootProject.<span class="keyword">file</span>(<span class="string">"local.properties"</span>)</div><div class="line"><span class="keyword">if</span> (localFile.exists()) &#123;</div><div class="line">    localProperties.load(localFile.newDataInputStream())</div><div class="line">    ext.devmodule = !(localProperties.getProperty(<span class="string">"robust_insert"</span>) == <span class="string">'false'</span>)</div><div class="line">    ext.buildRobustPatch = localProperties.getProperty(<span class="string">"build_patch"</span>) == <span class="string">"true"</span></div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    ext.devmodule = <span class="keyword">true</span></div><div class="line">    ext.buildRobustPatch = <span class="keyword">false</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><p>对<code>robust.xml</code>按需配置<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">packname</span> <span class="attr">name</span>=<span class="string">"hotfixPackage"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.meituan<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.sankuai<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.dianping<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">packname</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!--不需要Robust插入代码的包名，Robust库不需要插入代码，如下的配置项请保留，还可以根据各个APP的情况执行添加--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">exceptPackname</span> <span class="attr">name</span>=<span class="string">"exceptPackage"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.meituan.robust<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.meituan.sample.extension<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">exceptPackname</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!--补丁的包名，请保持和类PatchManipulateImp中fetchPatchList方法中设置的补丁类名保持一致（ setPatchesInfoImplClassFullName("com.meituan.robust.patch.PatchesInfoImpl")），</span></div><div class="line">    各个App可以独立定制，需要确保的是setPatchesInfoImplClassFullName设置的包名是如下的配置项，类名必须是：PatchesInfoImpl--&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">patchPackname</span> <span class="attr">name</span>=<span class="string">"patchPackname"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.meituan.robust.patch<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">patchPackname</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h4 id="统计、监控"><a href="#统计、监控" class="headerlink" title="统计、监控"></a>统计、监控</h4><ul>
+<li>Robust都提供了修复成功相关统计接口，需要按照我们自己的需要来进行统计上报，后台跑数据，评估真实效果</li>
+<li>对于patch和release包的版本控制，兼容处理</li>
+<li>修复patch时的崩溃，需要加启动保护和降级处理，对于异常情况，需要实时监控</li>
+</ul>
+<p>参考：<br><a href="https://tech.meituan.com/android_autopatch.html" target="_blank" rel="external">https://tech.meituan.com/android_autopatch.html</a></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-03-18T15:40:59.505Z" title="2018-3-18 23:40" itemprop="dateUpdated">2018年3月18日 23:40</time>
+</span><br>
+
+
+        <b>版权声明：本文为博主原创文章，转载请标识出处：</b><br/><a href="/2018/03/18/热修复之Robust浅析/" target="_blank" rel="external">https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/</a>
+    </div>
+    <footer>
+        <a href="https://fenglincanyi.github.io">
+            <img src="/img/me.jpg" alt="fenglincanyi">
+            fenglincanyi
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/&title=《No title》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/&title=《No title》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《No title》 — fenglincanyi&url=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/02/28/Linux服务器搭建Jenkins自动化打包/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Linux服务器搭建Jenkins自动化打包</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+<div class="comments" id="comments">
+    <div class="ds-thread" data-thread-key="热修复之Robust浅析" data-title="No title" data-url="https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/"></div>
+</div>
+<script>
+lazyScripts.push('//cdn.bootcss.com/marked/0.3.6/marked.min.js');
+
+var duoshuoQuery = {short_name:'ysblog', theme: 'none'};
+lazyScripts.push('/js/embed.min.js?v=1.4.2');
+
+
+</script>
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢打赏
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <ul class="reward-items">
+        
+        <li>
+            <img src="/img/wechat.jpg" title="微信打赏二维码" alt="微信打赏二维码">
+            <p>微信</p>
+        </li>
+        
+
+        
+        <li>
+            <img src="/img/alipay.jpg" title="支付宝打赏二维码" alt="支付宝打赏二维码">
+            <p>支付宝</p>
+        </li>
+        
+    </ul>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            <span>博客内容遵循 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
+            <span>fenglincanyi &copy; 2016 - 2018</span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/&title=《No title》 — fenglincanyi&pic=https://fenglincanyi.github.io/img/me.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/&title=《No title》 — fenglincanyi&source=" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《No title》 — fenglincanyi&url=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/&via=https://fenglincanyi.github.io" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://fenglincanyi.github.io/2018/03/18/热修复之Robust浅析/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuklEQVR42u3aQW7bQAwF0Nz/0u2mmyKV8z85k7jA08qwJXneGBBpkh8f8fErOF5f+/T68x2S14cPPDw8vKNL/3zO6zvk7+fI5KrHFeLh4eFd47UP9ISdb83szNfn4OHh4b0P7/W1CbhNkZOwgYeHh/d/8ZJEPAkAyd3w8PDw3ofX3jov7J4tPVysteDh4eFNelVR+vsOr6/09/Dw8PAODQS0ra88Ub4XkP5chYeHh3eBlz9w27Q1T533BZEvish4eHh4R3mbwaZNCGnLEEnx9x/v4OHh4V3gte3/5Mw8RW6LtsNwhYeHh3eU14aBfZs/2bh8s75Iu/Hw8PAu8zaDpFHNY8SOkubZ4vDw8PBGvHxBm0ZXO4jw+hsPTJbh4eHhrXlJKtwGhmTp7aYMW3R4eHh4R3nto/bGQEDeBqsHv/Dw8PAu82YtqDYVzgu+7XY/lnHx8PDwrvFmf/jbTWlDRTusUMQ9PDw8vAu8WRssL92eKj08fi8eHh7eNV6ewm4e4jN2XiaOhq7w8PDwvoW3P7Odgzo2vIWHh4d3jRedWhYU2sJukii3pRA8PDy8G7z9aFS7He1Wtqn542+Ih4eHd5TXDgTkJYPX57RjBKuSLh4eHt4hXpsub3izJc7KylmVFw8PD2/CawNDXoCYBZh8KGGWmuPh4eGd4t34suQhnoeT1W+Fh4eHd42XMNokOFlQ8mmbTD9WqfHw8PAu8NpixCy0HCsoBFEADw8P7yxv0+KaDRa06fisnfZXAwwPDw/vKG/TLWqLAvsBgryogYeHh3ebt3mst6l5m++3YQMPDw/vO3n7dlc+UpA81vMNigIDHh4e3o/yNql2ngrvhxjw8PDw3o23aVm1A1t5cTlr+eHh4eGd4bXDAQkyX0o7lFAHBjw8PLyjvNkf/rooEDe9cvDHqQMPDw8v5f0GMwxpzleh4wkAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.4.2"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.4.2" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+</body>
+</html>

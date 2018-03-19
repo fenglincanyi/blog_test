@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2018-03-04T10:22:14.596Z</updated>
+  <updated>2018-03-19T05:32:07.233Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -14,6 +14,90 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>热修复之Robust浅析</title>
+    <link href="https://fenglincanyi.github.io/2018/03/12/%E7%83%AD%E4%BF%AE%E5%A4%8D%E4%B9%8BRobust%E6%B5%85%E6%9E%90/"/>
+    <id>https://fenglincanyi.github.io/2018/03/12/热修复之Robust浅析/</id>
+    <published>2018-03-12T10:28:00.000Z</published>
+    <updated>2018-03-19T05:32:07.233Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>热修复在前几年来说，是个比较热的词；<br>按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …<br>各自的技术角度也是各有不同，也可以叫做流派不同。<br>从dex、class加载的角度，方法hook角度，代码插桩角度 … ….<br>从之前我分析的Freeline增量编译来说，也是属于这个范畴，并且对于平时开发来说，是一个很不错的增量方案。<br>作为一个Android 开发者来说，这么多技术方案的实现，真的是很不错的一个学习机会。无论热修复的能力好或坏，是否成熟与稳定，都可以给我们提供各种解决问题的思路和角度，十分有借鉴意义。<br>Robust 是借鉴了 Google instant run 的思路，将其作为热修复实现方案来改进演变而成的，从修复能力、兼容性、稳定性来讲，也算是性价比较高的。</p>
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><p>Robust 的热修复思路，是在方法执行之前，判断是否需要热修复(flag)，如果是，则执行patch类的方法，如果不是，则执行原来的内容。<br>——这就是热修复所要做到的效果<br>具体实现呢，我们再来说：<br>根据以上的需求，主要就需要这2点：</p>
+<ol>
+<li>每个类中，需要一个字段来标识是否需要热修复</li>
+<li>在每个方法前插入判断逻辑，需要热修复，则走patch的新逻辑</li>
+</ol>
+<h2 id="主要的流程"><a href="#主要的流程" class="headerlink" title="主要的流程"></a>主要的流程</h2><h3 id="编译期插桩"><a href="#编译期插桩" class="headerlink" title="编译期插桩"></a>编译期插桩</h3><p>要做到插入代码，自然想到通过gradle plugin 来搞事情了，毕竟Google为我们已经提供好了接口（instant run 也是这么干的）<br>Robust 自定义 Gradle Plugin：<strong>gradle-plugin</strong><br>在transform时期，加入自己的处理逻辑:<br><code>RobustTransform.groovy#transform</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 拿到所有的类，放入到list中</span></div><div class="line"><span class="keyword">def</span> box = ConvertUtils.toCtClasses(inputs, classPool)</div><div class="line"><span class="keyword">if</span>(useASM)&#123;</div><div class="line">    <span class="comment">// 用ASM工具来直接修改 class</span></div><div class="line">    insertcodeStrategy=<span class="keyword">new</span> AsmInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    insertcodeStrategy=<span class="keyword">new</span> JavaAssistInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);</div><div class="line">&#125;</div><div class="line"><span class="comment">// 插入代码，输出jar</span></div><div class="line">insertcodeStrategy.insertCode(box, jarFile);</div><div class="line"><span class="comment">// 记录类的method信息，保存</span></div><div class="line">writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)</div></pre></td></tr></table></figure></p>
+<p>主要的代码路径：<br>AsmInsertImpl.insertCode() -&gt;<br>AsmInsertImpl.transformCode() -&gt;<br>InsertMethodBodyAdapter.visitMethod() -&gt;<br>// 插入static field &amp; 方法体插入代码<br>classWriter.visitField() &amp;<br>MethodBodyInsertor.visitCode() -&gt; RobustAsmUtils.createInsertCode()</p>
+<p>这些操作执行结束后，所有的class内容已经完备了，那么放入产物main.jar中，等待proguard和转成dex<br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png" width="300" height="320" style="margin:0 auto;display:block"><br>另外记录操作过的method的信息（methodMap<methodname, id="">), 存储字节流到methodMap.robust中,并gzip压缩<br>后续编译操作，都与正常的流程一样了</methodname,></p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>从这里也能看出来，robust的缺点就是各处都插入了代码，对包体积是有影响的</p>
+<h3 id="打patch包"><a href="#打patch包" class="headerlink" title="打patch包"></a>打patch包</h3><p>打包之后产生的 mapping.txt, methodMap.robust,需要我们保存下来，用于打patch包<br>生成patch包，是在上次正常打包的代码基础上，也就是相同的代码条件下，来进行操作<br>自然的，patch打包，也是自动化通过gradle plugin来生成<br>Robust 自定义 Gradle Plugin：<strong>auto-patch-plugin</strong><br><code>AutoPatchTransform..groovy#transform</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">ReadAnnotation.readAnnotation(box, logger);</div><div class="line"><span class="keyword">if</span>(Config.supportProGuard) &#123;</div><div class="line">    ReadMapping.getInstance().initMappingInfo();</div><div class="line">&#125;</div><div class="line">generatPatch(box,patchPatch()</div><div class="line"></div><div class="line">zipPatchClassesFile()</div><div class="line">executeCommand(jar2DexCommand)</div><div class="line">executeCommand(dex2SmaliCommand)</div><div class="line">SmaliTool.getInstance().dealObscureInSmali();</div><div class="line">executeCommand(smali2DexCommand)</div><div class="line"><span class="comment">//package patch.dex to patch.jar</span></div><div class="line">packagePatchDex2Jar()</div><div class="line">``</div><div class="line">扫描新增的类、方法、修改的方法，并分别添加到newlyAddedClassNameList, newlyAddedMethodSet, modifiedClassNameList, patchMethodSignatureSet中`</div><div class="line">```groovy</div><div class="line"><span class="keyword">boolean</span> isNewlyAddClass = scanClassForAddClassAnnotation(ctclass);</div><div class="line"><span class="comment">//newly add class donnot need scann for modify</span></div><div class="line"><span class="keyword">if</span> (!isNewlyAddClass) &#123;</div><div class="line">    patchMethodSignureSet.addAll(scanClassForModifyMethod(ctclass));</div><div class="line">    scanClassForAddMethodAnnotation(ctclass);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>mapping读取：</p>
+<ul>
+<li>initConfig()时会读取methodMap.robust的数据并将method信息存入methodMap中</li>
+<li>initMappingInfo()读取mapping.txt, 并存入usedInModifiedClassMappingInfo中</li>
+</ul>
+<p>以上操作，准备工作已经就绪，开始生成patch操作：<br>InlineClassFactory, PatchesFactory, PatchesControlFactory, PatchesInfoFactor开始进行复杂的patch相关类的生成<br>将所有patch需要的类压缩至jar(meituan.jar), 执行命令去 jar -&gt; dex, dex -&gt; smali<br>转成smali后，是为了处理混淆的问题，这也是auto-patch的难点<br>美团技术团队，探究了各种方案，最后通过smali层面进行混淆问题的处理。<br>SmaliTool.groovy 进行一行一行的混淆问题处理，类的调用关系，混淆映射，修改好最终的smali文件；<br>然后再从smali还原到dex,生成最后的patch.jar<br>关于混淆处理的smali操作，由于本人能力有限，就不展开讲了… …</p>
+<h3 id="patch下发及加载"><a href="#patch下发及加载" class="headerlink" title="patch下发及加载"></a>patch下发及加载</h3><p>patch.jar 制作好之后，按道理来说，我们是需要一个热修复后台的。<br>在app启动之后，请求接口，下拉patch包, 放在app packagename 下目录，对patch包有一定的校验。<br>由前面的步骤，我们知道，下发的其实就是个 dex, 所以app启动后，是需要加载dex里的类</p>
+<h4 id="类加载"><a href="#类加载" class="headerlink" title="类加载"></a>类加载</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">DexClassLoader classLoader = <span class="keyword">new</span> DexClassLoader(patch.getTempPath(), context.getCacheDir().getAbsolutePath(),</div><div class="line">     <span class="keyword">null</span>, PatchExecutor.class.getClassLoader());</div><div class="line">patch.delete(patch.getTempPath());</div><div class="line"></div><div class="line">Class patchsInfoClass;</div><div class="line">PatchesInfo patchesInfo = <span class="keyword">null</span>;</div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">    patchsInfoClass = classLoader.loadClass(patch.getPatchesInfoImplClassFullName());</div><div class="line">    patchesInfo = (PatchesInfo) patchsInfoClass.newInstance();</div><div class="line">&#125; <span class="keyword">catch</span> (Throwable t) &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这时候借助 DexClassLoader将PatchesInfoImpl先的加载处来，读取patchsInfoClass，拿到PatchedClassInfo列表</p>
+<h4 id="动态替换"><a href="#动态替换" class="headerlink" title="动态替换"></a>动态替换</h4><p>PatchedClassInfo记录所有了修改的类，和PatchControl的对应关系，然后做下面的事情：</p>
+<ol>
+<li>加载要被修复的类patchedClassName，获取里面的字段changeQuickRedirect</li>
+<li>加载PatchControl，获取PatchControl的实例</li>
+<li>赋值：changeQuickRedirect=patchObject</li>
+</ol>
+<p>这样，插桩的代码会检测到，并执行新逻辑<br>PatchProxy.isSupport() -&gt;<br>PatchProxy.accessDispatch() -&gt;<br>PatchControl.accessDispatch() -&gt;<br>XXXPatch.patchMethod()</p>
+<h2 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h2><ul>
+<li>对于匿名对象使用，有时候patch打包支持的不是很好</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> Thread() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// ......这里的内容，打patch时可能会丢失</span></div><div class="line">    &#125;</div><div class="line">&#125;.start();</div></pre></td></tr></table></figure>
+<p>可以这样解决：<br>new class:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FixThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</div><div class="line">    <span class="meta">@overide</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// ....</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>调用的地方：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">new</span> FixThread().start();</div></pre></td></tr></table></figure></p>
+<ul>
+<li>打包混淆配置中，最好关掉optimizationpasses, 开启的话，很容易出现changeQuickRedirect字段被优化掉的情况，而且，后续打patch包的gradle plugin 处理不是很好</li>
+<li>内部类的构造方法是private（private会生成一个匿名的构造函数）时，需要在制作补丁过程中手动修改构造方法的访问域为public</li>
+<li>对kotlin的兼容性没有Java稳定，因为编译指令可能有所改变，所以要谨慎</li>
+</ul>
+<h2 id="使用注意点"><a href="#使用注意点" class="headerlink" title="使用注意点"></a>使用注意点</h2><h3 id="接入"><a href="#接入" class="headerlink" title="接入"></a>接入</h3><p>这里只说一点，gradle 配置plugin时，可以动态控制,在local.properties中加入配置：<br>    robust_insert=fasle<br>    build_patch=fasle</p>
+<p><code>project/build.gradle</code><br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">Properties localProperties = <span class="keyword">new</span> Properties()</div><div class="line"><span class="keyword">File</span> localFile = <span class="keyword">project</span>.rootProject.<span class="keyword">file</span>(<span class="string">"local.properties"</span>)</div><div class="line"><span class="keyword">if</span> (localFile.exists()) &#123;</div><div class="line">    localProperties.load(localFile.newDataInputStream())</div><div class="line">    ext.robusInsert = !(localProperties.getProperty(<span class="string">"robust_insert"</span>) == <span class="string">'false'</span>)</div><div class="line">    ext.buildPatch = localProperties.getProperty(<span class="string">"build_patch"</span>) == <span class="string">"true"</span></div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    ext.robusInsert = <span class="keyword">true</span></div><div class="line">    ext.buildPatch = <span class="keyword">false</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p><code>app/build.gradle</code><br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (!robusInsert) &#123;</div><div class="line">    <span class="keyword">if</span> (buildPatch) &#123;</div><div class="line">        <span class="keyword">println</span> <span class="string">"===========  apply plugin: 'auto-patch-plugin'  ==========="</span></div><div class="line">        apply plugin: <span class="string">'auto-patch-plugin'</span></div><div class="line">    &#125;</div><div class="line">    apply plugin: <span class="string">'robust'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p>对<code>robust.xml</code>按需配置<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</div><div class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">packname</span> <span class="attr">name</span>=<span class="string">"hotfixPackage"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.meituan<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.sankuai<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.dianping<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">packname</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!--不需要Robust插入代码的包名，Robust库不需要插入代码，如下的配置项请保留，还可以根据各个APP的情况执行添加--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">exceptPackname</span> <span class="attr">name</span>=<span class="string">"exceptPackage"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.meituan.robust<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.meituan.sample.extension<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">exceptPackname</span>&gt;</span></div><div class="line"></div><div class="line">    <span class="comment">&lt;!--补丁的包名，请保持和类PatchManipulateImp中fetchPatchList方法中设置的补丁类名保持一致（ setPatchesInfoImplClassFullName("com.meituan.robust.patch.PatchesInfoImpl")），</span></div><div class="line">    各个App可以独立定制，需要确保的是setPatchesInfoImplClassFullName设置的包名是如下的配置项，类名必须是：PatchesInfoImpl--&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">patchPackname</span> <span class="attr">name</span>=<span class="string">"patchPackname"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>com.meituan.robust.patch<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">patchPackname</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<h3 id="统计、监控"><a href="#统计、监控" class="headerlink" title="统计、监控"></a>统计、监控</h3><ul>
+<li>Robust都提供了修复成功相关统计接口，需要按照我们自己的需要来进行统计上报，后台跑数据，评估真实效果</li>
+<li>对于patch和release包的版本控制，兼容处理</li>
+<li>修复patch时的崩溃，需要加启动保护和降级处理，对于异常情况，需要实时监控</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>Robust 坑还是有的，单从稳定性和兼容性上来说，我们是可以比较信任的</li>
+<li>热修复并不仅仅是一个框架，更是一个完整的修复系统，包括：后台版本控制，patch异常处理，降级处理；毕竟热修复对于app来说，是一个毕竟敏感的事情</li>
+<li>各个主流的热修复技术，都涉及到Android底层的知识，所以对Android深入了解，对开发者十分有帮助</li>
+</ul>
+<p>参考：<br><a href="https://tech.meituan.com/android_autopatch.html" target="_blank" rel="external">https://tech.meituan.com/android_autopatch.html</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;引言&quot;&gt;&lt;a href=&quot;#引言&quot; class=&quot;headerlink&quot; title=&quot;引言&quot;&gt;&lt;/a&gt;引言&lt;/h2&gt;&lt;p&gt;热修复在前几年来说，是个比较热的词；&lt;br&gt;按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/tags/Android/"/>
+    
+      <category term="hotfix" scheme="https://fenglincanyi.github.io/tags/hotfix/"/>
+    
+  </entry>
   
   <entry>
     <title>Linux服务器搭建Jenkins自动化打包</title>
@@ -139,9 +223,9 @@
       <category term="Jenkins" scheme="https://fenglincanyi.github.io/categories/Jenkins/"/>
     
     
-      <category term="Android" scheme="https://fenglincanyi.github.io/tags/Android/"/>
-    
       <category term="Jenkins" scheme="https://fenglincanyi.github.io/tags/Jenkins/"/>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/tags/Android/"/>
     
   </entry>
   
@@ -496,7 +580,7 @@
     <link href="https://fenglincanyi.github.io/2017/07/19/Vue%20%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%90%AC%E7%A0%96/"/>
     <id>https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/</id>
     <published>2017-07-19T05:10:00.000Z</published>
-    <updated>2017-08-27T10:21:53.000Z</updated>
+    <updated>2017-10-31T15:32:59.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前段时间，捣鼓weex，就想到对vue有所了解。毕竟weex是从vue的基础上扩展而来，诸多特性也是vue的。作为目前前端比较火的框架之一，有所了解，也是有一定好处的，所谓”多不压身”。<br>Vue涵盖的不仅是一种前端框架，而且是前端生态的一系列设计思想、工具、规范。<br>本文直奔主题，什么装环境、hello world 之类的琐事就略过…… </p>
 <h2 id="几个重要概念"><a href="#几个重要概念" class="headerlink" title="几个重要概念"></a>几个重要概念</h2><h3 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h3><p>每个 Vue.js 应用都是通过构造函数 Vue 创建一个 Vue 的根实例 启动的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="comment">// 属性</span></div><div class="line">  <span class="comment">// 方法</span></div><div class="line">  <span class="comment">// 各种选项对象...</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
@@ -580,7 +664,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/06/09/Android%207.0%E9%80%82%E9%85%8D/"/>
     <id>https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/</id>
     <published>2017-06-09T12:10:00.000Z</published>
-    <updated>2017-06-09T08:57:24.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<p>Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。</p>
 <p>作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。</p>
@@ -706,7 +790,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/04/12/Android%206.0%E9%80%82%E9%85%8D/"/>
     <id>https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/</id>
     <published>2017-04-12T04:40:00.000Z</published>
-    <updated>2017-06-09T05:36:36.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Android-权限变更"><a href="#Android-权限变更" class="headerlink" title="Android 权限变更"></a>Android 权限变更</h2><p>在 Android 6.0 之前，APP 的授权是通过在 manifest.xml 文件中，去注册相关权限，安装时就可以获得所有声明了的权限。而在 6.0 及以后的版本，这种在 manifest.xml 声明权限的做法，已经在一些权限上不适用了。<br>在Android 6.0 及以后的系统中，用户可以自动打开或关闭任何应用的权限（设置 -&gt; 应用权限）</p>
 <h3 id="权限的划分"><a href="#权限的划分" class="headerlink" title="权限的划分"></a>权限的划分</h3><p>Android 是基于 Linux 系统的，所以，对于每个文件都有个权限的概念。<br>这次变化，主要将 Android 系统中的权限分为：</p>
@@ -843,7 +927,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/03/18/Android%20%E5%A2%9E%E9%87%8F%E7%BC%96%E8%AF%91%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93/"/>
     <id>https://fenglincanyi.github.io/2017/03/18/Android 增量编译方案总结/</id>
     <published>2017-03-18T12:10:00.000Z</published>
-    <updated>2017-05-25T08:23:48.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>自从去年10月份，使用Freeline 感觉非常不错，开发效率提升数倍。由于工作原因，一直将这篇总结拖到现在。ok，现在好好总结下。。。</p>
@@ -1157,7 +1241,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/02/28/Weex%20SDK%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/</id>
     <published>2017-02-28T11:32:00.000Z</published>
-    <updated>2017-02-28T12:58:35.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p> <strong>Weex 渲染页面过程</strong></p>
@@ -1236,9 +1320,9 @@ v-leave-to
       <category term="Weex" scheme="https://fenglincanyi.github.io/categories/Weex/"/>
     
     
-      <category term="Weex" scheme="https://fenglincanyi.github.io/tags/Weex/"/>
-    
       <category term="Android" scheme="https://fenglincanyi.github.io/tags/Android/"/>
+    
+      <category term="Weex" scheme="https://fenglincanyi.github.io/tags/Weex/"/>
     
   </entry>
   
@@ -1247,7 +1331,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/02/28/Weex%20SDK%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（一）/</id>
     <published>2017-02-28T07:06:00.000Z</published>
-    <updated>2017-02-28T13:02:59.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p><strong>WeexSDK 初始化源码分析</strong></p>
@@ -1308,9 +1392,9 @@ v-leave-to
       <category term="Weex" scheme="https://fenglincanyi.github.io/categories/Weex/"/>
     
     
-      <category term="Weex" scheme="https://fenglincanyi.github.io/tags/Weex/"/>
-    
       <category term="Android" scheme="https://fenglincanyi.github.io/tags/Android/"/>
+    
+      <category term="Weex" scheme="https://fenglincanyi.github.io/tags/Weex/"/>
     
   </entry>
   
@@ -1319,7 +1403,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/02/01/Gradle%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E6%8B%89%E5%8F%96git%E5%8F%8A%E5%8E%8B%E7%BC%A9%E6%96%87%E4%BB%B6/"/>
     <id>https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/</id>
     <published>2017-02-01T07:00:00.000Z</published>
-    <updated>2017-02-08T11:55:44.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>在实现 hybird 相关开发时，h5文件需要不断重新拉取，并解压文件，拷贝至项目的相关目录下。手工完成比较繁琐且耗时。自己查阅 gradle 相关文档，将其过程实现脚本自动化。<br>可实现：自动拉取相关 git 服务器上最新文件，并压缩至 src/main/assets/hybird目录下，打包时就会自动带上最新的h5文件了。</p>
 <h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>上代码：</p>
@@ -1375,7 +1459,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/21/Springmvc%20%E7%9B%B8%E5%85%B3/"/>
     <id>https://fenglincanyi.github.io/2017/01/21/Springmvc 相关/</id>
     <published>2017-01-21T06:55:00.000Z</published>
-    <updated>2017-03-05T10:49:24.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="springmvc-框架原理"><a href="#springmvc-框架原理" class="headerlink" title="springmvc 框架原理"></a>springmvc 框架原理</h2><figure class="image-bubble">
                 <div class="img-lightbox">
@@ -1462,7 +1546,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/17/Mybatis%20%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B/"/>
     <id>https://fenglincanyi.github.io/2017/01/17/Mybatis 逆向工程/</id>
     <published>2017-01-17T02:11:00.000Z</published>
-    <updated>2017-03-05T10:14:14.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="pom-配置"><a href="#pom-配置" class="headerlink" title="pom 配置"></a>pom 配置</h2><p>pom.xml 中 加入：</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis.generator<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-generator-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.3.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">verbose</span>&gt;</span>true<span class="tag">&lt;/<span class="name">verbose</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">overwrite</span>&gt;</span>true<span class="tag">&lt;/<span class="name">overwrite</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div></pre></td></tr></table></figure>
@@ -1557,7 +1641,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/15/Mybatis%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/</id>
     <published>2017-01-15T06:32:00.000Z</published>
-    <updated>2017-03-05T09:45:47.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：MyBatis 高级<br>结合demo进行学习</p>
@@ -1676,7 +1760,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/11/Mybatis%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/11/Mybatis 学习（一）/</id>
     <published>2017-01-11T04:01:00.000Z</published>
-    <updated>2017-03-05T09:14:37.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：MyBatis 基础</p>
@@ -1735,7 +1819,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/07/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/</id>
     <published>2017-01-07T04:01:00.000Z</published>
-    <updated>2017-03-05T08:53:15.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：Spring AOP相关</p>
@@ -1923,7 +2007,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
     <link href="https://fenglincanyi.github.io/2016/12/27/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/</id>
     <published>2016-12-27T09:01:00.000Z</published>
-    <updated>2017-03-05T08:41:50.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：Spring 依赖注入相关</p>
@@ -2017,7 +2101,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
     <link href="https://fenglincanyi.github.io/2016/12/26/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/</id>
     <published>2016-12-26T06:06:00.000Z</published>
-    <updated>2017-02-08T12:03:31.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Spring的2个基本概念"><a href="#Spring的2个基本概念" class="headerlink" title="Spring的2个基本概念"></a>Spring的2个基本概念</h2><ul>
 <li>aop<br>面向切面编程<br>在原有的基础上进行扩展，而不是进行修改。符合 开闭原则</li>
@@ -2126,7 +2210,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/12/17/instant%20run%20%E7%9B%B8%E5%85%B3%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/</id>
     <published>2016-12-17T05:00:00.000Z</published>
-    <updated>2017-02-08T11:57:39.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<p>Android Studio 2.0 引入了即时编译功能：instant run，一定程度上进行了增量编译、增量更新代码，节省了开发耗时（喝咖啡的时间）。<br>下面具体分析下instant run相关工作流程和相关的源码</p>
 <h3 id="instant-run-使用"><a href="#instant-run-使用" class="headerlink" title="instant run 使用"></a>instant run 使用</h3><h4 id="版本要求"><a href="#版本要求" class="headerlink" title="版本要求"></a>版本要求</h4><p>Gradle 2.0 以上<br>build.gradle：minSdkVersion 15 以上（设置21以上可获得最佳性能）<br>Android 5.0以上的手机或模拟器</p>
@@ -2296,7 +2380,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/12/15/Android%20WebView%20%E7%9B%B8%E5%85%B3%E8%B8%A9%E5%9D%91/"/>
     <id>https://fenglincanyi.github.io/2016/12/15/Android WebView 相关踩坑/</id>
     <published>2016-12-15T05:29:00.000Z</published>
-    <updated>2017-08-24T02:25:03.000Z</updated>
+    <updated>2017-10-31T15:32:59.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="url-传参-url-嵌套的问题"><a href="#url-传参-url-嵌套的问题" class="headerlink" title="url 传参 url 嵌套的问题"></a>url 传参 url 嵌套的问题</h3><h4 id="问题场景"><a href="#问题场景" class="headerlink" title="问题场景"></a>问题场景</h4><p>get请求链接中： 传参中含有url</p>
 <p>“chinahr://customer/h5page?” + LEOGAO_PAGE+”=”+finishpage+”&amp;”+LEOGAO_ACTION+”=”+finishaction + “&amp;”+INTENT_URL+”=” + <b><font color="red">url</font></b></p>
@@ -2339,7 +2423,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/11/24/Dalvik%E4%B8%ADPreVerify%E9%97%AE%E9%A2%98/"/>
     <id>https://fenglincanyi.github.io/2016/11/24/Dalvik中PreVerify问题/</id>
     <published>2016-11-24T05:01:00.000Z</published>
-    <updated>2017-02-08T11:27:41.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="PreVerify（预校验）的由来"><a href="#PreVerify（预校验）的由来" class="headerlink" title="PreVerify（预校验）的由来"></a>PreVerify（预校验）的由来</h2><p>Dalvik 虚拟机在启动的时候，会有许多的启动参数，其中有一项就是verify，当verify被打开的时候，doVerify变量为true，则进行类的校验（dvmVerifyClass方法调用）。若校验成功，则这个类会被打上标记：CLASS_ISPREVERIFIED。<br>上面描述的过程是dex -&gt; odex (dexopt 过程)时，做的一个优化。当从classes.dex 变为 odex 后，才会被拿去执行。</p>
 <h2 id="Class-被-Preverify-的过程"><a href="#Class-被-Preverify-的过程" class="headerlink" title="Class 被 Preverify 的过程"></a>Class 被 Preverify 的过程</h2><p>在dex 被 dexopt 的过程中，源码中有校验和优化 Class 相关的操作：</p>
@@ -2347,7 +2431,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <p>dvmVerifyClass 的具体过程，源码中是这样描述的：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line"> * Verify a class.</div><div class="line"> *</div><div class="line"> * By the time we get here, the value of gDvm.classVerifyMode should already</div><div class="line"> * have been factored in.  If you want to call into the verifier even</div><div class="line"> * though verification is disabled, that's your business.</div><div class="line"> *</div><div class="line"> * Returns "true" on success.</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">bool</span> <span class="title">dvmVerifyClass</span><span class="params">(ClassObject*clazz)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> i;</div><div class="line">    <span class="keyword">if</span> (dvmIsClassVerified(clazz)) &#123;</div><div class="line">        ALOGD(<span class="string">"Ignoring duplicate verify attempt on %s"</span>, clazz -&gt; descriptor);</div><div class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; clazz -&gt; directMethodCount; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (!verifyMethod( &amp; clazz -&gt; directMethods[i]))&#123;</div><div class="line">            LOG_VFY(<span class="string">"Verifier rejected class %s"</span>, clazz -&gt; descriptor);</div><div class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; clazz -&gt; virtualMethodCount; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (!verifyMethod( &amp; clazz -&gt; virtualMethods[i]))&#123;</div><div class="line">            LOG_VFY(<span class="string">"Verifier rejected class %s"</span>, clazz -&gt; descriptor);</div><div class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>其中，dvmVerifyClass中又去调用了 方法的校验 verifyMethod, 再去追源码：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line"> * Perform verification on a single method.</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">verifyMethod</span><span class="params">(Method* meth)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">bool</span> result = <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Verifier state blob.  Various values will be cached here so we</div><div class="line">     * can avoid expensive lookups and pass fewer arguments around.</div><div class="line">     */</div><div class="line">    VerifierData vdata;</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> 1   <span class="comment">// ndef NDEBUG</span></span></div><div class="line">    <span class="built_in">memset</span>(&amp;vdata, <span class="number">0x99</span>, <span class="keyword">sizeof</span>(vdata));</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line"></div><div class="line">    vdata.method = meth;</div><div class="line">    vdata.insnsSize = dvmGetMethodInsnsSize(meth);</div><div class="line">    vdata.insnRegCount = meth-&gt;registersSize;</div><div class="line">    vdata.insnFlags = <span class="literal">NULL</span>;</div><div class="line">    vdata.uninitMap = <span class="literal">NULL</span>;</div><div class="line">    vdata.basicBlocks = <span class="literal">NULL</span>;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * If there aren't any instructions, make sure that's expected, then</div><div class="line">     * exit successfully.  <span class="doctag">Note:</span> for native methods, meth-&gt;insns gets set</div><div class="line">     * to a native function pointer on first call, so don't use that as</div><div class="line">     * an indicator.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (vdata.insnsSize == <span class="number">0</span>) &#123;</div><div class="line">        <span class="keyword">if</span> (!dvmIsNativeMethod(meth) &amp;&amp; !dvmIsAbstractMethod(meth)) &#123;</div><div class="line">            LOG_VFY_METH(meth,</div><div class="line">                <span class="string">"VFY: zero-length code in concrete non-native method"</span>);</div><div class="line">            <span class="keyword">goto</span> bail;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">goto</span> success;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Sanity-check the register counts.  ins + locals = registers, so make</div><div class="line">     * sure that ins &lt;= registers.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (meth-&gt;insSize &gt; meth-&gt;registersSize) &#123;</div><div class="line">        LOG_VFY_METH(meth, <span class="string">"VFY: bad register counts (ins=%d regs=%d)"</span>,</div><div class="line">            meth-&gt;insSize, meth-&gt;registersSize);</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Allocate and populate an array to hold instruction data.</div><div class="line">     *</div><div class="line">     * <span class="doctag">TODO:</span> Consider keeping a reusable pre-allocated array sitting</div><div class="line">     * around for smaller methods.</div><div class="line">     */</div><div class="line">    vdata.insnFlags = (InsnFlags*) <span class="built_in">calloc</span>(vdata.insnsSize, <span class="keyword">sizeof</span>(InsnFlags));</div><div class="line">    <span class="keyword">if</span> (vdata.insnFlags == <span class="literal">NULL</span>)</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Compute the width of each instruction and store the result in insnFlags.</div><div class="line">     * Count up the #of occurrences of certain opcodes while we're at it.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (!computeWidthsAndCountOps(&amp;vdata))</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Allocate a map to hold the classes of uninitialized instances.</div><div class="line">     */</div><div class="line">    vdata.uninitMap = dvmCreateUninitInstanceMap(meth, vdata.insnFlags,</div><div class="line">        vdata.newInstanceCount);</div><div class="line">    <span class="keyword">if</span> (vdata.uninitMap == <span class="literal">NULL</span>)</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Set the "in try" flags for all instructions guarded by a "try" block.</div><div class="line">     * Also sets the "branch target" flag on exception handlers.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (!scanTryCatchBlocks(meth, vdata.insnFlags))</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Perform static instruction verification.  Also sets the "branch</div><div class="line">     * target" flags.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (!verifyInstructions(&amp;vdata))</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Do code-flow analysis.</div><div class="line">     *</div><div class="line">     * We could probably skip this for a method with no registers, but</div><div class="line">     * that's so rare that there's little point in checking.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (!dvmVerifyCodeFlow(&amp;vdata)) &#123;</div><div class="line">        <span class="comment">//ALOGD("+++ %s failed code flow", meth-&gt;name);</span></div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">success:</div><div class="line">    result = <span class="literal">true</span>;</div><div class="line"></div><div class="line">bail:</div><div class="line">    dvmFreeVfyBasicBlocks(&amp;vdata);</div><div class="line">    dvmFreeUninitInstanceMap(vdata.uninitMap);</div><div class="line">    <span class="built_in">free</span>(vdata.insnFlags);</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/*</span></div><div class="line"> * Perform verification on a single method.</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">verifyMethod</span><span class="params">(Method* meth)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">bool</span> result = <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Verifier state blob.  Various values will be cached here so we</div><div class="line">     * can avoid expensive lookups and pass fewer arguments around.</div><div class="line">     */</div><div class="line">    VerifierData vdata;</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> 1   <span class="comment">// ndef NDEBUG</span></span></div><div class="line">    <span class="built_in">memset</span>(&amp;vdata, <span class="number">0x99</span>, <span class="keyword">sizeof</span>(vdata));</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line"></div><div class="line">    vdata.method = meth;</div><div class="line">    vdata.insnsSize = dvmGetMethodInsnsSize(meth);</div><div class="line">    vdata.insnRegCount = meth-&gt;registersSize;</div><div class="line">    vdata.insnFlags = <span class="literal">NULL</span>;</div><div class="line">    vdata.uninitMap = <span class="literal">NULL</span>;</div><div class="line">    vdata.basicBlocks = <span class="literal">NULL</span>;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * If there aren't any instructions, make sure that's expected, then</div><div class="line">     * exit successfully.  Note: for native methods, meth-&gt;insns gets set</div><div class="line">     * to a native function pointer on first call, so don't use that as</div><div class="line">     * an indicator.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (vdata.insnsSize == <span class="number">0</span>) &#123;</div><div class="line">        <span class="keyword">if</span> (!dvmIsNativeMethod(meth) &amp;&amp; !dvmIsAbstractMethod(meth)) &#123;</div><div class="line">            LOG_VFY_METH(meth,</div><div class="line">                <span class="string">"VFY: zero-length code in concrete non-native method"</span>);</div><div class="line">            <span class="keyword">goto</span> bail;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">goto</span> success;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Sanity-check the register counts.  ins + locals = registers, so make</div><div class="line">     * sure that ins &lt;= registers.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (meth-&gt;insSize &gt; meth-&gt;registersSize) &#123;</div><div class="line">        LOG_VFY_METH(meth, <span class="string">"VFY: bad register counts (ins=%d regs=%d)"</span>,</div><div class="line">            meth-&gt;insSize, meth-&gt;registersSize);</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Allocate and populate an array to hold instruction data.</div><div class="line">     *</div><div class="line">     * <span class="doctag">TODO:</span> Consider keeping a reusable pre-allocated array sitting</div><div class="line">     * around for smaller methods.</div><div class="line">     */</div><div class="line">    vdata.insnFlags = (InsnFlags*) <span class="built_in">calloc</span>(vdata.insnsSize, <span class="keyword">sizeof</span>(InsnFlags));</div><div class="line">    <span class="keyword">if</span> (vdata.insnFlags == <span class="literal">NULL</span>)</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Compute the width of each instruction and store the result in insnFlags.</div><div class="line">     * Count up the #of occurrences of certain opcodes while we're at it.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (!computeWidthsAndCountOps(&amp;vdata))</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Allocate a map to hold the classes of uninitialized instances.</div><div class="line">     */</div><div class="line">    vdata.uninitMap = dvmCreateUninitInstanceMap(meth, vdata.insnFlags,</div><div class="line">        vdata.newInstanceCount);</div><div class="line">    <span class="keyword">if</span> (vdata.uninitMap == <span class="literal">NULL</span>)</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Set the "in try" flags for all instructions guarded by a "try" block.</div><div class="line">     * Also sets the "branch target" flag on exception handlers.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (!scanTryCatchBlocks(meth, vdata.insnFlags))</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Perform static instruction verification.  Also sets the "branch</div><div class="line">     * target" flags.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (!verifyInstructions(&amp;vdata))</div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line"></div><div class="line">    <span class="comment">/*</span></div><div class="line">     * Do code-flow analysis.</div><div class="line">     *</div><div class="line">     * We could probably skip this for a method with no registers, but</div><div class="line">     * that's so rare that there's little point in checking.</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (!dvmVerifyCodeFlow(&amp;vdata)) &#123;</div><div class="line">        <span class="comment">//ALOGD("+++ %s failed code flow", meth-&gt;name);</span></div><div class="line">        <span class="keyword">goto</span> bail;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">success:</div><div class="line">    result = <span class="literal">true</span>;</div><div class="line"></div><div class="line">bail:</div><div class="line">    dvmFreeVfyBasicBlocks(&amp;vdata);</div><div class="line">    dvmFreeUninitInstanceMap(vdata.uninitMap);</div><div class="line">    <span class="built_in">free</span>(vdata.insnFlags);</div><div class="line">    <span class="keyword">return</span> result;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>dvmVerifyClass 具体过程中，会去校验 这个 Class中的所有的 directMethod 方法，和 virtualMethod 方法。具体这些方法包含哪些呢？ 其中时包含了：</p>
 <ul>
 <li>static 方法</li>
@@ -2379,134 +2463,11 @@ globalSession 一次登陆，任何地方都保存有登录状态
   </entry>
   
   <entry>
-    <title>Android 类加载初探</title>
-    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
-    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
-    <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote>
-<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
-</blockquote>
-<p>需要关注的类有：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
-<ul>
-<li>BaseDexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>DexClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<ul>
-<li>PathClassLoader</li>
-</ul>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
-<p><strong>ClassLoader 相关说明：</strong></p>
-<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
-<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
-<p>DexPathList 构造函数：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>makeDexElements过程：<br><figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure></p>
-<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
-<figure class="image-bubble">
-                <div class="img-lightbox">
-                    <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
-                </div>
-                <div class="image-caption"></div>
-            </figure>
-<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
-<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
-    
-    </summary>
-    
-      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
-    
-    
-      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
-    
-  </entry>
-  
-  <entry>
     <title>Android apk安装过程实例分析</title>
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
     <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>注：本文不对apk安装之前，系统所做的复杂工作做分析，只针对普通的apk安装过程进行简单的过程理解</p>
@@ -2626,11 +2587,134 @@ globalSession 一次登陆，任何地方都保存有登录状态
   </entry>
   
   <entry>
+    <title>Android 类加载初探</title>
+    <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
+    <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
+    <published>2016-11-17T13:08:00.000Z</published>
+    <updated>2017-10-31T13:50:20.000Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
+</blockquote>
+<p>需要关注的类有：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<h3 id="二、3个类加载器的关系"><a href="#二、3个类加载器的关系" class="headerlink" title="二、3个类加载器的关系"></a>二、3个类加载器的关系</h3><p>我们先来看看这3个ClassLoader的定义</p>
+<ul>
+<li>BaseDexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>DexClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li>PathClassLoader</li>
+</ul>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上面可看出：BaseDexClassLoader 继承自最原始的 ClassLoader，DexClassLoader 和 PathClassLoader都继承自BaseClassLoader。依据传入的参数不同，来实现各自不同的 dex 加载功能</p>
+<p><strong>ClassLoader 相关说明：</strong></p>
+<p>从存储中加载类和资源。 在运行时安装一个或多个类加载器。 每当运行时系统需要在内存中尚不可用的特定类时，都会查询这些类。 通常，类加载器是一个树型结构，其中子类加载器将所有请求委托给父类加载器。 只有父类加载器无法满足请求，子类加载器才会尝试处理它（委托机制）</p>
+<p>下面我们再继续分析，传入不同的 optimizedDirectory 参数，两者会有什么样的区别？</p>
+<p>DexPathList 构造函数：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>makeDexElements过程：<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>加载DexFile，若optimizedDirectory 目录为空，则初始化一个DexFile，否则，直接加载dex文件：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>初始化DexFile文件，通常是从一个文件对象中打开一个Dex file ，通常是一个 内容是 classes.dex 的 zip/jar文件，<br>虚拟机将在 /data/dalvik-cache 目录下生成相应名称的文件，且打开它，在系统权限允许的情况下尽可能的先创建或更新该文件<br>不能传递 优化后的 文件名（/data/dalvik-cache），而是在 dexopt 之前的原始状态的文件名。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>由上可知，PathClassLoader 的构造函数，与DexClassLoader相比较，optimizedDirectory 优化目录为null。<br>由于optimizedDirectory是用来缓存我们需要加载的dex文件的，并创建一个DexFile对象，如果它为null，那么会直接使用dex文件原有的路径来创建DexFile对象。<br>optimizedDirectory必须是一个内部存储路径，无论哪种动态加载，加载的可执行文件一定要存放在内部存储。DexClassLoader可以指定自己的optimizedDirectory，所以它可以加载外部的dex，因为这个dex会被复制到内部路径的optimizedDirectory<br>所以DexClassLoader可以通过其他路径（内部存储路径）加载dex，而PathClassLoader没有optimizedDirectory，所以它只能加载内部的dex，这些大都是存在系统中已经安装过的apk里面的。</p>
+<p>若想查看相关目录下的dex文件，可参考上一篇文章。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;源码路径(此版本：Android 5.0)：&lt;br&gt;android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;需要关注的类有：&lt;br&gt;&lt;figu
+    
+    </summary>
+    
+      <category term="Android" scheme="https://fenglincanyi.github.io/categories/Android/"/>
+    
+    
+      <category term="ClassLoader" scheme="https://fenglincanyi.github.io/tags/ClassLoader/"/>
+    
+  </entry>
+  
+  <entry>
     <title>RadioGroup、RadioButton动态创建并定制icon显示</title>
     <link href="https://fenglincanyi.github.io/2016/10/25/RadioGroup%E3%80%81RadioButton%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BA%E5%B9%B6%E5%AE%9A%E5%88%B6icon%E6%98%BE%E7%A4%BA/"/>
     <id>https://fenglincanyi.github.io/2016/10/25/RadioGroup、RadioButton动态创建并定制icon显示/</id>
     <published>2016-10-25T02:24:00.000Z</published>
-    <updated>2017-02-08T11:57:56.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<p>由于原生的Radiobutton不能满足业务需求，所以需要自己定制icon图片，和默认选中某一项。需要自己代码动态实现。废话不多说，上代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setViewData</span><span class="params">()</span> </span>&#123;</div><div class="line">        radioGroup.removeAllViews();</div><div class="line"></div><div class="line">        <span class="keyword">int</span> margin = ScreenUtil.dip2px(<span class="keyword">this</span>, <span class="number">14.0f</span>);</div><div class="line">        <span class="keyword">int</span> marginLeft = ScreenUtil.dip2px(<span class="keyword">this</span>, <span class="number">20.0f</span>);</div><div class="line">        <span class="keyword">int</span> paddingLeft = ScreenUtil.dip2px(<span class="keyword">this</span>, <span class="number">3.0f</span>);</div><div class="line"></div><div class="line">        RadioGroup.LayoutParams layoutParams = </div><div class="line">            <span class="keyword">new</span> RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);</div><div class="line">        RadioGroup.LayoutParams layoutParams1 = </div><div class="line">            <span class="keyword">new</span> RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, <span class="number">1</span>);</div><div class="line">        layoutParams.setMargins(marginLeft, margin, margin, margin);</div><div class="line">        layoutParams1.setMargins(margin, <span class="number">0</span>, margin, <span class="number">0</span>);</div><div class="line"></div><div class="line">        <span class="keyword">int</span> defaultId = -<span class="number">1</span>;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; messageList.size(); i++) &#123;</div><div class="line">            RadioButton rb = <span class="keyword">new</span> RadioButton(<span class="keyword">this</span>);</div><div class="line">            rb.setMaxLines(<span class="number">2</span>);</div><div class="line">            rb.setPadding(paddingLeft, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</div><div class="line">            rb.setText(messageList.get(i).relayMessage);</div><div class="line">            rb.setButtonDrawable(android.R.color.transparent);</div><div class="line">            rb.setTextColor(Color.parseColor(<span class="string">"#555555"</span>));</div><div class="line">            rb.setButtonDrawable(<span class="keyword">null</span>);<span class="comment">// 去掉左边默认图标</span></div><div class="line">            rb.setCompoundDrawablePadding(margin);</div><div class="line">            rb.setEllipsize(TextUtils.TruncateAt.END);<span class="comment">// 结尾处打点显示</span></div><div class="line">            Drawable drawable = getResources().getDrawable(R.drawable.relay_message_radio_selector);</div><div class="line">            drawable.setBounds(<span class="number">0</span>, <span class="number">0</span>, drawable.getMinimumWidth(), drawable.getMinimumHeight());</div><div class="line">            rb.setCompoundDrawables(drawable, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</div><div class="line">            <span class="comment">// 手动生成id</span></div><div class="line">            <span class="keyword">int</span> generateId = generateViewId();</div><div class="line">            messages.put(generateId, messageList.get(i).relayMessage);</div><div class="line">            rb.setId(generateId);</div><div class="line">            <span class="keyword">if</span> (i == <span class="number">0</span>) &#123;</div><div class="line">                defaultId = generateId;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            TextView view = <span class="keyword">new</span> TextView(<span class="keyword">this</span>);</div><div class="line">            view.setBackgroundColor(Color.parseColor(<span class="string">"#dddddd"</span>));</div><div class="line"></div><div class="line">            radioGroup.addView(rb, layoutParams);</div><div class="line">            radioGroup.addView(view, layoutParams1);</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// 此处：默认选中第一个</span></div><div class="line">        radioGroup.check(defaultId);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 <p>R.drawable.relay_message_radio_selector 代码如下：</p>
@@ -2662,7 +2746,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/10/06/RxJava%20%E5%88%9D%E6%8E%A2%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/</id>
     <published>2016-10-05T16:45:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="一、几个基本概念"><a href="#一、几个基本概念" class="headerlink" title="一、几个基本概念"></a>一、几个基本概念</h3><ul>
 <li>由来<br>  Rx(Reactive Extensions)，最初是LINQ的一个扩展，后由微软团队开发，在2012年11月开源。ReactiveX.io给的定义是，Rx是一个使用可观察数据流进行异步编程的编程接口，ReactiveX结合了观察者模式、迭代器模式和函数式编程的精华。</li>
@@ -2728,7 +2812,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/09/22/View%20%E6%B5%8B%E9%87%8F%E7%9B%B8%E5%85%B3%E6%80%BB%E7%BB%93/"/>
     <id>https://fenglincanyi.github.io/2016/09/22/View 测量相关总结/</id>
     <published>2016-09-22T05:18:00.000Z</published>
-    <updated>2017-09-09T10:41:09.000Z</updated>
+    <updated>2017-12-01T04:56:01.560Z</updated>
     
     <content type="html"><![CDATA[<h2 id="ViewGroup的测量过程"><a href="#ViewGroup的测量过程" class="headerlink" title="ViewGroup的测量过程"></a>ViewGroup的测量过程</h2><p><strong>ViewGroup 没有重写 View 的 measure()  和 onMeasure()  方法，沿用的还是View的</strong></p>
 <p>然后在 View 的源码中，我们找到 measure()，它内部调用到 onMeasure()。</p>
@@ -2769,7 +2853,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/09/04/%E6%BB%91%E5%8A%A8%E7%9B%B8%E5%85%B3%20ScrollView%20&amp;%20ListView/"/>
     <id>https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView &amp; ListView/</id>
     <published>2016-09-04T03:13:00.000Z</published>
-    <updated>2017-09-09T10:41:32.000Z</updated>
+    <updated>2017-12-01T04:56:01.560Z</updated>
     
     <content type="html"><![CDATA[<h2 id="ScrollView-嵌套-ListView-问题分析"><a href="#ScrollView-嵌套-ListView-问题分析" class="headerlink" title="ScrollView 嵌套 ListView 问题分析"></a>ScrollView 嵌套 ListView 问题分析</h2><p><strong>滑动冲突的问题</strong><br>ScrollView 中嵌套 ListView，ListView 在测量时，高度不论写活还是写死，Listiew 的测量模式都是 不确定模式：unspecified</p>
 <figure class="image-bubble">
@@ -2906,7 +2990,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/08/16/%E6%BB%91%E5%8A%A8%E5%86%B2%E7%AA%81%E4%B9%8BEditText-ScrollView/"/>
     <id>https://fenglincanyi.github.io/2016/08/16/滑动冲突之EditText-ScrollView/</id>
     <published>2016-08-16T09:14:00.000Z</published>
-    <updated>2017-02-16T03:09:09.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="问题一"><a href="#问题一" class="headerlink" title="问题一"></a>问题一</h3><pre><code>EditText的内容过多时，EditText的内容并不能滚动，而是ScrollView的滚动
 </code></pre><h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><pre><code>重写EditText的onTouch事件，将触摸事件交给EditText来处理
@@ -2934,7 +3018,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/06/04/%E7%AE%80%E5%8D%95%E7%9A%84%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/06/04/简单的页面置换算法分析/</id>
     <published>2016-06-04T11:39:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本文主要分析操作系统中涉及到的一些常见的置换算法，并不对涉及的操作系统内容过多介绍。这些算法在其他的计算机应用中也有体现，基本原理都是一致的，可参考理解。</p>
@@ -2992,7 +3076,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/05/24/%E5%B8%B8%E8%A7%81%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%EF%BC%88C++%E5%AE%9E%E7%8E%B0%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/05/24/常见排序算法（C++实现）/</id>
     <published>2016-05-24T05:55:00.000Z</published>
-    <updated>2017-03-14T12:45:39.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="一、直接插入排序"><a href="#一、直接插入排序" class="headerlink" title="一、直接插入排序"></a>一、直接插入排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">直接插入排序</div><div class="line">稳定的排序算法，时间复杂度：O(n^2)</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">insertSort</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> temp;<span class="comment">//存储要插入的数</span></div><div class="line">    <span class="keyword">int</span> i, j;<span class="comment">//j:实际上用来记录位置</span></div><div class="line"></div><div class="line"><span class="comment">/*只需要对后面n-1个数排序*/</span></div><div class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; n; i++)&#123;</div><div class="line">        temp = a[i];<span class="comment">// 暂时存储要插入的数</span></div><div class="line">        <span class="keyword">if</span> (a[i] &lt; a[i - <span class="number">1</span>])&#123;</div><div class="line">            <span class="keyword">for</span> (j = i - <span class="number">1</span>; j&gt;=<span class="number">0</span> &amp;&amp; temp &lt; a[j]; j--)&#123;<span class="comment">//遍历前面的数，进行比较，寻找插入的位置</span></div><div class="line">                a[j + <span class="number">1</span>] = a[j];<span class="comment">//前面大的数后移</span></div><div class="line">            &#125;</div><div class="line">            a[j + <span class="number">1</span>] = temp;<span class="comment">// j是刚好不满足情况的位置，则 j+1 满足该位置</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span></span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i]&lt;&lt;<span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123; <span class="number">3</span>, <span class="number">2</span>, <span class="number">43</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span> &#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="comment">//cout &lt;&lt; n &lt;&lt; endl;</span></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    insertSort(a, n);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h2 id="二、折半插入排序"><a href="#二、折半插入排序" class="headerlink" title="二、折半插入排序"></a>二、折半插入排序</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></div><div class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</div><div class="line"></div><div class="line"><span class="comment">/*</span></div><div class="line">折半插入排序：时间复杂度：O(n^2)，稳定</div><div class="line">对直接插入排序 “初步优化”，寻找插入位置更快</div><div class="line">*/</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">binaryInsertSort</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> temp;</div><div class="line">    <span class="keyword">int</span> i, j;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; n; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (a[i] &lt; a[i - <span class="number">1</span>]) &#123;</div><div class="line">            temp = a[i];</div><div class="line"></div><div class="line">            <span class="comment">// “二分法”，寻找插入位置，存储到low</span></div><div class="line">            <span class="keyword">int</span> low = <span class="number">0</span>, high = i - <span class="number">1</span>, mid;</div><div class="line">            <span class="keyword">while</span> (low &lt;= high) &#123;</div><div class="line">                mid = (low + high) / <span class="number">2</span>;</div><div class="line">                <span class="keyword">if</span> (temp &lt; a[mid]) &#123;</div><div class="line">                    high = mid - <span class="number">1</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">else</span> &#123;</div><div class="line">                    low = mid + <span class="number">1</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">// 对要插入数之前小的数，整体后移</span></div><div class="line">            <span class="keyword">for</span> (j = i - <span class="number">1</span>; j &gt;= low; j--) &#123;</div><div class="line">                a[j + <span class="number">1</span>] = a[j];</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">// 最后将刚要插入的数放到找到的位置上</span></div><div class="line">            a[low] = temp;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">/*打印数组*/</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> a[], <span class="keyword">int</span> n)</span> </span>&#123;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</div><div class="line">        <span class="built_in">cout</span> &lt;&lt; a[i] &lt;&lt; <span class="string">" "</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> a[] = &#123;<span class="number">3</span>, <span class="number">2</span>, <span class="number">488</span>, <span class="number">12</span>, <span class="number">90</span>, <span class="number">23</span>&#125;;</div><div class="line">    <span class="keyword">int</span> n = <span class="keyword">sizeof</span>(a) / <span class="keyword">sizeof</span>(a[<span class="number">0</span>]);</div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序前："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line"></div><div class="line">    binaryInsertSort(a, n);</div><div class="line"></div><div class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"排序后："</span> &lt;&lt; <span class="built_in">endl</span>;</div><div class="line">    print(a, n);</div><div class="line">    system(<span class="string">"pause"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -3022,7 +3106,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/05/16/Android%20SingleTask%20%E6%8E%A2%E7%A9%B6/"/>
     <id>https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/</id>
     <published>2016-05-16T03:12:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>Android 4种启动模式来说，用法说明此处不再提及主要介绍SingleTop，SingleTask相关的问题</p>
@@ -3111,7 +3195,7 @@ adb shell dumpsys activity | grep mFocusedActivity  获取处于栈顶的Activit
     <link href="https://fenglincanyi.github.io/2016/02/28/%E5%AF%B9%E7%A7%B0%E3%80%81%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF%E5%88%9D%E6%8E%A2/"/>
     <id>https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/</id>
     <published>2016-02-28T09:52:00.000Z</published>
-    <updated>2017-09-10T04:58:43.000Z</updated>
+    <updated>2017-12-01T04:56:01.560Z</updated>
     
     <content type="html"><![CDATA[<h3 id="一、对称加密"><a href="#一、对称加密" class="headerlink" title="一、对称加密"></a>一、对称加密</h3><ol>
 <li><p><strong>对称加密简介</strong></p>
@@ -3258,7 +3342,7 @@ M: 变长的消息，H(M)是定长的 Hash值
     <link href="https://fenglincanyi.github.io/2016/02/19/Git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/02/19/Git学习笔记（二）/</id>
     <published>2016-02-19T08:06:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="常用命令："><a href="#常用命令：" class="headerlink" title="常用命令："></a>常用命令：</h3><blockquote>
 <p>1、初始</p>
@@ -3363,7 +3447,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
     <link href="https://fenglincanyi.github.io/2016/02/19/Git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/02/19/Git学习笔记（一）/</id>
     <published>2016-02-19T07:28:00.000Z</published>
-    <updated>2017-01-19T08:20:55.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<h3 id="一、Git特点"><a href="#一、Git特点" class="headerlink" title="一、Git特点"></a>一、Git特点</h3><h4 id="1-直接记录快照，而非差异比较"><a href="#1-直接记录快照，而非差异比较" class="headerlink" title="1. 直接记录快照，而非差异比较"></a>1. 直接记录快照，而非差异比较</h4><ul>
 <li>在 Git 中保存项目状态时，它主要对当时的全部文件制作一个快照并保存这个快照的索引。</li>
@@ -3429,7 +3513,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
     <link href="https://fenglincanyi.github.io/2016/01/16/Android%20Studio%20NDK%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8ADemo%E7%A4%BA%E4%BE%8B/"/>
     <id>https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/</id>
     <published>2016-01-16T11:34:00.000Z</published>
-    <updated>2017-02-08T11:49:06.000Z</updated>
+    <updated>2017-10-31T13:50:20.000Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p> 说明：Android Studio 1.4后支持C/C++开发，1.3之前的版本坑点较多，所以使用1.4后的版本较为容易</p>
