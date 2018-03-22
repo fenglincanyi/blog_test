@@ -75,8 +75,10 @@ SmaliTool.getInstance().dealObscureInSmali();
 executeCommand(smali2DexCommand)
 //package patch.dex to patch.jar
 packagePatchDex2Jar()
-``
-扫描新增的类、方法、修改的方法，并分别添加到newlyAddedClassNameList, newlyAddedMethodSet, modifiedClassNameList, patchMethodSignatureSet中`
+```
+扫描新增的类、方法、修改的方法，并分别添加到
+newlyAddedClassNameList, newlyAddedMethodSet, modifiedClassNameList, patchMethodSignatureSet中
+
 ```groovy
 boolean isNewlyAddClass = scanClassForAddClassAnnotation(ctclass);
 //newly add class donnot need scann for modify
@@ -89,13 +91,24 @@ mapping读取：
 * initConfig()时会读取methodMap.robust的数据并将method信息存入methodMap中
 * initMappingInfo()读取mapping.txt, 并存入usedInModifiedClassMappingInfo中
 
-以上操作，准备工作已经就绪，开始生成patch操作：
-InlineClassFactory, PatchesFactory, PatchesControlFactory, PatchesInfoFactor开始进行复杂的patch相关类的生成
-将所有patch需要的类压缩至jar(meituan.jar), 执行命令去 jar -> dex, dex -> smali
-转成smali后，是为了处理混淆的问题，这也是auto-patch的难点
-美团技术团队，探究了各种方案，最后通过smali层面进行混淆问题的处理。
+生成patch之前，会预先处理内部类，内联的方法(InlineClassFactory.dealInLineClass);
+
+准备工作已经就绪，开始生成patch操作：
+PatchesFactory, PatchesControlFactory, PatchesInfoFactory开始进行复杂的patch相关类的生成;
+另外，还有热修复的一些辅助类：createControlClass, createPatchesInfoClass
+
+在此过程中，有些复杂的情况，需要做一些特殊的处理：
+主要是2个因素的影响：编译器对类的编译和更改、混淆引起的问题，内联优化掉的内容等等
+所以在 createPatchClass()时，操作也是比较复杂的,这也是auto-patch的难点......
+
+之后，将所有生成的class压缩至jar(meituan.jar), 执行命令去 jar -> dex, dex -> smali
+之所以这样做，是为了处理混淆的问题,目前生成的dex里的class都是未混淆过的类，字段，方法，所以这时候，
+通过查询mapping缓存，去替换成上一次打包所对应的各种a,b,c;
+这一步骤，可以参照中间产物 xxxPatch.class, xxxPatch.smali, mapping.txt 看出来。
+
 SmaliTool.groovy 进行一行一行的混淆问题处理，类的调用关系，混淆映射，修改好最终的smali文件；
-然后再从smali还原到dex,生成最后的patch.jar
+然后再从smali还原到dex,再达成最后的patch.jar
+
 关于混淆处理的smali操作，由于本人能力有限，就不展开讲了... ...
 
 ### patch下发及加载
@@ -120,7 +133,7 @@ try {
 #### 动态替换
 PatchedClassInfo记录所有了修改的类，和PatchControl的对应关系，然后做下面的事情：
 1. 加载要被修复的类patchedClassName，获取里面的字段changeQuickRedirect
-2. 加载PatchControl，获取PatchControl的实例
+2. 加载PatchControl，获取PatchControl的实例patchObject
 3. 赋值：changeQuickRedirect=patchObject
 
 这样，插桩的代码会检测到，并执行新逻辑
@@ -128,6 +141,8 @@ PatchProxy.isSupport() ->
 PatchProxy.accessDispatch() ->
 PatchControl.accessDispatch() ->
 XXXPatch.patchMethod()
+
+此过程中，会将方法签名，参数，原来的类，方法id进行一系列的传递和校验，具体就不展开了。。。
 ## 坑点
 * 对于匿名对象使用，有时候patch打包支持的不是很好
 

@@ -28,7 +28,7 @@
 <meta property="og:description" content="引言热修复在前几年来说，是个比较热的词；按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …各自的技术角度也是各有不同，也可以叫做流派不同。从dex、class加载的角度，方法hook角度，代码插桩角度 … ….从之前我分析的Freeline增量编译来说，也是属于这个">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png">
 <meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/robust2.png">
-<meta property="og:updated_time" content="2018-03-19T05:32:07.233Z">
+<meta property="og:updated_time" content="2018-03-22T17:36:02.635Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="热修复之Robust浅析">
 <meta name="twitter:description" content="引言热修复在前几年来说，是个比较热的词；按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …各自的技术角度也是各有不同，也可以叫做流派不同。从dex、class加载的角度，方法hook角度，代码插桩角度 … ….从之前我分析的Freeline增量编译来说，也是属于这个">
@@ -199,23 +199,31 @@
                 <div class="image-caption"></div>
             </figure>
 <p>从这里也能看出来，robust的缺点就是各处都插入了代码，对包体积是有影响的</p>
-<h3 id="打patch包"><a href="#打patch包" class="headerlink" title="打patch包"></a>打patch包</h3><p>打包之后产生的 mapping.txt, methodMap.robust,需要我们保存下来，用于打patch包<br>生成patch包，是在上次正常打包的代码基础上，也就是相同的代码条件下，来进行操作<br>自然的，patch打包，也是自动化通过gradle plugin来生成<br>Robust 自定义 Gradle Plugin：<strong>auto-patch-plugin</strong><br><code>AutoPatchTransform..groovy#transform</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">ReadAnnotation.readAnnotation(box, logger);</div><div class="line"><span class="keyword">if</span>(Config.supportProGuard) &#123;</div><div class="line">    ReadMapping.getInstance().initMappingInfo();</div><div class="line">&#125;</div><div class="line">generatPatch(box,patchPatch()</div><div class="line"></div><div class="line">zipPatchClassesFile()</div><div class="line">executeCommand(jar2DexCommand)</div><div class="line">executeCommand(dex2SmaliCommand)</div><div class="line">SmaliTool.getInstance().dealObscureInSmali();</div><div class="line">executeCommand(smali2DexCommand)</div><div class="line"><span class="comment">//package patch.dex to patch.jar</span></div><div class="line">packagePatchDex2Jar()</div><div class="line">``</div><div class="line">扫描新增的类、方法、修改的方法，并分别添加到newlyAddedClassNameList, newlyAddedMethodSet, modifiedClassNameList, patchMethodSignatureSet中`</div><div class="line">```groovy</div><div class="line"><span class="keyword">boolean</span> isNewlyAddClass = scanClassForAddClassAnnotation(ctclass);</div><div class="line"><span class="comment">//newly add class donnot need scann for modify</span></div><div class="line"><span class="keyword">if</span> (!isNewlyAddClass) &#123;</div><div class="line">    patchMethodSignureSet.addAll(scanClassForModifyMethod(ctclass));</div><div class="line">    scanClassForAddMethodAnnotation(ctclass);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="打patch包"><a href="#打patch包" class="headerlink" title="打patch包"></a>打patch包</h3><p>打包之后产生的 mapping.txt, methodMap.robust,需要我们保存下来，用于打patch包<br>生成patch包，是在上次正常打包的代码基础上，也就是相同的代码条件下，来进行操作<br>自然的，patch打包，也是自动化通过gradle plugin来生成<br>Robust 自定义 Gradle Plugin：<strong>auto-patch-plugin</strong><br><code>AutoPatchTransform..groovy#transform</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ReadAnnotation.readAnnotation(box, logger);</div><div class="line"><span class="keyword">if</span>(Config.supportProGuard) &#123;</div><div class="line">    ReadMapping.getInstance().initMappingInfo();</div><div class="line">&#125;</div><div class="line">generatPatch(box,patchPatch()</div><div class="line"></div><div class="line">zipPatchClassesFile()</div><div class="line">executeCommand(jar2DexCommand)</div><div class="line">executeCommand(dex2SmaliCommand)</div><div class="line">SmaliTool.getInstance().dealObscureInSmali();</div><div class="line">executeCommand(smali2DexCommand)</div><div class="line"><span class="comment">//package patch.dex to patch.jar</span></div><div class="line">packagePatchDex2Jar()</div></pre></td></tr></table></figure></p>
+<p>扫描新增的类、方法、修改的方法，并分别添加到<br>newlyAddedClassNameList, newlyAddedMethodSet, modifiedClassNameList, patchMethodSignatureSet中</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">boolean</span> isNewlyAddClass = scanClassForAddClassAnnotation(ctclass);</div><div class="line"><span class="comment">//newly add class donnot need scann for modify</span></div><div class="line"><span class="keyword">if</span> (!isNewlyAddClass) &#123;</div><div class="line">    patchMethodSignureSet.addAll(scanClassForModifyMethod(ctclass));</div><div class="line">    scanClassForAddMethodAnnotation(ctclass);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>mapping读取：</p>
 <ul>
 <li>initConfig()时会读取methodMap.robust的数据并将method信息存入methodMap中</li>
 <li>initMappingInfo()读取mapping.txt, 并存入usedInModifiedClassMappingInfo中</li>
 </ul>
-<p>以上操作，准备工作已经就绪，开始生成patch操作：<br>InlineClassFactory, PatchesFactory, PatchesControlFactory, PatchesInfoFactor开始进行复杂的patch相关类的生成<br>将所有patch需要的类压缩至jar(meituan.jar), 执行命令去 jar -&gt; dex, dex -&gt; smali<br>转成smali后，是为了处理混淆的问题，这也是auto-patch的难点<br>美团技术团队，探究了各种方案，最后通过smali层面进行混淆问题的处理。<br>SmaliTool.groovy 进行一行一行的混淆问题处理，类的调用关系，混淆映射，修改好最终的smali文件；<br>然后再从smali还原到dex,生成最后的patch.jar<br>关于混淆处理的smali操作，由于本人能力有限，就不展开讲了… …</p>
+<p>生成patch之前，会预先处理内部类，内联的方法(InlineClassFactory.dealInLineClass);</p>
+<p>准备工作已经就绪，开始生成patch操作：<br>PatchesFactory, PatchesControlFactory, PatchesInfoFactory开始进行复杂的patch相关类的生成;<br>另外，还有热修复的一些辅助类：createControlClass, createPatchesInfoClass</p>
+<p>在此过程中，有些复杂的情况，需要做一些特殊的处理：<br>主要是2个因素的影响：编译器对类的编译和更改、混淆引起的问题，内联优化掉的内容等等<br>所以在 createPatchClass()时，操作也是比较复杂的,这也是auto-patch的难点……</p>
+<p>之后，将所有生成的class压缩至jar(meituan.jar), 执行命令去 jar -&gt; dex, dex -&gt; smali<br>之所以这样做，是为了处理混淆的问题,目前生成的dex里的class都是未混淆过的类，字段，方法，所以这时候，<br>通过查询mapping缓存，去替换成上一次打包所对应的各种a,b,c;<br>这一步骤，可以参照中间产物 xxxPatch.class, xxxPatch.smali, mapping.txt 看出来。</p>
+<p>SmaliTool.groovy 进行一行一行的混淆问题处理，类的调用关系，混淆映射，修改好最终的smali文件；<br>然后再从smali还原到dex,再达成最后的patch.jar</p>
+<p>关于混淆处理的smali操作，由于本人能力有限，就不展开讲了… …</p>
 <h3 id="patch下发及加载"><a href="#patch下发及加载" class="headerlink" title="patch下发及加载"></a>patch下发及加载</h3><p>patch.jar 制作好之后，按道理来说，我们是需要一个热修复后台的。<br>在app启动之后，请求接口，下拉patch包, 放在app packagename 下目录，对patch包有一定的校验。<br>由前面的步骤，我们知道，下发的其实就是个 dex, 所以app启动后，是需要加载dex里的类</p>
 <h4 id="类加载"><a href="#类加载" class="headerlink" title="类加载"></a>类加载</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">DexClassLoader classLoader = <span class="keyword">new</span> DexClassLoader(patch.getTempPath(), context.getCacheDir().getAbsolutePath(),</div><div class="line">     <span class="keyword">null</span>, PatchExecutor.class.getClassLoader());</div><div class="line">patch.delete(patch.getTempPath());</div><div class="line"></div><div class="line">Class patchsInfoClass;</div><div class="line">PatchesInfo patchesInfo = <span class="keyword">null</span>;</div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">    patchsInfoClass = classLoader.loadClass(patch.getPatchesInfoImplClassFullName());</div><div class="line">    patchesInfo = (PatchesInfo) patchsInfoClass.newInstance();</div><div class="line">&#125; <span class="keyword">catch</span> (Throwable t) &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>这时候借助 DexClassLoader将PatchesInfoImpl先的加载处来，读取patchsInfoClass，拿到PatchedClassInfo列表</p>
 <h4 id="动态替换"><a href="#动态替换" class="headerlink" title="动态替换"></a>动态替换</h4><p>PatchedClassInfo记录所有了修改的类，和PatchControl的对应关系，然后做下面的事情：</p>
 <ol>
 <li>加载要被修复的类patchedClassName，获取里面的字段changeQuickRedirect</li>
-<li>加载PatchControl，获取PatchControl的实例</li>
+<li>加载PatchControl，获取PatchControl的实例patchObject</li>
 <li>赋值：changeQuickRedirect=patchObject</li>
 </ol>
 <p>这样，插桩的代码会检测到，并执行新逻辑<br>PatchProxy.isSupport() -&gt;<br>PatchProxy.accessDispatch() -&gt;<br>PatchControl.accessDispatch() -&gt;<br>XXXPatch.patchMethod()</p>
+<p>此过程中，会将方法签名，参数，原来的类，方法id进行一系列的传递和校验，具体就不展开了。。。</p>
 <h2 id="坑点"><a href="#坑点" class="headerlink" title="坑点"></a>坑点</h2><ul>
 <li>对于匿名对象使用，有时候patch打包支持的不是很好</li>
 </ul>
@@ -249,7 +257,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2018-03-19T05:32:07.233Z" title="2018-3-19 13:32" itemprop="dateUpdated">2018年3月19日 13:32</time>
+    最后更新时间：<time datetime="2018-03-22T17:36:02.635Z" title="2018-3-23 1:36" itemprop="dateUpdated">2018年3月23日 1:36</time>
 </span><br>
 
 
