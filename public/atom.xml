@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2018-03-22T17:36:02.635Z</updated>
+  <updated>2018-03-22T17:51:14.500Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://fenglincanyi.github.io/2018/03/12/%E7%83%AD%E4%BF%AE%E5%A4%8D%E4%B9%8BRobust%E6%B5%85%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2018/03/12/热修复之Robust浅析/</id>
     <published>2018-03-12T10:28:00.000Z</published>
-    <updated>2018-03-22T17:36:02.635Z</updated>
+    <updated>2018-03-22T17:51:14.500Z</updated>
     
     <content type="html"><![CDATA[<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>热修复在前几年来说，是个比较热的词；<br>按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …<br>各自的技术角度也是各有不同，也可以叫做流派不同。<br>从dex、class加载的角度，方法hook角度，代码插桩角度 … ….<br>从之前我分析的Freeline增量编译来说，也是属于这个范畴，并且对于平时开发来说，是一个很不错的增量方案。<br>作为一个Android 开发者来说，这么多技术方案的实现，真的是很不错的一个学习机会。无论热修复的能力好或坏，是否成熟与稳定，都可以给我们提供各种解决问题的思路和角度，十分有借鉴意义。<br>Robust 是借鉴了 Google instant run 的思路，将其作为热修复实现方案来改进演变而成的，从修复能力、兼容性、稳定性来讲，也算是性价比较高的。</p>
 <h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><p>Robust 的热修复思路，是在方法执行之前，判断是否需要热修复(flag)，如果是，则执行patch类的方法，如果不是，则执行原来的内容。<br>——这就是热修复所要做到的效果<br>具体实现呢，我们再来说：<br>根据以上的需求，主要就需要这2点：</p>
@@ -89,7 +89,7 @@
 <li>热修复并不仅仅是一个框架，更是一个完整的修复系统，包括：后台版本控制，patch异常处理，降级处理；毕竟热修复对于app来说，是一个毕竟敏感的事情</li>
 <li>各个主流的热修复技术，都涉及到Android底层的知识，所以对Android深入了解，对开发者十分有帮助</li>
 </ul>
-<p>参考：<br><a href="https://tech.meituan.com/android_autopatch.html" target="_blank" rel="external">https://tech.meituan.com/android_autopatch.html</a></p>
+<p>附录：<br><a href="https://tech.meituan.com/android_autopatch.html" target="_blank" rel="external">https://tech.meituan.com/android_autopatch.html</a><br><a href="https://github.com/fenglincanyi/Robust" target="_blank" rel="external">https://github.com/fenglincanyi/Robust</a></p>
 ]]></content>
     
     <summary type="html">

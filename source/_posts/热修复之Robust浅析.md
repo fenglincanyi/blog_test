@@ -236,5 +236,6 @@ if (!robusInsert) {
 * 各个主流的热修复技术，都涉及到Android底层的知识，所以对Android深入了解，对开发者十分有帮助
 
 
-参考：
+附录：
 https://tech.meituan.com/android_autopatch.html
+https://github.com/fenglincanyi/Robust
