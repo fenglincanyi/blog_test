@@ -5,7 +5,7 @@ categories: Java后台
 tags: Springmvc
 ---
 ## springmvc 框架原理
-![](http://7xr1vo.com1.z0.glb.clouddn.com/mvc.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/mvc.png)
 
 springmvc执行流程：
 1. 前端控制器（DispatcherServlet）, 接受请求，然后请求 处理器映射器（HanderMapping）
@@ -27,7 +27,7 @@ springmvc执行流程：
 ## springmvc 基本配置
 如果不在 springmvc.xml 配置相关的映射器、适配器，spring会使用默认的，默认的配置 在 DispatcherServlet.properties 中：
 这些默认的都不建议使用了。
-![](http://7xr1vo.com1.z0.glb.clouddn.com/B77F53FF-BBEF-40EC-BD0A-E176EB7AD8DA.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/B77F53FF-BBEF-40EC-BD0A-E176EB7AD8DA.png)
 
 
 ``` java
@@ -64,7 +64,7 @@ org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapt
 
 
 springmvc.xml 中的约束配置，参考文档进行配置：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/5665FF5D-517B-45F0-819D-3707A9534C8B.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/5665FF5D-517B-45F0-819D-3707A9534C8B.png)
 
 ``` xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -190,7 +190,7 @@ public ModelAndView editItemsSubmit(Integer id, ItemsQueryVo itemsQueryVo) throw
 </dependency>
 ```
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/BD15A0C3-C8A8-4C0E-84AB-656C19A1C1B0.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/BD15A0C3-C8A8-4C0E-84AB-656C19A1C1B0.png)
 
 具体看项目。。。
 

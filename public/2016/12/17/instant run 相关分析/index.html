@@ -28,29 +28,29 @@ instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 �
 <meta property="og:site_name" content="fenglincanyi">
 <meta property="og:description" content="Android Studio 2.0 引入了即时编译功能：instant run，一定程度上进行了增量编译、增量更新代码，节省了开发耗时（喝咖啡的时间）。下面具体分析下instant run相关工作流程和相关的源码
 instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 以上（设置21以上可获得最佳性能）Android 5.0以上的">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/Image.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/Image1.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/Image2.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/1-Y-gIucAGyqQscMdXuHaSiA.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/1-U2tXGUWaeDU7L3u9Z_U0fw.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20apk.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20zip%20class.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%97%A0%E6%A0%87%E9%A2%98.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E7%9B%B8%E5%85%B3jar.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20application.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E8%AE%BE%E7%BD%AE%E7%88%B6classloader%E8%BF%87%E7%A8%8B.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E7%9B%B8%E5%85%B3classLoader%E5%AE%9A%E4%B9%89.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E6%9C%89%E4%BB%A3%E7%A0%81%E5%8F%98%E6%9B%B4%E6%97%B6%E6%96%B0%E7%94%9F%E6%88%90.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%A2%9E%E5%8A%A0%E7%9A%84%E4%BB%A3%E7%A0%81override%E7%B1%BB.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%8F%98%E5%8C%96%E7%9A%84%E7%B1%BB%E6%95%B0%E7%BB%84%E5%AD%98%E5%82%A8.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%20patch%E7%9B%B8%E5%85%B3.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%93%E5%8C%85%E7%BB%93%E6%9E%9C.png">
-<meta property="og:updated_time" content="2017-10-31T13:50:20.000Z">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image1.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image2.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/1-Y-gIucAGyqQscMdXuHaSiA.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/1-U2tXGUWaeDU7L3u9Z_U0fw.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20apk.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20zip%20class.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%97%A0%E6%A0%87%E9%A2%98.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E7%9B%B8%E5%85%B3jar.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20application.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E8%AE%BE%E7%BD%AE%E7%88%B6classloader%E8%BF%87%E7%A8%8B.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%E7%9B%B8%E5%85%B3classLoader%E5%AE%9A%E4%B9%89.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%E6%9C%89%E4%BB%A3%E7%A0%81%E5%8F%98%E6%9B%B4%E6%97%B6%E6%96%B0%E7%94%9F%E6%88%90.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E5%A2%9E%E5%8A%A0%E7%9A%84%E4%BB%A3%E7%A0%81override%E7%B1%BB.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E5%8F%98%E5%8C%96%E7%9A%84%E7%B1%BB%E6%95%B0%E7%BB%84%E5%AD%98%E5%82%A8.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%20patch%E7%9B%B8%E5%85%B3.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%93%E5%8C%85%E7%BB%93%E6%9E%9C.png">
+<meta property="og:updated_time" content="2019-03-19T15:42:32.229Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="instant run 相关分析">
 <meta name="twitter:description" content="Android Studio 2.0 引入了即时编译功能：instant run，一定程度上进行了增量编译、增量更新代码，节省了开发耗时（喝咖啡的时间）。下面具体分析下instant run相关工作流程和相关的源码
 instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 以上（设置21以上可获得最佳性能）Android 5.0以上的">
-<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/Image.png">
+<meta name="twitter:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image.png">
     
         <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
     
@@ -205,20 +205,20 @@ instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 �
 <h4 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h4><p>首先确认开启instant run，在settings中搜索instant run，可看到相关设置，默认instant run功能是开启的<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>当第一次点击 run 按钮 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>，进行第一次编译打包。<br>apk成功安装之后，再观察工具栏，run按钮发生了变化：<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -231,7 +231,7 @@ instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 �
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/1-Y-gIucAGyqQscMdXuHaSiA.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/1-Y-gIucAGyqQscMdXuHaSiA.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -239,29 +239,29 @@ instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 �
 <h3 id="过程分析"><a href="#过程分析" class="headerlink" title="过程分析"></a>过程分析</h3><h4 id="第一次打包"><a href="#第一次打包" class="headerlink" title="第一次打包"></a>第一次打包</h4><p>instant run 第一次编译打包流程，会执行下面的工作<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/1-U2tXGUWaeDU7L3u9Z_U0fw.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/1-U2tXGUWaeDU7L3u9Z_U0fw.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>先来看看生成的apk：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20apk.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20apk.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p> 多出了 instant-run.zip文件，那它里面是什么内容呢？<br> <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20zip%20class.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20zip%20class.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br> instant-run.zip里的dex文件，是我们真正的业务代码</p>
 <p> 那instant run 相关的类呢，反而跑到了外层的classes.dex和classes2.dex中。</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%97%A0%E6%A0%87%E9%A2%98.png" alt=""><br><figure class="image-bubble">
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%97%A0%E6%A0%87%E9%A2%98.png" alt=""><br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E7%9B%B8%E5%85%B3jar.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E7%9B%B8%E5%85%B3jar.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -273,7 +273,7 @@ instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 �
 <p>再来看看清单文件，application 被替换成 BootstrapApplication：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20application.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20application.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -286,13 +286,13 @@ instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 �
 <p>下面我们分析一下setClassLoader详细过程：<br>主要经历了以下的方法：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E8%AE%BE%E7%BD%AE%E7%88%B6classloader%E8%BF%87%E7%A8%8B.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E8%AE%BE%E7%BD%AE%E7%88%B6classloader%E8%BF%87%E7%A8%8B.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>这几个ClassLoader类定义的逻辑关系如下：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E7%9B%B8%E5%85%B3classLoader%E5%AE%9A%E4%B9%89.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%E7%9B%B8%E5%85%B3classLoader%E5%AE%9A%E4%B9%89.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>findClass过程依次委托给 父ClassLoader，最后是让PathClassLoader去加载类</p>
@@ -306,35 +306,35 @@ instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 �
 <h3 id="代码热更新流程"><a href="#代码热更新流程" class="headerlink" title="代码热更新流程"></a>代码热更新流程</h3><p>在我们增加一行代码后，点击运行，我们来观察生成的类的变化<br>在 build 目录下，transforms 中有生成相关的代码<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E6%9C%89%E4%BB%A3%E7%A0%81%E5%8F%98%E6%9B%B4%E6%97%B6%E6%96%B0%E7%94%9F%E6%88%90.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%E6%9C%89%E4%BB%A3%E7%A0%81%E5%8F%98%E6%9B%B4%E6%97%B6%E6%96%B0%E7%94%9F%E6%88%90.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <h4 id="几个重要类"><a href="#几个重要类" class="headerlink" title="几个重要类"></a>几个重要类</h4><p>我们来具体看看demo 中代码更改：MainActivity$override类内容的确是最新的代码内容<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%A2%9E%E5%8A%A0%E7%9A%84%E4%BB%A3%E7%A0%81override%E7%B1%BB.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E5%A2%9E%E5%8A%A0%E7%9A%84%E4%BB%A3%E7%A0%81override%E7%B1%BB.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>AppPatchesLoaderImpl类记录了更改的类，存储在一个数组中，供类加载时候，替换成最新的类的代码内容<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%8F%98%E5%8C%96%E7%9A%84%E7%B1%BB%E6%95%B0%E7%BB%84%E5%AD%98%E5%82%A8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E5%8F%98%E5%8C%96%E7%9A%84%E7%B1%BB%E6%95%B0%E7%BB%84%E5%AD%98%E5%82%A8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%20patch%E7%9B%B8%E5%85%B3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%20patch%E7%9B%B8%E5%85%B3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <p>在此处，我反编译了slice_0-classes.dex：<br> <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%93%E5%8C%85%E7%BB%93%E6%9E%9C.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%93%E5%8C%85%E7%BB%93%E6%9E%9C.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -354,7 +354,7 @@ instant run 使用版本要求Gradle 2.0 以上build.gradle：minSdkVersion 15 �
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2017-10-31T13:50:20.000Z" title="2017-10-31 21:50" itemprop="dateUpdated">2017年10月31日 21:50</time>
+    最后更新时间：<time datetime="2019-03-19T15:42:32.229Z" title="2019-3-19 23:42" itemprop="dateUpdated">2019年3月19日 23:42</time>
 </span><br>
 
 
@@ -525,7 +525,7 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
     <div class="bottom">
         <p>
             <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
-            <span>fenglincanyi &copy; 2016 - 2018</span>
+            <span>fenglincanyi &copy; 2016 - 2019</span>
         </p>
     </div>
 </footer>

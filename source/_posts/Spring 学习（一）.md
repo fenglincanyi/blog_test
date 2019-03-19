@@ -34,7 +34,7 @@ public class Factory {
 }
 ```
 ## Spring 运行时
-![](http://7xr1vo.com1.z0.glb.clouddn.com/spring-overview.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/spring-overview.png)
 Spring 提供了全面的Java web 服务框架，从web层到业务层，再到持久层，都有着相关模块的实现。
 对于Spring 最基本使用，必须尹若 Core Container中的4个重要的部分，方可使用。
 若只引用某部分的库，maven也会自动引用最核心的jar包到你的应用中。
@@ -64,7 +64,7 @@ Spring 提供了全面的Java web 服务框架，从web层到业务层，再到�
 ```
 
 在resource 目录下，创建 xml 配置文件，如图：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/A5CEBFD6-CFE5-404A-A42F-CF521BAB4B47.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/A5CEBFD6-CFE5-404A-A42F-CF521BAB4B47.png)
 
 Idea 在你编辑时候，会提示相关的属性，方便书写配置
 
@@ -78,7 +78,7 @@ Idea 在你编辑时候，会提示相关的属性，方便书写配置
 
 </beans>
 ```
-![](http://7xr1vo.com1.z0.glb.clouddn.com/9FEC554D-7DDC-48C7-BA89-3FAAAC181312.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/9FEC554D-7DDC-48C7-BA89-3FAAAC181312.png)
 
 创建测试用例：
 
@@ -100,7 +100,7 @@ public class UserTest {
 
 }
 ```
-![](http://7xr1vo.com1.z0.glb.clouddn.com/979F1DF8-ADF4-499F-8119-62CDDE033AD4.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/979F1DF8-ADF4-499F-8119-62CDDE033AD4.png)
 
 至此，我们完成了第一个 Spring demo
 ## bean 的管理
@@ -152,7 +152,7 @@ public class User2Test {
 
 }
 ```
-![](http://7xr1vo.com1.z0.glb.clouddn.com/0815D096-5833-4AA4-9BD8-EE493BE15F32.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/0815D096-5833-4AA4-9BD8-EE493BE15F32.png)
 * 通过实例工厂创建对象
 
 ``` xml
@@ -176,7 +176,7 @@ scope：作用域
     globalSession 一次登陆，任何地方都保存有登录状态
 
 ## 附录：IDEA Resource 目录下，存放的文件类型
-![](http://7xr1vo.com1.z0.glb.clouddn.com/23395798-F73A-4EBB-95E2-1641C5EF8A24.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/23395798-F73A-4EBB-95E2-1641C5EF8A24.png)
 
 （IDEA 官网：https://www.jetbrains.com/help/idea/2016.3/resource-files.html ）
 

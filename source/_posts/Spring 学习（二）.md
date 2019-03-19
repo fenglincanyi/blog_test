@@ -77,7 +77,7 @@ public class UserServiceTest {
 
 }
 ```
-![](http://7xr1vo.com1.z0.glb.clouddn.com/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png)
 
 ## p命名空间注入
 xml 头部加入：
@@ -105,7 +105,7 @@ public class Person {
     }
 }
 ```
-![](http://7xr1vo.com1.z0.glb.clouddn.com/EA20EBAD-5360-4197-BA0C-4059ABF7636F.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/EA20EBAD-5360-4197-BA0C-4059ABF7636F.png)
 
 ## 复杂类型注入
 
@@ -178,7 +178,7 @@ xml 分别配置：
 </bean>
 ```
 测试：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/76FF4DDF-95DD-4F5A-B43F-30946D328A30.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/76FF4DDF-95DD-4F5A-B43F-30946D328A30.png)
 
 
 # 注解实现
@@ -244,7 +244,7 @@ public class UserService {
 }
 ```
 测试：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/A49E426F-CDC3-4A7E-8AD2-D428586B749D.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/A49E426F-CDC3-4A7E-8AD2-D428586B749D.png)
 
 
 <br>

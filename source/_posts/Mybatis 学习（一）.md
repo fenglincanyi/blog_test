@@ -30,7 +30,7 @@ db
 报错：
 org.apache.ibatis.binding.BindingException: Invalid bound statement (not found):    ………
 然后，发现target目录下，XxxMapper.xml 没有在 target 下相应的目录生成
-![](http://7xr1vo.com1.z0.glb.clouddn.com/4B5E209A-0C22-4072-8B8D-AD3532042E98.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/4B5E209A-0C22-4072-8B8D-AD3532042E98.png)
 
 原因：
 

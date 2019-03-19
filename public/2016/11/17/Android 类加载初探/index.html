@@ -44,18 +44,18 @@
                 
             
 一">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png">
-<meta property="og:updated_time" content="2017-10-31T13:50:20.000Z">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader1.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader2.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader3.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader4.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader5.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader6.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader7.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader8.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader9.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader10.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader11.png">
+<meta property="og:updated_time" content="2019-03-19T15:40:04.572Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android 类加载初探">
 <meta name="twitter:description" content="源码路径(此版本：Android 5.0)：android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system
@@ -68,7 +68,7 @@
                 
             
 一">
-<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png">
+<meta name="twitter:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader1.png">
     
         <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
     
@@ -224,28 +224,28 @@
 <p>需要关注的类有：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader4.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -256,7 +256,7 @@
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader5.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -266,7 +266,7 @@
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader6.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -276,7 +276,7 @@
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader7.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -287,14 +287,14 @@
 <p>DexPathList 构造函数：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>makeDexElements过程：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader9.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -302,7 +302,7 @@
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader10.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -310,7 +310,7 @@
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader11.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -323,7 +323,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2017-10-31T13:50:20.000Z" title="2017-10-31 21:50" itemprop="dateUpdated">2017年10月31日 21:50</time>
+    最后更新时间：<time datetime="2019-03-19T15:40:04.572Z" title="2019-3-19 23:40" itemprop="dateUpdated">2019年3月19日 23:40</time>
 </span><br>
 
 
@@ -494,7 +494,7 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
     <div class="bottom">
         <p>
             <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
-            <span>fenglincanyi &copy; 2016 - 2018</span>
+            <span>fenglincanyi &copy; 2016 - 2019</span>
         </p>
     </div>
 </footer>

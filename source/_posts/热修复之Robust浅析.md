@@ -49,11 +49,11 @@ classWriter.visitField() &
 MethodBodyInsertor.visitCode() -> RobustAsmUtils.createInsertCode()
 
 这些操作执行结束后，所有的class内容已经完备了，那么放入产物main.jar中，等待proguard和转成dex
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png" width="300" height="320" style="margin:0 auto;display:block"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust1.png" width="300" height="320" style="margin:0 auto;display:block"/>
 另外记录操作过的method的信息（methodMap<methodName, id>), 存储字节流到methodMap.robust中,并gzip压缩
 后续编译操作，都与正常的流程一样了
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/robust2.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust2.png)
 从这里也能看出来，robust的缺点就是各处都插入了代码，对包体积是有影响的
 ### 打patch包
 打包之后产生的 mapping.txt, methodMap.robust,需要我们保存下来，用于打patch包

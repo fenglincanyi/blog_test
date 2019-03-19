@@ -25,20 +25,20 @@ tags: [Dalvik, ART]
 - 实例考察：
 	- 安装时logcat日志：拷贝工作，然后进行dex优化，dexopt执行操作
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B.png)
 
    
    拷贝后，目录如下：
 	
-![](http://7xr1vo.com1.z0.glb.clouddn.com/copy%20lib%E7%BB%93%E6%9E%9C.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/copy%20lib%E7%BB%93%E6%9E%9C.png)
 
  dex位置：
 	
-![](http://7xr1vo.com1.z0.glb.clouddn.com/dex%E4%BD%8D%E7%BD%AE.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/dex%E4%BD%8D%E7%BD%AE.png)
 
 如果把此位置的 dex 删除后，且杀掉已经运行的进程后，再次点击app启动后奔溃，如图：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/%E5%88%A0%E6%8E%89dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84dex%E5%90%8E%EF%BC%8C%E4%B8%94%E6%9D%80%E6%8E%89%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84%E5%BA%94%E7%94%A8%E8%BF%9B%E7%A8%8B%EF%BC%8C%E5%86%8D%E6%AC%A1%E5%90%AF%E5%8A%A8.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E5%88%A0%E6%8E%89dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84dex%E5%90%8E%EF%BC%8C%E4%B8%94%E6%9D%80%E6%8E%89%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84%E5%BA%94%E7%94%A8%E8%BF%9B%E7%A8%8B%EF%BC%8C%E5%86%8D%E6%AC%A1%E5%90%AF%E5%8A%A8.png)
 
 由此可知，要启动app时，需要加载 /data/dalik-cache 目录下的dex文件
 
@@ -59,29 +59,29 @@ Android 4.4之后，对于Android虚拟机又继续做了优化，art 代替了 
 - 实例考察
  - ART 安装apk时，日志记录：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/art%E5%AE%89%E8%A3%85apk%E7%9A%84log.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/art%E5%AE%89%E8%A3%85apk%E7%9A%84log.png)
 	 可以看到，有apk的拷贝，有dex2oat的dex优化过程。再追一下相关的目录：
 	 
 
- ![](http://7xr1vo.com1.z0.glb.clouddn.com/local%E7%9B%AE%E5%BD%95%E4%B8%8B.png)
+ ![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/local%E7%9B%AE%E5%BD%95%E4%B8%8B.png)
  
-  ![](http://7xr1vo.com1.z0.glb.clouddn.com/dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B.png)
+  ![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B.png)
   
 里面有一部分是系统框架层的相关文件。
 	
 安装后的目录结构也有变化：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/data_app%E7%9B%AE%E5%BD%95%E4%B8%8B.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/data_app%E7%9B%AE%E5%BD%95%E4%B8%8B.png)
 
 生成相应的平台下的文件，此处我使用的是x86的模拟器
 
 Android 在编译时用到的 dexopt、dex2oat、aapt 都在 /system/bin目录下：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/4.4%E4%B8%8Bsystem_bin%E4%B8%8B%E7%9A%84aapt.png.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/4.4%E4%B8%8Bsystem_bin%E4%B8%8B%E7%9A%84aapt.png.png)
 
 当时对于 multidex 的包也进行了目录查找，如下，留下后续研究做参考。
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/multidex.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/multidex.png)
 
 相关参考文献：
 https://mssun.me/blog/android-art-runtime-2-dex2oat.html

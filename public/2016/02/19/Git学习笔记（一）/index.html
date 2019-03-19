@@ -34,9 +34,9 @@ Git 对待数据更像是一个 快照流。2. 近乎所有操作都是本地执
 为了高效，如果文件没有修改，Git 不再重新存储该文件，而是只保留一个链接指向之前存储的文件。
 Git 对待数据更像是一个 快照流。2. 近乎所有操作都是本地执行
 在 Git 中的绝大多数操作都只需要访问本地文件和资源，一般不需要来自网络上其它计算机的信息。3.">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/git3%E7%A7%8D%E5%B7%A5%E4%BD%9C%E5%8C%BA%E5%9F%9F.png">
-<meta property="og:updated_time" content="2017-10-31T13:50:20.000Z">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/git3%E7%A7%8D%E5%B7%A5%E4%BD%9C%E5%8C%BA%E5%9F%9F.png">
+<meta property="og:updated_time" content="2019-03-19T15:41:52.528Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Git学习笔记（一）">
 <meta name="twitter:description" content="一、Git特点1. 直接记录快照，而非差异比较
@@ -44,7 +44,7 @@ Git 对待数据更像是一个 快照流。2. 近乎所有操作都是本地执
 为了高效，如果文件没有修改，Git 不再重新存储该文件，而是只保留一个链接指向之前存储的文件。
 Git 对待数据更像是一个 快照流。2. 近乎所有操作都是本地执行
 在 Git 中的绝大多数操作都只需要访问本地文件和资源，一般不需要来自网络上其它计算机的信息。3.">
-<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png">
+<meta name="twitter:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png">
     
         <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
     
@@ -209,7 +209,7 @@ Git 对待数据更像是一个 快照流。2. 近乎所有操作都是本地执
 <h3 id="二、Git-中的文件有3种状态："><a href="#二、Git-中的文件有3种状态：" class="headerlink" title="二、Git 中的文件有3种状态："></a>二、Git 中的文件有3种状态：</h3><h4 id="1-已提交：数据已经安全的保存在本地数据库中"><a href="#1-已提交：数据已经安全的保存在本地数据库中" class="headerlink" title="1. 已提交：数据已经安全的保存在本地数据库中"></a>1. 已提交：数据已经安全的保存在本地数据库中</h4><h4 id="2-已修改：修改了文件，但未保存到数据库中"><a href="#2-已修改：修改了文件，但未保存到数据库中" class="headerlink" title="2. 已修改：修改了文件，但未保存到数据库中"></a>2. 已修改：修改了文件，但未保存到数据库中</h4><h4 id="3-已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中"><a href="#3-已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中" class="headerlink" title="3. 已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中"></a>3. 已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中</h4><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure> 
@@ -220,7 +220,7 @@ Git 对待数据更像是一个 快照流。2. 近乎所有操作都是本地执
 <h4 id="3-暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引"><a href="#3-暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引" class="headerlink" title="3. 暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引"></a>3. 暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引</h4><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/git3%E7%A7%8D%E5%B7%A5%E4%BD%9C%E5%8C%BA%E5%9F%9F.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/git3%E7%A7%8D%E5%B7%A5%E4%BD%9C%E5%8C%BA%E5%9F%9F.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure> 
@@ -245,7 +245,7 @@ Git 对待数据更像是一个 快照流。2. 近乎所有操作都是本地执
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2017-10-31T13:50:20.000Z" title="2017-10-31 21:50" itemprop="dateUpdated">2017年10月31日 21:50</time>
+    最后更新时间：<time datetime="2019-03-19T15:41:52.528Z" title="2019-3-19 23:41" itemprop="dateUpdated">2019年3月19日 23:41</time>
 </span><br>
 
 
@@ -416,7 +416,7 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
     <div class="bottom">
         <p>
             <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
-            <span>fenglincanyi &copy; 2016 - 2018</span>
+            <span>fenglincanyi &copy; 2016 - 2019</span>
         </p>
     </div>
 </footer>

@@ -26,13 +26,13 @@
 <meta property="og:url" content="https://fenglincanyi.github.io/2018/03/12/热修复之Robust浅析/index.html">
 <meta property="og:site_name" content="fenglincanyi">
 <meta property="og:description" content="引言热修复在前几年来说，是个比较热的词；按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …各自的技术角度也是各有不同，也可以叫做流派不同。从dex、class加载的角度，方法hook角度，代码插桩角度 … ….从之前我分析的Freeline增量编译来说，也是属于这个">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png">
-<meta property="og:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/robust2.png">
-<meta property="og:updated_time" content="2018-03-22T17:51:14.500Z">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust1.png">
+<meta property="og:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust2.png">
+<meta property="og:updated_time" content="2019-03-19T13:58:52.848Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="热修复之Robust浅析">
 <meta name="twitter:description" content="引言热修复在前几年来说，是个比较热的词；按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …各自的技术角度也是各有不同，也可以叫做流派不同。从dex、class加载的角度，方法hook角度，代码插桩角度 … ….从之前我分析的Freeline增量编译来说，也是属于这个">
-<meta name="twitter:image" content="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png">
+<meta name="twitter:image" content="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust1.png">
     
         <link rel="alternative" href="/atom.xml" title="fenglincanyi" type="application/atom+xml">
     
@@ -190,11 +190,11 @@
 </ol>
 <h2 id="主要的流程"><a href="#主要的流程" class="headerlink" title="主要的流程"></a>主要的流程</h2><h3 id="编译期插桩"><a href="#编译期插桩" class="headerlink" title="编译期插桩"></a>编译期插桩</h3><p>要做到插入代码，自然想到通过gradle plugin 来搞事情了，毕竟Google为我们已经提供好了接口（instant run 也是这么干的）<br>Robust 自定义 Gradle Plugin：<strong>gradle-plugin</strong><br>在transform时期，加入自己的处理逻辑:<br><code>RobustTransform.groovy#transform</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 拿到所有的类，放入到list中</span></div><div class="line"><span class="keyword">def</span> box = ConvertUtils.toCtClasses(inputs, classPool)</div><div class="line"><span class="keyword">if</span>(useASM)&#123;</div><div class="line">    <span class="comment">// 用ASM工具来直接修改 class</span></div><div class="line">    insertcodeStrategy=<span class="keyword">new</span> AsmInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    insertcodeStrategy=<span class="keyword">new</span> JavaAssistInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);</div><div class="line">&#125;</div><div class="line"><span class="comment">// 插入代码，输出jar</span></div><div class="line">insertcodeStrategy.insertCode(box, jarFile);</div><div class="line"><span class="comment">// 记录类的method信息，保存</span></div><div class="line">writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)</div></pre></td></tr></table></figure></p>
 <p>主要的代码路径：<br>AsmInsertImpl.insertCode() -&gt;<br>AsmInsertImpl.transformCode() -&gt;<br>InsertMethodBodyAdapter.visitMethod() -&gt;<br>// 插入static field &amp; 方法体插入代码<br>classWriter.visitField() &amp;<br>MethodBodyInsertor.visitCode() -&gt; RobustAsmUtils.createInsertCode()</p>
-<p>这些操作执行结束后，所有的class内容已经完备了，那么放入产物main.jar中，等待proguard和转成dex<br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png" width="300" height="320" style="margin:0 auto;display:block"><br>另外记录操作过的method的信息（methodMap<methodname, id="">), 存储字节流到methodMap.robust中,并gzip压缩<br>后续编译操作，都与正常的流程一样了</methodname,></p>
+<p>这些操作执行结束后，所有的class内容已经完备了，那么放入产物main.jar中，等待proguard和转成dex<br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust1.png" width="300" height="320" style="margin:0 auto;display:block"><br>另外记录操作过的method的信息（methodMap<methodname, id="">), 存储字节流到methodMap.robust中,并gzip压缩<br>后续编译操作，都与正常的流程一样了</methodname,></p>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -257,7 +257,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2018-03-22T17:51:14.500Z" title="2018-3-23 1:51" itemprop="dateUpdated">2018年3月23日 1:51</time>
+    最后更新时间：<time datetime="2019-03-19T13:58:52.848Z" title="2019-3-19 21:58" itemprop="dateUpdated">2019年3月19日 21:58</time>
 </span><br>
 
 
@@ -421,7 +421,7 @@ lazyScripts.push('/js/embed.min.js?v=1.4.2');
     <div class="bottom">
         <p>
             <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></span>
-            <span>fenglincanyi &copy; 2016 - 2018</span>
+            <span>fenglincanyi &copy; 2016 - 2019</span>
         </p>
     </div>
 </footer>

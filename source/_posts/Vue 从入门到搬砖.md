@@ -60,7 +60,7 @@ var LIFECYCLE_HOOKS = [
 ];
 ```
 <div style="text-align:center">
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/vue_lifecycle.png" width="400" height="720"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/vue_lifecycle.png" width="400" height="720"/>
 </div>
 
 ## 语法概览
@@ -182,7 +182,7 @@ new Vue({
 组件通信
 
 <div style="text-align:center">
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/props-events.png" width="210" height="200"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/props-events.png" width="210" height="200"/>
 </div>
 
 **单项数据流**

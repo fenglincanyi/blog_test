@@ -9,11 +9,11 @@ tags: [滑动, ScrollView, ListView]
 **滑动冲突的问题**
 ScrollView 中嵌套 ListView，ListView 在测量时，高度不论写活还是写死，Listiew 的测量模式都是 不确定模式：unspecified
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView1.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView1.png)
 
 ScrollView 换成 LinearLayout后：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView2.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView2.png)
 
 经过上面的实验，什么原因造成的 heightMeasureSpec的值是 680 呢？
 
@@ -22,22 +22,22 @@ ScrollView 换成 LinearLayout后：
 
 在ScrollView 测量时：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView3.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView3.png)
 
 Listview 测量时：heightMeasureSpec = 680
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView4.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView4.png)
 
 再继续向前追溯：
 ScrollView的 onMeasure() 调用了父类的  onMeasure() 即 FrameLayout 的：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView5.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView5.png)
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView6.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView6.png)
 
 再仔细观察：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView7.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView7.png)
 
 
 可以再查看ScrollView 的 measureChild() 方法，也是通过 设置 高度的测量模式：unspecified
@@ -129,7 +129,7 @@ https://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-v
 对于 ScrollView 的子View ，也不能配置高度属性为 match_parent, 即使设置了，也是按照 wrap_content 的效果走的
 而且 Android Studio 在lint 检查的时候，已经建议你这样做了
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView8.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView8.png)
 
 
 
@@ -189,7 +189,7 @@ listView.setOnTouchListener(object : View.OnTouchListener {
 })
 // 请求 父view 不允许拦截，则交给 listview 来处理 move 事件
 ```
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView9.gif" width="320" height="560"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView9.gif" width="320" height="560"/>
 
 另外，ScrollView嵌套RecyclerView也会存在显示不全的问题
 
@@ -208,7 +208,7 @@ NestedScrollView
 
 如图：
 
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView10.png" width="320" height="560"/>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView11.png" width="320" height="560"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView10.png" width="320" height="560"/>  <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView11.png" width="320" height="560"/>
 
 我们再换用
 NestedScrollView嵌套RecyclerView不会存在显示不全的问题; google 已经帮我们处理好了
@@ -220,7 +220,7 @@ NestedScrollView嵌套RecyclerView不会存在显示不全的问题; google 已�
 分别如图：
 wrap_content 时，RecycleView 会全部显示出来
 
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView12.png" width="320" height="560"/>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView13.png" width="320" height="560"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView12.png" width="320" height="560"/>  <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView13.png" width="320" height="560"/>
 
 
 实现细节，可以看看 NestedScrollView 和 RecyclerView 的 measure 的处理方式

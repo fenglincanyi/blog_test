@@ -10,7 +10,7 @@ tags: [Freeline]
 ## 前言：Android 开发者之痛
 
 普通的编译流程：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline1.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline1.png)
 存在问题：
 * 存在问题：
 * 全量编译
@@ -23,7 +23,7 @@ tags: [Freeline]
 * Mac: 2.5min
     提高机器硬件已不能解决开发耗时严重的问题了...
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline2.jpeg)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline2.jpeg)
 
 如何解决？
 1. 配置Gradle 参数、调整tasks间执行顺序、依赖
@@ -39,7 +39,7 @@ tags: [Freeline]
 
     增量构建的方式：以工程目录为单位进行增量构建，发生变更时候，变更的工程，以及该工程作为父节点或祖先节点的工程，均需要重新构建，构建完这些变更涉及的工程后，Buck需要重新走一次合并各工程DEX,对齐，签名，打包APK的过程,构建完毕后，继续走安装流程
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline3.gif)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline3.gif)
 
 缺点：
 * 增量机制并不完善
@@ -54,13 +54,13 @@ tags: [Freeline]
 ——屠毅敏（AndroidDynamicLoader ）
 
 资源文件更改：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline4.gif)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline4.gif)
 
 代码变动：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline5.gif)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline5.gif)
 
 编译速度对比：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline6.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline6.png)
 
 **原理实现**：
 * 利用反射，将修改的patch dex 插入到 dex Elements[] 最前面 
@@ -134,7 +134,7 @@ https://zeroturnaround.com/software/jrebel-for-android/features/
 
 ### Freeline 整体工作流程
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline7.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline7.png)
 
 <br>
 * PC端与手机建立TCP长连接
@@ -145,7 +145,7 @@ https://zeroturnaround.com/software/jrebel-for-android/features/
 * App 更新代码或资源，刷新或重启
 
 ### 单个工程流程
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline8.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline8.png)
 
 #### 几个重要的模块
 ##### Python 实现任务调度（调度中心、发号施令）
@@ -257,11 +257,11 @@ https://segmentfault.com/a/1190000004053072
 
 #### 资源的更新逻辑
 根据最新的 R.java 文件 拿到 各个资源id  生成 public.xml 和 ids.xml，用于解决资源id 冲突    id-gen-tool 工具   
- ![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline9.png)
+ ![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline9.png)
 
 对于增量的 资源进行 Freelineaapt 编译，未做过更改的资源，直接使用 backup 中的资源，再打成一个 增量包：inc.pack
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline10.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline10.png)
 
 增量包中，只包含 增量的资源，全量的arsc 和 AndroidManifest.xml
 
@@ -278,24 +278,24 @@ https://github.com/fenglincanyi/Study/blob/master/Freeline%E7%9B%B8%E5%85%B3/Fre
 ## 实例分析
 > 我们重点关注 项目目录下的 **app/build/freeline**
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline11.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline11.png)
 
 更改代码后，再执行增量编译后，观察此目录：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline12.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline12.png)
 
 只生成了最新的更改过的文件
 反编译 dex 目录下的 classes.dex 得出, 此文件里全是更改过的类文件：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline13.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline13.png)
 
 换个目录看看：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline14.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline14.png)
 
 对 hackload.dex 反编译：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline15.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline15.png)
 
 发现这个 hackload.dex 就是插桩时候，使用的单独的dex，里面是用来避免 preverify 问题的类
 随后，我们看看编译后的apk 文件，解压缩，反编译看看任意一个classes.dex:
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline16.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline16.png)
 发现，确实是在构造方法里插入一个其他dex中的类，来避免打上 verified 的标识，验证了上面的做法。
 <br>
 好，松一口气，代码更新算是说完了...
@@ -307,20 +307,20 @@ https://github.com/fenglincanyi/Study/blob/master/Freeline%E7%9B%B8%E5%85%B3/Fre
 
 前面说过：
 是通过反向对 R.java 文件摘出 资源 id信息，放在 ids.xml 和 public.xml 中，那我们来看看这两个文件：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline17.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline17.png)
 
 **ids.xml:**
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline18.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline18.png)
 
 里面是压缩过的id信息，就是我们在写布局文件的那些内容
 
 **public.xml:**
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline19.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline19.png)
 
 此处只是部分，public.xml 文件记录了 name 和 id 之间的映射
 
 一个普通的 R.java 文件，包含了以下资源信息
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline20.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline20.png)
 所以，这里的 ids.xml 只存储了 我们自己写的 id 信息，而 public.xml 存储了 R.java 完整信息。
 ids.xml 是为了处理资源id冲突问题，预先准备的文件
 
@@ -328,16 +328,16 @@ ids.xml 是为了处理资源id冲突问题，预先准备的文件
 
 app.pack 文件压缩了所有的资源文件，包括assets 和 res 目录下的资源文件，和清单文件，资源索引表
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline21.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline21.png)
 
 解压 app.pack 文件后：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline22.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline22.png)
 
 扩展一下，看看 resource.arsc 文件：
 此文件的并不是APP一下子解析加载的，是按需加载，
 它是一种二进制索引表,对应了app里所有资源name,及id
-![](http://7xr1vo.com1.z0.glb.clouddn.com/freeline23.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline23.png)
 
 
 ## 总结

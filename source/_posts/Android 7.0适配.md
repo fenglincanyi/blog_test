@@ -152,7 +152,7 @@ as a workaround for http://b/26394120, note that the access will be removed in f
 发现有两处警告，都是来源于 libgmacs.so 中。联系别的部门做适配...
 
 还有，此问题，如果项目 targetSdkVersion < 24，则会在 7.0手机上每次启动app时，弹出警告框：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/%E7%A7%81%E6%9C%89%E5%BA%93.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E7%A7%81%E6%9C%89%E5%BA%93.png)
 但也可以继续正常运行，但是这个很不友好，需要尽快联系提供者解决
 
 
@@ -191,10 +191,10 @@ Android 各个版本中，貌似对通知栏都有一定的更改，而且现在
 7.0 的通知栏，改变了样式，增加了小图标，还可以显示通知数量。
 
 自己在玩原生7.0 系统时，发现小图标变成灰色的方块了：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-142841.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/device-2017-06-08-142841.png)
 
 然后，发现在 华为 7.0 手机上，小图标显示又是正常的，应该是华为对通知栏显示做了处理
-![](http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-195515.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/device-2017-06-08-195515.png)
 
 这时候就比较蹩脚了，暂且这么干吧，我们项目中，使用了小米推送（通知消息），查阅了小米推送的文档：
 
@@ -220,7 +220,7 @@ NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATIO
         manager.notify(1, notification);
 ```
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-09-162941.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/device-2017-06-09-162941.png)
 这是我们可以定制的
 但是现在的项目比较死，暂时不适用自定义的了
 暂时使用小米推送的改动小图标的方式，替换上一个透明背景的logo吧，总比灰色的方块强吧。而且其他app也是同样的显示效果，如上面的图标中的百度淘宝和头条。

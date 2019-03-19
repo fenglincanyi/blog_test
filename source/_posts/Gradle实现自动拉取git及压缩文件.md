@@ -61,13 +61,13 @@ task deletehybird(type: Delete) {
 
 <br>
 此处，单独运行 task，演示效果：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/5FAACC49-BCE0-44ED-A60C-30378795BF74.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/5FAACC49-BCE0-44ED-A60C-30378795BF74.png)
 
 build 结果：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/22.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/22.png)
 
 在 assets 目录下生成：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/33.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/33.png)
 
 ### 遇到的问题
 Mac系统执行 commandLine 去 clone 时，每次都报错：

@@ -21,7 +21,7 @@ tags: RxJava
 ### 二、响应式编程模式
 * 下图采自官方文档，基本阐述了数据流和数据变换的过程：
 	
-	![这里写图片描述](http://7xr1vo.com1.z0.glb.clouddn.com/rxjava%E7%AE%80%E5%8D%95%E5%9B%BE%E8%A7%A3.png)
+	![这里写图片描述](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/rxjava%E7%AE%80%E5%8D%95%E5%9B%BE%E8%A7%A3.png)
 * 冷热观察者
 	* 热 观察者：可能一创建完就开始发射数据，因此所有后续订阅它的观察者可能从序列中间的某个位置开始接受数据（有一些数据错过了）
 	* 冷 观察者：一个"冷"的Observable会一直等待，直到有观察者订阅它才开始发射数据，因此这个观察者可以确保会收到整个数据序列

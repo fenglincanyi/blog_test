@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://fenglincanyi.github.io/"/>
-  <updated>2018-03-22T17:51:14.500Z</updated>
+  <updated>2019-03-19T13:58:52.848Z</updated>
   <id>https://fenglincanyi.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://fenglincanyi.github.io/2018/03/12/%E7%83%AD%E4%BF%AE%E5%A4%8D%E4%B9%8BRobust%E6%B5%85%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2018/03/12/热修复之Robust浅析/</id>
     <published>2018-03-12T10:28:00.000Z</published>
-    <updated>2018-03-22T17:51:14.500Z</updated>
+    <updated>2019-03-19T13:58:52.848Z</updated>
     
     <content type="html"><![CDATA[<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>热修复在前几年来说，是个比较热的词；<br>按大致的时序来排的话：比如阿里的andfix，qq空间的热修复方案（多dex插桩占位，未开源），Nuwa，腾讯tinker，饿了么Amigo，美团robust，阿里Sophix … …<br>各自的技术角度也是各有不同，也可以叫做流派不同。<br>从dex、class加载的角度，方法hook角度，代码插桩角度 … ….<br>从之前我分析的Freeline增量编译来说，也是属于这个范畴，并且对于平时开发来说，是一个很不错的增量方案。<br>作为一个Android 开发者来说，这么多技术方案的实现，真的是很不错的一个学习机会。无论热修复的能力好或坏，是否成熟与稳定，都可以给我们提供各种解决问题的思路和角度，十分有借鉴意义。<br>Robust 是借鉴了 Google instant run 的思路，将其作为热修复实现方案来改进演变而成的，从修复能力、兼容性、稳定性来讲，也算是性价比较高的。</p>
 <h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><p>Robust 的热修复思路，是在方法执行之前，判断是否需要热修复(flag)，如果是，则执行patch类的方法，如果不是，则执行原来的内容。<br>——这就是热修复所要做到的效果<br>具体实现呢，我们再来说：<br>根据以上的需求，主要就需要这2点：</p>
@@ -30,11 +30,11 @@
 </ol>
 <h2 id="主要的流程"><a href="#主要的流程" class="headerlink" title="主要的流程"></a>主要的流程</h2><h3 id="编译期插桩"><a href="#编译期插桩" class="headerlink" title="编译期插桩"></a>编译期插桩</h3><p>要做到插入代码，自然想到通过gradle plugin 来搞事情了，毕竟Google为我们已经提供好了接口（instant run 也是这么干的）<br>Robust 自定义 Gradle Plugin：<strong>gradle-plugin</strong><br>在transform时期，加入自己的处理逻辑:<br><code>RobustTransform.groovy#transform</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 拿到所有的类，放入到list中</span></div><div class="line"><span class="keyword">def</span> box = ConvertUtils.toCtClasses(inputs, classPool)</div><div class="line"><span class="keyword">if</span>(useASM)&#123;</div><div class="line">    <span class="comment">// 用ASM工具来直接修改 class</span></div><div class="line">    insertcodeStrategy=<span class="keyword">new</span> AsmInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">    insertcodeStrategy=<span class="keyword">new</span> JavaAssistInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);</div><div class="line">&#125;</div><div class="line"><span class="comment">// 插入代码，输出jar</span></div><div class="line">insertcodeStrategy.insertCode(box, jarFile);</div><div class="line"><span class="comment">// 记录类的method信息，保存</span></div><div class="line">writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)</div></pre></td></tr></table></figure></p>
 <p>主要的代码路径：<br>AsmInsertImpl.insertCode() -&gt;<br>AsmInsertImpl.transformCode() -&gt;<br>InsertMethodBodyAdapter.visitMethod() -&gt;<br>// 插入static field &amp; 方法体插入代码<br>classWriter.visitField() &amp;<br>MethodBodyInsertor.visitCode() -&gt; RobustAsmUtils.createInsertCode()</p>
-<p>这些操作执行结束后，所有的class内容已经完备了，那么放入产物main.jar中，等待proguard和转成dex<br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust1.png" width="300" height="320" style="margin:0 auto;display:block"><br>另外记录操作过的method的信息（methodMap<methodname, id="">), 存储字节流到methodMap.robust中,并gzip压缩<br>后续编译操作，都与正常的流程一样了</methodname,></p>
+<p>这些操作执行结束后，所有的class内容已经完备了，那么放入产物main.jar中，等待proguard和转成dex<br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust1.png" width="300" height="320" style="margin:0 auto;display:block"><br>另外记录操作过的method的信息（methodMap<methodname, id="">), 存储字节流到methodMap.robust中,并gzip压缩<br>后续编译操作，都与正常的流程一样了</methodname,></p>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/robust2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/robust2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -112,7 +112,7 @@
     <link href="https://fenglincanyi.github.io/2018/02/28/Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%90%AD%E5%BB%BAJenkins%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85/"/>
     <id>https://fenglincanyi.github.io/2018/02/28/Linux服务器搭建Jenkins自动化打包/</id>
     <published>2018-02-28T14:38:00.000Z</published>
-    <updated>2018-03-04T10:22:14.596Z</updated>
+    <updated>2019-03-19T15:35:02.581Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本文作为一次折腾服务器自动化配置的一次“纪念帖”… …</p>
@@ -126,7 +126,7 @@
 <p>如图，启动成功<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -139,21 +139,21 @@
 <li>JDK<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></li>
 <li>Git<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></li>
 <li>Gradle<br>gradle 使我们自己下载的，可以将本地的gradle zip 用 scp 直接上传至服务器，解压至相应目录<br>此处，我们配置多个gradle版本，4.1 和 3.5<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins4.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins4.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -168,49 +168,49 @@
 <li>新建任务<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins5.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins5.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></li>
 <li>配置项目url<br>这里选择github的项目为例子：<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins6.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins6.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></li>
 <li>配置git url<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins7.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins7.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></li>
 <li>配置gradle<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></li>
 <li>配置构建后操作<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins9.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins9.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 配置结束，save, 我们执行下:<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins10.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins10.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 打包结果，输出apk，mapping:<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/jenkins11.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins11.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -242,7 +242,7 @@
     <link href="https://fenglincanyi.github.io/2017/12/28/Android%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E5%AE%9E%E8%B7%B5/"/>
     <id>https://fenglincanyi.github.io/2017/12/28/Android进程间通信实践/</id>
     <published>2017-12-27T17:38:00.000Z</published>
-    <updated>2018-01-04T09:03:50.933Z</updated>
+    <updated>2019-03-19T15:36:49.074Z</updated>
     
     <content type="html"><![CDATA[<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>Android的跨进程通信，普通的业务场景中遇到的很少，但又是Android开发中很重要的一个知识点，作为Android Developer 不能不掌握。<br>最近的工作中需要实现这一功能，所以完成功能之后，决定回炉巩固一下。比较涉及底层的内容，都是比较有意思的。<br>进程间通信，不外乎一下的几种方式：Intent、四大组件、AIDL、Socket、共享文件。<br>我们来一一过一遍……</p>
 <h2 id="Intent"><a href="#Intent" class="headerlink" title="Intent"></a>Intent</h2><p>我们常用隐示意图intent，去调用一些系统功能，如：拨打电话，打开相册：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Intent callIntent = <span class="keyword">new</span>  Intent(Intent.ACTION_CALL, Uri.parse(<span class="string">"tel:12345678"</span> ));</div><div class="line">startActivity(callIntent);</div><div class="line"></div><div class="line">Intent intent = <span class="keyword">new</span> Intent(Intent.ACTION_PICK);</div><div class="line">intent.setDataAndType(MediaStore.Images.Media.INTERNAL_CONTENT_URI, <span class="string">"image/*"</span>);</div><div class="line">startActivityForResult(intent, <span class="number">999</span>);</div></pre></td></tr></table></figure></p>
@@ -269,7 +269,7 @@
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">provider</span></span></div><div class="line">    <span class="attr">android:name</span>=<span class="string">"com.android.geng.DataInfoProvider"</span></div><div class="line">    <span class="attr">android:authorities</span>=<span class="string">"com.android.test.provider"</span></div><div class="line">    <span class="attr">android:exported</span>=<span class="string">"true"</span> /&gt;</div><div class="line">    <span class="comment">&lt;!-- 供外界访问 --&gt;</span></div></pre></td></tr></table></figure>
 <p><strong>在App B中</strong>，调用 A 的provider：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 查询数据</span></div><div class="line">String s = <span class="string">"content://com.android.test.provider/data_info/"</span>;<span class="comment">// content://authority/tablename/</span></div><div class="line">Cursor c = resolver.query(Uri.parse(s), <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</div><div class="line"><span class="keyword">if</span> (c != <span class="keyword">null</span> &amp;&amp; c.getCount() &gt; <span class="number">0</span> &amp;&amp; c.moveToNext()) &#123;</div><div class="line">	<span class="comment">// 读取 Cursor</span></div><div class="line">	<span class="keyword">int</span> packageTag = c.getInt(c.getColumnIndex(<span class="string">"package_tag"</span>));</div><div class="line">&#125;</div><div class="line"><span class="keyword">if</span> (c != <span class="keyword">null</span>) &#123;</div><div class="line">	c.close();</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 更新数据</span></div><div class="line">ContentValues values = <span class="keyword">new</span> ContentValues();</div><div class="line">values.put(<span class="string">"package_tag"</span>, <span class="number">100</span>);</div><div class="line"><span class="comment">// result : 更新了多少行</span></div><div class="line"><span class="keyword">int</span> result = resolver.update(Uri.parse(s), values, <span class="string">"package_name = ?"</span>, <span class="keyword">new</span> String[]&#123;<span class="string">"com.android.test"</span>&#125;);</div></pre></td></tr></table></figure></p>
 <p>同样的，这种通信方式，在原生系统上，极端情况下（App A进程死的），也是可以访问其provider的。经过测试，小米普遍可以；华为、oppo、vivo基本上都是不同程度的限制。都是为了防止app胡乱进行保活机制。</p>
-<h3 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h3><p>Service 无疑是跨进程通信中用的最多的，可以通过好几种方式进行消息传递，生命周期也是和activity有所不同，优先级比activity低。<br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/service_lifecycle.png" width="320" height="440" style="margin:0 auto;display:block"></p>
+<h3 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h3><p>Service 无疑是跨进程通信中用的最多的，可以通过好几种方式进行消息传递，生命周期也是和activity有所不同，优先级比activity低。<br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/service_lifecycle.png" width="320" height="440" style="margin:0 auto;display:block"></p>
 <p>系统提供2种方式让我们来玩耍:</p>
 <h4 id="startService"><a href="#startService" class="headerlink" title="startService"></a>startService</h4><p>startService 首次首次调用，会经历上图的过程；后面再次start, 只会走onStartCommand();<br>startService方式 必须管理自己的生命周期。也就是说，除非系统必须回收内存资源，否则系统不会停止或销毁服务，而且服务在 onStartCommand() 返回后会继续运行。<br>可以由自身 stopSelf() 或者 其他组件调用 stopService(), 系统就会销毁Service<br>注意的有：<br><strong>onStartCommand() 的返回值</strong></p>
 <ul>
@@ -292,11 +292,11 @@
 <p><strong>App A:</strong><br><code>MainActivity.java</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClickView</span><span class="params">(View view)</span> </span>&#123;</div><div class="line">    Intent intent = <span class="keyword">new</span> Intent();</div><div class="line">    intent.setComponent(<span class="keyword">new</span> ComponentName(<span class="string">"com.geng.bapp"</span>, <span class="string">"com.geng.bapp.BAppService"</span>));</div><div class="line">    intent.putExtra(<span class="string">"app_source"</span>, getPackageName());</div><div class="line">    startService(intent);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p><code>AppService.java</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Service 注册，android:exported="true"</span></div><div class="line"><span class="comment">// 服务端</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> Messenger messenger;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MessageHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">            <span class="keyword">switch</span> (msg.what) &#123;</div><div class="line">                <span class="keyword">case</span> <span class="number">200</span>:</div><div class="line">                    Bundle data = msg.getData();</div><div class="line">                    <span class="keyword">if</span> (data == <span class="keyword">null</span>) &#123;</div><div class="line">                        <span class="keyword">return</span>;</div><div class="line">                    &#125;</div><div class="line">                    System.out.println(<span class="string">"A收到B的消息： "</span> + data.getString(<span class="string">"source"</span>) + <span class="string">", "</span> + data.getBoolean(<span class="string">"user_setting"</span>) + <span class="string">", "</span> + data.getInt(<span class="string">"priority"</span>));</div><div class="line"></div><div class="line">                    Messenger clientMessenger = msg.replyTo;</div><div class="line">                    Message m = Message.obtain();</div><div class="line">                    m.what = <span class="number">100</span>;</div><div class="line">                    Bundle bundle = <span class="keyword">new</span> Bundle();</div><div class="line">                    bundle.putString(<span class="string">"reply msg"</span>, <span class="string">"A received B msg"</span>);</div><div class="line">                    m.setData(bundle);</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        clientMessenger.send(m);</div><div class="line">                    &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                <span class="keyword">default</span>:</div><div class="line">                    <span class="keyword">super</span>.handleMessage(msg);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onCreate();</div><div class="line">        messenger = <span class="keyword">new</span> Messenger(<span class="keyword">new</span> MessageHandler());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">onStartCommand</span><span class="params">(Intent intent, <span class="keyword">int</span> flags, <span class="keyword">int</span> startId)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> START_NOT_STICKY;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Nullable</span></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</div><div class="line">        <span class="comment">// 返回binder</span></div><div class="line">        <span class="keyword">return</span> messenger.getBinder();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.onDestroy();</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 <p><strong>App B:</strong><br><code>BAppService.java</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Service 注册，android:exported="true"</span></div><div class="line"><span class="comment">// 客户端</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BAppService</span> <span class="keyword">extends</span> <span class="title">Service</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isBinded;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MessengerReplyHandler</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">            <span class="keyword">switch</span> (msg.what) &#123;</div><div class="line">                <span class="keyword">case</span> <span class="number">100</span>:</div><div class="line">                    Bundle b  = msg.getData();</div><div class="line">                    <span class="keyword">if</span> (b != <span class="keyword">null</span> &amp;&amp; !TextUtils.isEmpty(b.getString(<span class="string">"reply msg"</span>))) &#123;</div><div class="line">                        System.out.println(<span class="string">"B收到A的响应："</span> + b.getString(<span class="string">"reply msg"</span>));</div><div class="line">                    &#125;</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">                <span class="keyword">default</span>:</div><div class="line">                    <span class="keyword">super</span>.handleMessage(msg);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> Messenger clientMessenger = <span class="keyword">new</span> Messenger(<span class="keyword">new</span> MessengerReplyHandler());</div><div class="line"></div><div class="line"></div><div class="line">    <span class="keyword">private</span> ServiceConnection sc = <span class="keyword">new</span> ServiceConnection() &#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceConnected</span><span class="params">(ComponentName name, IBinder service)</span> </span>&#123;</div><div class="line">            isBinded = <span class="keyword">true</span>;</div><div class="line"></div><div class="line">            Messenger serverMessenger = <span class="keyword">new</span> Messenger(service);</div><div class="line">            Message msg = Message.obtain();</div><div class="line"></div><div class="line">            msg.what = <span class="number">200</span>;</div><div class="line">            Bundle bundle = msg.getData();</div><div class="line">            bundle.putString(<span class="string">"source"</span>, <span class="string">"browser"</span>);</div><div class="line">            bundle.putBoolean(<span class="string">"user_setting"</span>, <span class="keyword">false</span>);</div><div class="line">            bundle.putBoolean(<span class="string">"setting_state"</span>, <span class="keyword">true</span>);</div><div class="line">            bundle.putInt(<span class="string">"priority"</span>, <span class="number">100</span>);</div><div class="line"></div><div class="line">            msg.replyTo = clientMessenger;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                serverMessenger.send(msg);<span class="comment">// 给服务端发消息</span></div><div class="line">            &#125; <span class="keyword">catch</span> (RemoteException e) &#123;</div><div class="line">                e.printStackTrace();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onServiceDisconnected</span><span class="params">(ComponentName name)</span> </span>&#123;</div><div class="line">            isBinded = <span class="keyword">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">onStartCommand</span><span class="params">(Intent intent, <span class="keyword">int</span> flags, <span class="keyword">int</span> startId)</span> </span>&#123;</div><div class="line">        String serverApp = intent.getStringExtra(<span class="string">"app_source"</span>);</div><div class="line"></div><div class="line">        System.out.println(<span class="string">"B onStartCommand: "</span>+ serverApp);</div><div class="line"></div><div class="line">        Intent in = <span class="keyword">new</span> Intent();</div><div class="line">        in.setComponent(<span class="keyword">new</span> ComponentName(serverApp, serverApp+<span class="string">".AppService"</span>));</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (isBinded) &#123;</div><div class="line">            unbindService(sc);</div><div class="line">        &#125;</div><div class="line">        bindService(in, sc, BIND_AUTO_CREATE);<span class="comment">//自动创建</span></div><div class="line">    </div><div class="line">        <span class="keyword">return</span> START_NOT_STICKY;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Nullable</span></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> IBinder <span class="title">onBind</span><span class="params">(Intent intent)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>运行结果：<br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/bindservicedemo.png" width="500" height="60" style="margin:0 auto;display:block"></p>
-<h2 id="AIDL"><a href="#AIDL" class="headerlink" title="AIDL"></a>AIDL</h2><p>终于来到最专业干这事的地方了，AIDL：Android 接口定义语言（Android Interface Define Language）<br>代码实现起来，稍显复杂，我们还是按照上面那个 demo 来做：<br>建立 AIDL 文件（默认会生成一个示例方法）：<br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl1.png" width="550" height="330" style="margin:0 auto;display:block"><br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl2.png" width="320" height="200" style="margin:0 auto;display:block"></p>
+<p>运行结果：<br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/bindservicedemo.png" width="500" height="60" style="margin:0 auto;display:block"></p>
+<h2 id="AIDL"><a href="#AIDL" class="headerlink" title="AIDL"></a>AIDL</h2><p>终于来到最专业干这事的地方了，AIDL：Android 接口定义语言（Android Interface Define Language）<br>代码实现起来，稍显复杂，我们还是按照上面那个 demo 来做：<br>建立 AIDL 文件（默认会生成一个示例方法）：<br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl1.png" width="550" height="330" style="margin:0 auto;display:block"><br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl2.png" width="320" height="200" style="margin:0 auto;display:block"></p>
 <p>在这个IAppAidlInterface.aidl文件中，我们加上自己的接口：<br><code>IAppAidlInterface.aidl</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// IAppAidlInterface.aidl</span></div><div class="line"><span class="keyword">package</span> com.geng.aidldemo</div><div class="line"><span class="comment">// 注意：手动导入包</span></div><div class="line"><span class="keyword">import</span> com.geng.aidldemo.PeopleBean;</div><div class="line"></div><div class="line"><span class="comment">// Declare any non-default types here with import statements</span></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IAppAidlInterface</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Demonstrates some basic types that you can use as parameters</div><div class="line">     * and return values in AIDL.</div><div class="line">     */</div><div class="line"><span class="comment">//    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,</span></div><div class="line"><span class="comment">//            double aDouble, String aString);</span></div><div class="line"></div><div class="line">    <span class="function">String <span class="title">setData</span><span class="params">(String packageName, <span class="keyword">int</span> tag)</span></span>;</div><div class="line"></div><div class="line">    <span class="function">List&lt;PeopleBean&gt; <span class="title">queryInfo</span><span class="params">(String name, <span class="keyword">int</span> age)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p><code>PeopleBean.aidl</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// IAppAidlInterface.aidl</span></div><div class="line"><span class="keyword">package</span> com.geng.aidldemo;</div><div class="line"></div><div class="line"><span class="comment">// Declare any non-default types here with import statements</span></div><div class="line"><span class="comment">// 加入自己的bean,要实现parcelable</span></div><div class="line">parcelable PeopleBean;</div></pre></td></tr></table></figure></p>
-<p>然后，我们将在APP A中AIDL相关目录 复制到App B中，PeopleBean 也是。<strong>包名要保持一致</strong><br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl4.png" style="margin:0 auto;display:block"></p>
+<p>然后，我们将在APP A中AIDL相关目录 复制到App B中，PeopleBean 也是。<strong>包名要保持一致</strong><br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl4.png" style="margin:0 auto;display:block"></p>
 <ul>
 <li>注意：<br><strong>建立aidl文件后(或有文件更改)，需要clean/rebuild, 不然在实现aidl中接口时，会报错。</strong></li>
 </ul>
@@ -305,11 +305,11 @@
 <p>测试结果：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl5.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl5.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
-<p>我们再看看，中间的产物：<br>在 app A/B 的build中, 有IAppAidlInterface的接口文件产生。<br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl3.png" width="350" height="230" style="margin:0 auto;display:block"></p>
+<p>我们再看看，中间的产物：<br>在 app A/B 的build中, 有IAppAidlInterface的接口文件产生。<br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl3.png" width="350" height="230" style="margin:0 auto;display:block"></p>
 <p><strong>一个内部抽象类Stub实现了外部的接口，并继承了android.os.Binder，最内部的静态类Proxy，真正实现了2个接口方法，并进行序列化的操作</strong></p>
 <p><code>build/generated/source/aidl/IAppAidlInterface.java</code><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IAppAidlInterface</span> <span class="keyword">extends</span> <span class="title">android</span>.<span class="title">os</span>.<span class="title">IInterface</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Local-side IPC implementation stub class.</div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Stub</span> <span class="keyword">extends</span> <span class="title">android</span>.<span class="title">os</span>.<span class="title">Binder</span> <span class="keyword">implements</span> <span class="title">com</span>.<span class="title">geng</span>.<span class="title">aidldemo</span>.<span class="title">IAppAidlInterface</span> </span>&#123;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> java.lang.String DESCRIPTOR = <span class="string">"com.geng.aidldemo.IAppAidlInterface"</span>;</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * Construct the stub at attach it to the interface.</div><div class="line">         */</div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Stub</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="keyword">this</span>.attachInterface(<span class="keyword">this</span>, DESCRIPTOR);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * Cast an IBinder object into an com.geng.aidldemo.IAppAidlInterface interface,</div><div class="line">         * generating a proxy if needed.</div><div class="line">         */</div><div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> com.geng.aidldemo.<span class="function">IAppAidlInterface <span class="title">asInterface</span><span class="params">(android.os.IBinder obj)</span> </span>&#123;</div><div class="line">            <span class="keyword">if</span> ((obj == <span class="keyword">null</span>)) &#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">            &#125;</div><div class="line">            android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);</div><div class="line">            <span class="keyword">if</span> (((iin != <span class="keyword">null</span>) &amp;&amp; (iin <span class="keyword">instanceof</span> com.geng.aidldemo.IAppAidlInterface))) &#123;</div><div class="line">                <span class="keyword">return</span> ((com.geng.aidldemo.IAppAidlInterface) iin);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> com.geng.aidldemo.IAppAidlInterface.Stub.Proxy(obj);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="keyword">public</span> android.os.<span class="function">IBinder <span class="title">asBinder</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTransact</span><span class="params">(<span class="keyword">int</span> code, android.os.Parcel data, android.os.Parcel reply, <span class="keyword">int</span> flags)</span> <span class="keyword">throws</span> android.os.RemoteException </span>&#123;</div><div class="line">            <span class="keyword">switch</span> (code) &#123;</div><div class="line">                <span class="keyword">case</span> INTERFACE_TRANSACTION: &#123;</div><div class="line">                    reply.writeString(DESCRIPTOR);</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">case</span> TRANSACTION_setData: &#123;</div><div class="line">                    data.enforceInterface(DESCRIPTOR);</div><div class="line">                    java.lang.String _arg0;</div><div class="line">                    _arg0 = data.readString();</div><div class="line">                    <span class="keyword">int</span> _arg1;</div><div class="line">                    _arg1 = data.readInt();</div><div class="line">                    java.lang.String _result = <span class="keyword">this</span>.setData(_arg0, _arg1);</div><div class="line">                    reply.writeNoException();</div><div class="line">                    reply.writeString(_result);</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">case</span> TRANSACTION_queryInfo: &#123;</div><div class="line">                    data.enforceInterface(DESCRIPTOR);</div><div class="line">                    java.lang.String _arg0;</div><div class="line">                    _arg0 = data.readString();</div><div class="line">                    <span class="keyword">int</span> _arg1;</div><div class="line">                    _arg1 = data.readInt();</div><div class="line">                    java.util.List&lt;com.geng.aidldemo.PeopleBean&gt; _result = <span class="keyword">this</span>.queryInfo(_arg0, _arg1);</div><div class="line">                    reply.writeNoException();</div><div class="line">                    reply.writeTypedList(_result);</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.onTransact(code, data, reply, flags);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Proxy</span> <span class="keyword">implements</span> <span class="title">com</span>.<span class="title">geng</span>.<span class="title">aidldemo</span>.<span class="title">IAppAidlInterface</span> </span>&#123;</div><div class="line">            <span class="keyword">private</span> android.os.IBinder mRemote;</div><div class="line"></div><div class="line">            Proxy(android.os.IBinder remote) &#123;</div><div class="line">                mRemote = remote;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="keyword">public</span> android.os.<span class="function">IBinder <span class="title">asBinder</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> mRemote;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">public</span> java.lang.<span class="function">String <span class="title">getInterfaceDescriptor</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> DESCRIPTOR;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="keyword">public</span> java.lang.<span class="function">String <span class="title">setData</span><span class="params">(java.lang.String packageName, <span class="keyword">int</span> tag)</span> <span class="keyword">throws</span> android.os.RemoteException </span>&#123;</div><div class="line">                android.os.Parcel _data = android.os.Parcel.obtain();</div><div class="line">                android.os.Parcel _reply = android.os.Parcel.obtain();</div><div class="line">                java.lang.String _result;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    _data.writeInterfaceToken(DESCRIPTOR);</div><div class="line">                    _data.writeString(packageName);</div><div class="line">                    _data.writeInt(tag);</div><div class="line">                    mRemote.transact(Stub.TRANSACTION_setData, _data, _reply, <span class="number">0</span>);</div><div class="line">                    _reply.readException();</div><div class="line">                    _result = _reply.readString();</div><div class="line">                &#125; <span class="keyword">finally</span> &#123;</div><div class="line">                    _reply.recycle();</div><div class="line">                    _data.recycle();</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">return</span> _result;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="keyword">public</span> java.util.List&lt;com.geng.aidldemo.PeopleBean&gt; queryInfo(java.lang.String name, <span class="keyword">int</span> age) <span class="keyword">throws</span> android.os.RemoteException &#123;</div><div class="line">                android.os.Parcel _data = android.os.Parcel.obtain();</div><div class="line">                android.os.Parcel _reply = android.os.Parcel.obtain();</div><div class="line">                java.util.List&lt;com.geng.aidldemo.PeopleBean&gt; _result;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    _data.writeInterfaceToken(DESCRIPTOR);</div><div class="line">                    _data.writeString(name);</div><div class="line">                    _data.writeInt(age);</div><div class="line">                    mRemote.transact(Stub.TRANSACTION_queryInfo, _data, _reply, <span class="number">0</span>);</div><div class="line">                    _reply.readException();</div><div class="line">                    _result = _reply.createTypedArrayList(com.geng.aidldemo.PeopleBean.CREATOR);</div><div class="line">                &#125; <span class="keyword">finally</span> &#123;</div><div class="line">                    _reply.recycle();</div><div class="line">                    _data.recycle();</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">return</span> _result;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_setData = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">0</span>);</div><div class="line">        <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_queryInfo = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> java.lang.<span class="function">String <span class="title">setData</span><span class="params">(java.lang.String packageName, <span class="keyword">int</span> tag)</span> <span class="keyword">throws</span> android.os.RemoteException</span>;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> java.util.List&lt;com.geng.aidldemo.PeopleBean&gt; queryInfo(java.lang.String name, <span class="keyword">int</span> age) <span class="keyword">throws</span> android.os.RemoteException;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>总体来说，AIDL的方式写起来是比较麻烦，但是逻辑还是很简单的，<strong>客户端 调用 服务端的方法实现</strong></p>
@@ -347,7 +347,7 @@
     <link href="https://fenglincanyi.github.io/2017/12/02/%E6%B3%A8%E8%A7%A3%E5%9F%BA%E7%A1%80%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%BA%94%E7%94%A8/"/>
     <id>https://fenglincanyi.github.io/2017/12/02/注解基础及相关应用/</id>
     <published>2017-12-02T10:21:00.000Z</published>
-    <updated>2017-12-06T16:47:37.324Z</updated>
+    <updated>2019-03-19T15:37:10.704Z</updated>
     
     <content type="html"><![CDATA[<h3 id="引子"><a href="#引子" class="headerlink" title="引子"></a>引子</h3><p>作为Java / Android 开发者，我们平时开发中经常用到注解，有的方便了我们开发，动态的添加代码，减少我们的开发量；有的编译时能友好的提示我们，帮我们纠错。<br>现在我们就回炉，看看注解相关的问题</p>
 <h3 id="注解基础"><a href="#注解基础" class="headerlink" title="注解基础"></a>注解基础</h3><h4 id="Java-内置注解"><a href="#Java-内置注解" class="headerlink" title="Java 内置注解"></a>Java 内置注解</h4><p>Java 在jdk中，定义了一套注解，我们最常见的有：</p>
@@ -395,7 +395,7 @@
 <h3 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h3><p>在自定义个注解时，会自动继承java.lang.annotation.Annotation接口。<br>我们可以看到：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -423,7 +423,7 @@
 <p>4.项目依赖是这样的：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>贴上 具体的配置，不多说了。<br>app 的 gradle 配置：</p>
@@ -448,20 +448,20 @@
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <p>META-INF下的文件自动生成了<br>我们再看看，app module 下：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation4.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation4.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation5.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation5.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>PeopleBean 自动生成了。<br>OK，大功告成。</p>
@@ -472,14 +472,14 @@
 <h4 id="配置远程调试"><a href="#配置远程调试" class="headerlink" title="配置远程调试"></a>配置远程调试</h4><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation6.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation6.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation7.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation7.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -487,7 +487,7 @@
 <h4 id="开启守护进程"><a href="#开启守护进程" class="headerlink" title="开启守护进程"></a>开启守护进程</h4><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -497,7 +497,7 @@
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation9.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation9.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -508,7 +508,7 @@
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/annotation10.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/annotation10.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -588,7 +588,7 @@
     <link href="https://fenglincanyi.github.io/2017/07/19/Vue%20%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%90%AC%E7%A0%96/"/>
     <id>https://fenglincanyi.github.io/2017/07/19/Vue 从入门到搬砖/</id>
     <published>2017-07-19T05:10:00.000Z</published>
-    <updated>2017-10-31T15:32:59.000Z</updated>
+    <updated>2019-03-19T15:38:35.822Z</updated>
     
     <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前段时间，捣鼓weex，就想到对vue有所了解。毕竟weex是从vue的基础上扩展而来，诸多特性也是vue的。作为目前前端比较火的框架之一，有所了解，也是有一定好处的，所谓”多不压身”。<br>Vue涵盖的不仅是一种前端框架，而且是前端生态的一系列设计思想、工具、规范。<br>本文直奔主题，什么装环境、hello world 之类的琐事就略过…… </p>
 <h2 id="几个重要概念"><a href="#几个重要概念" class="headerlink" title="几个重要概念"></a>几个重要概念</h2><h3 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h3><p>每个 Vue.js 应用都是通过构造函数 Vue 创建一个 Vue 的根实例 启动的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> vm = <span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="comment">// 属性</span></div><div class="line">  <span class="comment">// 方法</span></div><div class="line">  <span class="comment">// 各种选项对象...</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
@@ -604,7 +604,7 @@
 </ol>
 <h3 id="数据绑定"><a href="#数据绑定" class="headerlink" title="数据绑定"></a>数据绑定</h3><p>Vue 几乎屏蔽了直接通过操作 dom 更新的方式，更是趋向于 “数据的更新” 来达到 “视图的更新”。<br>Vue 实例的 data 的相关字段更新后，与之使用到的视图中也随之更新，重新渲染。<br>Vue 在不同组件间强制使用单向数据流。父组件通过 prop 向子组件赋值数据，子组件反过来向父组件 emit 发送事件</p>
 <h2 id="生命周期钩子"><a href="#生命周期钩子" class="headerlink" title="生命周期钩子"></a>生命周期钩子</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> LIFECYCLE_HOOKS = [</div><div class="line">  <span class="string">'beforeCreate'</span>,<span class="comment">//el 和 data 并未初始化 </span></div><div class="line">  <span class="string">'created'</span>,<span class="comment">// data 初始化</span></div><div class="line">  <span class="string">'beforeMount'</span>,<span class="comment">// el 初始化 </span></div><div class="line">  <span class="string">'mounted'</span>,<span class="comment">// 完成挂载</span></div><div class="line">  <span class="string">'beforeUpdate'</span>,<span class="comment">// 数据完成更新</span></div><div class="line">  <span class="string">'updated'</span>,<span class="comment">// virtual dom 更新并重新渲染</span></div><div class="line">  <span class="string">'beforeDestroy'</span>,<span class="comment">// vue 实例调用 desotry</span></div><div class="line">  <span class="string">'destroyed'</span>,<span class="comment">// 移除组件、事件、监听</span></div><div class="line">  <span class="string">'activated'</span>,<span class="comment">// 完成激活子组件</span></div><div class="line">  <span class="string">'deactivated'</span><span class="comment">// 停用释放子组件</span></div><div class="line">];</div></pre></td></tr></table></figure>
-<div style="text-align:center"><br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/vue_lifecycle.png" width="400" height="720"><br></div>
+<div style="text-align:center"><br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/vue_lifecycle.png" width="400" height="720"><br></div>
 
 <h2 id="语法概览"><a href="#语法概览" class="headerlink" title="语法概览"></a>语法概览</h2><h3 id="文本"><a href="#文本" class="headerlink" title="文本"></a>文本</h3><p>数据绑定，使用 mustache 语法：</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">span</span>&gt;</span>Message: &#123;&#123; msg &#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></div></pre></td></tr></table></figure>
@@ -634,7 +634,7 @@
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 注册</span></div><div class="line">Vue.component(<span class="string">'my-component'</span>, &#123;</div><div class="line">  <span class="attr">template</span>: <span class="string">'&lt;div&gt;A custom component!&lt;/div&gt;'</span></div><div class="line">&#125;)</div><div class="line"><span class="comment">// 创建根实例</span></div><div class="line"><span class="keyword">new</span> Vue(&#123;</div><div class="line">  <span class="attr">el</span>: <span class="string">'#example'</span></div><div class="line">&#125;)</div></pre></td></tr></table></figure>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!--使用--&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"example"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">my-component</span>&gt;</span><span class="tag">&lt;/<span class="name">my-component</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
 <p>组件通信</p>
-<div style="text-align:center"><br><img src="http://7xr1vo.com1.z0.glb.clouddn.com/props-events.png" width="210" height="200"><br></div>
+<div style="text-align:center"><br><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/props-events.png" width="210" height="200"><br></div>
 
 <p><strong>单项数据流</strong><br>prop 是单向绑定的：当父组件的属性变化时，将传导给子组件，但是不会反过来</p>
 <h2 id="过渡效果"><a href="#过渡效果" class="headerlink" title="过渡效果"></a>过渡效果</h2><p>配合 css 实现动画效果，元素的出现和消息过渡动画也是非常有意思的</p>
@@ -672,7 +672,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/06/09/Android%207.0%E9%80%82%E9%85%8D/"/>
     <id>https://fenglincanyi.github.io/2017/06/09/Android 7.0适配/</id>
     <published>2017-06-09T12:10:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T14:06:22.253Z</updated>
     
     <content type="html"><![CDATA[<p>Android 7.0 行为变更，涉及：电池和内存、后台优化、权限更改、NDK 应用链接至平台库。</p>
 <p>作为开发者，我们要关注 权限更改、NDK私有库的问题，适配工作也是围绕这2者展开。</p>
@@ -735,7 +735,7 @@ v-leave-to
 <p>还有，此问题，如果项目 targetSdkVersion &lt; 24，则会在 7.0手机上每次启动app时，弹出警告框：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E7%A7%81%E6%9C%89%E5%BA%93.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E7%A7%81%E6%9C%89%E5%BA%93.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>但也可以继续正常运行，但是这个很不友好，需要尽快联系提供者解决</p>
@@ -745,14 +745,14 @@ v-leave-to
 <p>自己在玩原生7.0 系统时，发现小图标变成灰色的方块了：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-142841.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/device-2017-06-08-142841.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>然后，发现在 华为 7.0 手机上，小图标显示又是正常的，应该是华为对通知栏显示做了处理<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-08-195515.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/device-2017-06-08-195515.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -766,7 +766,7 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/device-2017-06-09-162941.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/device-2017-06-09-162941.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -798,7 +798,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/04/12/Android%206.0%E9%80%82%E9%85%8D/"/>
     <id>https://fenglincanyi.github.io/2017/04/12/Android 6.0适配/</id>
     <published>2017-04-12T04:40:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T14:01:15.615Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Android-权限变更"><a href="#Android-权限变更" class="headerlink" title="Android 权限变更"></a>Android 权限变更</h2><p>在 Android 6.0 之前，APP 的授权是通过在 manifest.xml 文件中，去注册相关权限，安装时就可以获得所有声明了的权限。而在 6.0 及以后的版本，这种在 manifest.xml 声明权限的做法，已经在一些权限上不适用了。<br>在Android 6.0 及以后的系统中，用户可以自动打开或关闭任何应用的权限（设置 -&gt; 应用权限）</p>
 <h3 id="权限的划分"><a href="#权限的划分" class="headerlink" title="权限的划分"></a>权限的划分</h3><p>Android 是基于 Linux 系统的，所以，对于每个文件都有个权限的概念。<br>这次变化，主要将 Android 系统中的权限分为：</p>
@@ -897,7 +897,7 @@ v-leave-to
 <p><strong>处理流程：</strong><br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%80%82%E9%85%8D.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E9%80%82%E9%85%8D.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -935,7 +935,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/03/18/Android%20%E5%A2%9E%E9%87%8F%E7%BC%96%E8%AF%91%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93/"/>
     <id>https://fenglincanyi.github.io/2017/03/18/Android 增量编译方案总结/</id>
     <published>2017-03-18T12:10:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:40:39.005Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>自从去年10月份，使用Freeline 感觉非常不错，开发效率提升数倍。由于工作原因，一直将这篇总结拖到现在。ok，现在好好总结下。。。</p>
@@ -943,7 +943,7 @@ v-leave-to
 <h2 id="前言：Android-开发者之痛"><a href="#前言：Android-开发者之痛" class="headerlink" title="前言：Android 开发者之痛"></a>前言：Android 开发者之痛</h2><p>普通的编译流程：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>存在问题：</p>
@@ -962,7 +962,7 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline2.jpeg" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline2.jpeg" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -982,7 +982,7 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline3.gif" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline3.gif" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -997,21 +997,21 @@ v-leave-to
 <p>资源文件更改：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline4.gif" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline4.gif" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>代码变动：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline5.gif" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline5.gif" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>编译速度对比：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline6.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline6.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1051,7 +1051,7 @@ v-leave-to
 <h3 id="Freeline-整体工作流程"><a href="#Freeline-整体工作流程" class="headerlink" title="Freeline 整体工作流程"></a>Freeline 整体工作流程</h3><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline7.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline7.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1067,7 +1067,7 @@ v-leave-to
 <h3 id="单个工程流程"><a href="#单个工程流程" class="headerlink" title="单个工程流程"></a>单个工程流程</h3><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1086,12 +1086,12 @@ v-leave-to
 <p><strong>Preverify 过程：</strong><br>dex2opt过程中，若发现当前类中，存在一个直接引用类也和当前类在同一个dex中，则当前类会被打上 verified=true 的标记。下次加载时，则会判断这个类所在的dex是否是同一个dex</p>
 <p><strong>如何避免 preverify 异常？</strong><br>在 dexopt 过程中，Class_isPreverfied 问题：<br>通过在每个类的构造方式，加入一个 另一个dex的 类，让其preverify 失效，这样就可以让增量的class被加载了<br>这也是Google的一个安全策略</p>
 <p>相关知识可参考：<br>直接引用类的定义：<br><a href="https://zhuanlan.zhihu.com/p/20308548" target="_blank" rel="external">https://zhuanlan.zhihu.com/p/20308548</a><br>dex分包过程，dexopt介绍：<br><a href="https://segmentfault.com/a/1190000004053072" target="_blank" rel="external">https://segmentfault.com/a/1190000004053072</a></p>
-<h4 id="资源的更新逻辑"><a href="#资源的更新逻辑" class="headerlink" title="资源的更新逻辑"></a>资源的更新逻辑</h4><p>根据最新的 R.java 文件 拿到 各个资源id  生成 public.xml 和 ids.xml，用于解决资源id 冲突    id-gen-tool 工具<br> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline9.png" alt=""></p>
+<h4 id="资源的更新逻辑"><a href="#资源的更新逻辑" class="headerlink" title="资源的更新逻辑"></a>资源的更新逻辑</h4><p>根据最新的 R.java 文件 拿到 各个资源id  生成 public.xml 和 ids.xml，用于解决资源id 冲突    id-gen-tool 工具<br> <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline9.png" alt=""></p>
 <p>对于增量的 资源进行 Freelineaapt 编译，未做过更改的资源，直接使用 backup 中的资源，再打成一个 增量包：inc.pack</p>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline10.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline10.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1106,42 +1106,42 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline11.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline11.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <p>更改代码后，再执行增量编译后，观察此目录：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline12.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline12.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>只生成了最新的更改过的文件<br>反编译 dex 目录下的 classes.dex 得出, 此文件里全是更改过的类文件：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline13.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline13.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>换个目录看看：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline14.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline14.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>对 hackload.dex 反编译：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline15.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline15.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>发现这个 hackload.dex 就是插桩时候，使用的单独的dex，里面是用来避免 preverify 问题的类<br>随后，我们看看编译后的apk 文件，解压缩，反编译看看任意一个classes.dex:<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline16.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline16.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>发现，确实是在构造方法里插入一个其他dex中的类，来避免打上 verified 的标识，验证了上面的做法。<br><br><br>好，松一口气，代码更新算是说完了…</p>
@@ -1152,14 +1152,14 @@ v-leave-to
 <p>前面说过：<br>是通过反向对 R.java 文件摘出 资源 id信息，放在 ids.xml 和 public.xml 中，那我们来看看这两个文件：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline17.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline17.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p><strong>ids.xml:</strong><br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline18.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline18.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1167,7 +1167,7 @@ v-leave-to
 <p><strong>public.xml:</strong><br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline19.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline19.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1175,7 +1175,7 @@ v-leave-to
 <p>一个普通的 R.java 文件，包含了以下资源信息<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline20.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline20.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>所以，这里的 ids.xml 只存储了 我们自己写的 id 信息，而 public.xml 存储了 R.java 完整信息。<br>ids.xml 是为了处理资源id冲突问题，预先准备的文件</p>
@@ -1184,7 +1184,7 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline21.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline21.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1192,14 +1192,14 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline22.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline22.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <p>扩展一下，看看 resource.arsc 文件：<br>此文件的并不是APP一下子解析加载的，是按需加载，<br>它是一种二进制索引表,对应了app里所有资源name,及id<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/freeline23.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/freeline23.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1249,7 +1249,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/02/28/Weex%20SDK%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/02/28/Weex SDK源码分析（二）/</id>
     <published>2017-02-28T11:32:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:43:22.640Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p> <strong>Weex 渲染页面过程</strong></p>
@@ -1295,7 +1295,7 @@ v-leave-to
 <p>task 数据格式（json），如图：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20debug%E5%9B%BE.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/weex%20debug%E5%9B%BE.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1303,7 +1303,7 @@ v-leave-to
 <p>具体可参考 WXDomModule、WXDomHandler 类分析<br>这个时候，就回到我们之前说过的 WXDomStatement 的流程了，WXDomStatement会添加dom 节点（addDomInternal() ），在 addDomInternal 过程中，对dom节点又是一通猛烈的操作：根节点（root节点的准备工作），普通节点（add到父节点下）。<br>然后，对 dom 对象 进行遍历操作（递归）：domObject.traverseTree()，在dom 线程创建 component，生成 component 树（也是递归操作：通过WXRenderStatement.generateComponentTree() ）。<br>对于每个dom节点都会进行 setLayout()、setExtra()、setPadding()，可以去看看compent.setLayout()，就是去使用Android的API 对view进布局和绘制，此处不再贴代码。<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/weex%20component%20%E6%96%B9%E6%B3%95.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/weex%20component%20%E6%96%B9%E6%B3%95.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1411,7 +1411,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/02/01/Gradle%E5%AE%9E%E7%8E%B0%E8%87%AA%E5%8A%A8%E6%8B%89%E5%8F%96git%E5%8F%8A%E5%8E%8B%E7%BC%A9%E6%96%87%E4%BB%B6/"/>
     <id>https://fenglincanyi.github.io/2017/02/01/Gradle实现自动拉取git及压缩文件/</id>
     <published>2017-02-01T07:00:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:42:13.465Z</updated>
     
     <content type="html"><![CDATA[<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>在实现 hybird 相关开发时，h5文件需要不断重新拉取，并解压文件，拷贝至项目的相关目录下。手工完成比较繁琐且耗时。自己查阅 gradle 相关文档，将其过程实现脚本自动化。<br>可实现：自动拉取相关 git 服务器上最新文件，并压缩至 src/main/assets/hybird目录下，打包时就会自动带上最新的h5文件了。</p>
 <h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>上代码：</p>
@@ -1419,21 +1419,21 @@ v-leave-to
 <p><br><br>此处，单独运行 task，演示效果：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5FAACC49-BCE0-44ED-A60C-30378795BF74.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/5FAACC49-BCE0-44ED-A60C-30378795BF74.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>build 结果：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/22.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/22.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>在 assets 目录下生成：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/33.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/33.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1467,12 +1467,12 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/21/Springmvc%20%E7%9B%B8%E5%85%B3/"/>
     <id>https://fenglincanyi.github.io/2017/01/21/Springmvc 相关/</id>
     <published>2017-01-21T06:55:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:43:35.209Z</updated>
     
     <content type="html"><![CDATA[<h2 id="springmvc-框架原理"><a href="#springmvc-框架原理" class="headerlink" title="springmvc 框架原理"></a>springmvc 框架原理</h2><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/mvc.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/mvc.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1497,7 +1497,7 @@ v-leave-to
 <h2 id="springmvc-基本配置"><a href="#springmvc-基本配置" class="headerlink" title="springmvc 基本配置"></a>springmvc 基本配置</h2><p>如果不在 springmvc.xml 配置相关的映射器、适配器，spring会使用默认的，默认的配置 在 DispatcherServlet.properties 中：<br>这些默认的都不建议使用了。<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/B77F53FF-BBEF-40EC-BD0A-E176EB7AD8DA.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/B77F53FF-BBEF-40EC-BD0A-E176EB7AD8DA.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1507,7 +1507,7 @@ v-leave-to
 <p>springmvc.xml 中的约束配置，参考文档进行配置：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5665FF5D-517B-45F0-819D-3707A9534C8B.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/5665FF5D-517B-45F0-819D-3707A9534C8B.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1527,7 +1527,7 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/BD15A0C3-C8A8-4C0E-84AB-656C19A1C1B0.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/BD15A0C3-C8A8-4C0E-84AB-656C19A1C1B0.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1554,21 +1554,21 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/17/Mybatis%20%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B/"/>
     <id>https://fenglincanyi.github.io/2017/01/17/Mybatis 逆向工程/</id>
     <published>2017-01-17T02:11:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:45:54.095Z</updated>
     
     <content type="html"><![CDATA[<h2 id="pom-配置"><a href="#pom-配置" class="headerlink" title="pom 配置"></a>pom 配置</h2><p>pom.xml 中 加入：</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis.generator<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-generator-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.3.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">verbose</span>&gt;</span>true<span class="tag">&lt;/<span class="name">verbose</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">overwrite</span>&gt;</span>true<span class="tag">&lt;/<span class="name">overwrite</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div></pre></td></tr></table></figure>
 <h2 id="maven配置"><a href="#maven配置" class="headerlink" title="maven配置"></a>maven配置</h2><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5709477C-1A4B-4AEF-B0E6-5EBE20688677.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/5709477C-1A4B-4AEF-B0E6-5EBE20688677.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/8C4EFD37-2282-4BEA-81C7-4C4E11D2A91C.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/8C4EFD37-2282-4BEA-81C7-4C4E11D2A91C.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1576,28 +1576,28 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/C97FA1F0-DEDF-4A13-9810-6029D03D97DE.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/C97FA1F0-DEDF-4A13-9810-6029D03D97DE.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4EAE9177-A8D0-411D-869D-2167D54CB026.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/4EAE9177-A8D0-411D-869D-2167D54CB026.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/E3C00FBA-21F9-4B6B-80BE-74D553270C6A.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/E3C00FBA-21F9-4B6B-80BE-74D553270C6A.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/D0FC7201-E1D6-4D16-90E6-87D079213CA3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/D0FC7201-E1D6-4D16-90E6-87D079213CA3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1605,7 +1605,7 @@ v-leave-to
 <h2 id="mybatis-config-xml-文件配置"><a href="#mybatis-config-xml-文件配置" class="headerlink" title="mybatis config.xml 文件配置"></a>mybatis config.xml 文件配置</h2><p>拷贝驱动包的绝对路径<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/68C3A3B3-DB05-4786-A412-C808F0A8AA17.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/68C3A3B3-DB05-4786-A412-C808F0A8AA17.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1614,14 +1614,14 @@ v-leave-to
 <h2 id="运行逆向生成代码"><a href="#运行逆向生成代码" class="headerlink" title="运行逆向生成代码"></a>运行逆向生成代码</h2><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/90C77448-2475-4EE3-B0D3-BF49D2A79606.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/90C77448-2475-4EE3-B0D3-BF49D2A79606.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/617ABCDF-11AB-45AF-BA9C-1150393FEDC9.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/617ABCDF-11AB-45AF-BA9C-1150393FEDC9.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1649,7 +1649,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/15/Mybatis%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/15/Mybatis 学习（二）/</id>
     <published>2017-01-15T06:32:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:44:01.907Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：MyBatis 高级<br>结合demo进行学习</p>
@@ -1661,7 +1661,7 @@ v-leave-to
 <p>结果集：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/0A6D42AE-B4E6-4960-8313-FAE563CBA426.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/0A6D42AE-B4E6-4960-8313-FAE563CBA426.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1681,7 +1681,7 @@ v-leave-to
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/CB9AFFD6-B061-41CC-BC0B-0376C263DC0F.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/CB9AFFD6-B061-41CC-BC0B-0376C263DC0F.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1693,7 +1693,7 @@ v-leave-to
 <p>结果集：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/937F9118-45DC-4D2F-83A3-8ED359C2CD7F.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/937F9118-45DC-4D2F-83A3-8ED359C2CD7F.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1710,7 +1710,7 @@ v-leave-to
 <p>结果集：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/C9339305-3D30-4A4F-B349-73DC6B6C9D50.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/C9339305-3D30-4A4F-B349-73DC6B6C9D50.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1727,7 +1727,7 @@ v-leave-to
 <p>测试：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/51C2ECFE-8AD9-4354-B9D1-3E0B7DC66FE8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/51C2ECFE-8AD9-4354-B9D1-3E0B7DC66FE8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1768,7 +1768,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/11/Mybatis%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/11/Mybatis 学习（一）/</id>
     <published>2017-01-11T04:01:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:46:13.567Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：MyBatis 基础</p>
@@ -1785,7 +1785,7 @@ v-leave-to
 <h2 id="遇到问题"><a href="#遇到问题" class="headerlink" title="遇到问题"></a>遇到问题</h2><p>报错：<br>org.apache.ibatis.binding.BindingException: Invalid bound statement (not found):    ………<br>然后，发现target目录下，XxxMapper.xml 没有在 target 下相应的目录生成<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4B5E209A-0C22-4072-8B8D-AD3532042E98.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/4B5E209A-0C22-4072-8B8D-AD3532042E98.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -1827,7 +1827,7 @@ v-leave-to
     <link href="https://fenglincanyi.github.io/2017/01/07/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%89%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2017/01/07/Spring 学习（三）/</id>
     <published>2017-01-07T04:01:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:45:20.569Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：Spring AOP相关</p>
@@ -1865,7 +1865,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/DE37AB73-E35C-4515-8EE9-377A606E3956.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/DE37AB73-E35C-4515-8EE9-377A606E3956.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -1875,7 +1875,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/83664DD4-196B-44DB-BF22-16A94F0FFA01.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/83664DD4-196B-44DB-BF22-16A94F0FFA01.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2015,7 +2015,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
     <link href="https://fenglincanyi.github.io/2016/12/27/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/12/27/Spring 学习（二）/</id>
     <published>2016-12-27T09:01:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:44:15.252Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本次学习内容：Spring 依赖注入相关</p>
@@ -2030,7 +2030,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/40B10214-301C-4735-8CE0-8DB0F4CCCC8B.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2042,7 +2042,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/EA20EBAD-5360-4197-BA0C-4059ABF7636F.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/EA20EBAD-5360-4197-BA0C-4059ABF7636F.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2051,7 +2051,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <p>测试：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/76FF4DDF-95DD-4F5A-B43F-30946D328A30.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/76FF4DDF-95DD-4F5A-B43F-30946D328A30.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2074,7 +2074,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <p>测试：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/A49E426F-CDC3-4A7E-8AD2-D428586B749D.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/A49E426F-CDC3-4A7E-8AD2-D428586B749D.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2109,7 +2109,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
     <link href="https://fenglincanyi.github.io/2016/12/26/Spring%20%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/12/26/Spring 学习（一）/</id>
     <published>2016-12-26T06:06:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:44:56.336Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Spring的2个基本概念"><a href="#Spring的2个基本概念" class="headerlink" title="Spring的2个基本概念"></a>Spring的2个基本概念</h2><ul>
 <li>aop<br>面向切面编程<br>在原有的基础上进行扩展，而不是进行修改。符合 开闭原则</li>
@@ -2127,7 +2127,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <h2 id="Spring-运行时"><a href="#Spring-运行时" class="headerlink" title="Spring 运行时"></a>Spring 运行时</h2><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/spring-overview.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/spring-overview.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2137,7 +2137,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <p>在resource 目录下，创建 xml 配置文件，如图：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/A5CEBFD6-CFE5-404A-A42F-CF521BAB4B47.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/A5CEBFD6-CFE5-404A-A42F-CF521BAB4B47.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2146,7 +2146,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/9FEC554D-7DDC-48C7-BA89-3FAAAC181312.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/9FEC554D-7DDC-48C7-BA89-3FAAAC181312.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2155,7 +2155,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/979F1DF8-ADF4-499F-8119-62CDDE033AD4.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/979F1DF8-ADF4-499F-8119-62CDDE033AD4.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2172,7 +2172,7 @@ execution(* xxx*(..))                        所有xxx开头的方法加强
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/0815D096-5833-4AA4-9BD8-EE493BE15F32.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/0815D096-5833-4AA4-9BD8-EE493BE15F32.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2190,7 +2190,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 </code></pre><h2 id="附录：IDEA-Resource-目录下，存放的文件类型"><a href="#附录：IDEA-Resource-目录下，存放的文件类型" class="headerlink" title="附录：IDEA Resource 目录下，存放的文件类型"></a>附录：IDEA Resource 目录下，存放的文件类型</h2><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/23395798-F73A-4EBB-95E2-1641C5EF8A24.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/23395798-F73A-4EBB-95E2-1641C5EF8A24.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2218,27 +2218,27 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/12/17/instant%20run%20%E7%9B%B8%E5%85%B3%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/12/17/instant run 相关分析/</id>
     <published>2016-12-17T05:00:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:42:32.229Z</updated>
     
     <content type="html"><![CDATA[<p>Android Studio 2.0 引入了即时编译功能：instant run，一定程度上进行了增量编译、增量更新代码，节省了开发耗时（喝咖啡的时间）。<br>下面具体分析下instant run相关工作流程和相关的源码</p>
 <h3 id="instant-run-使用"><a href="#instant-run-使用" class="headerlink" title="instant run 使用"></a>instant run 使用</h3><h4 id="版本要求"><a href="#版本要求" class="headerlink" title="版本要求"></a>版本要求</h4><p>Gradle 2.0 以上<br>build.gradle：minSdkVersion 15 以上（设置21以上可获得最佳性能）<br>Android 5.0以上的手机或模拟器</p>
 <h4 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h4><p>首先确认开启instant run，在settings中搜索instant run，可看到相关设置，默认instant run功能是开启的<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>当第一次点击 run 按钮 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>，进行第一次编译打包。<br>apk成功安装之后，再观察工具栏，run按钮发生了变化：<figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/Image2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/Image2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2251,7 +2251,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/1-Y-gIucAGyqQscMdXuHaSiA.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/1-Y-gIucAGyqQscMdXuHaSiA.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2259,29 +2259,29 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <h3 id="过程分析"><a href="#过程分析" class="headerlink" title="过程分析"></a>过程分析</h3><h4 id="第一次打包"><a href="#第一次打包" class="headerlink" title="第一次打包"></a>第一次打包</h4><p>instant run 第一次编译打包流程，会执行下面的工作<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/1-U2tXGUWaeDU7L3u9Z_U0fw.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/1-U2tXGUWaeDU7L3u9Z_U0fw.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>先来看看生成的apk：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20apk.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20apk.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p> 多出了 instant-run.zip文件，那它里面是什么内容呢？<br> <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20zip%20class.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20zip%20class.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br> instant-run.zip里的dex文件，是我们真正的业务代码</p>
 <p> 那instant run 相关的类呢，反而跑到了外层的classes.dex和classes2.dex中。</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%97%A0%E6%A0%87%E9%A2%98.png" alt=""><br><figure class="image-bubble">
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%97%A0%E6%A0%87%E9%A2%98.png" alt=""><br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E7%9B%B8%E5%85%B3jar.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E7%9B%B8%E5%85%B3jar.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2293,7 +2293,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <p>再来看看清单文件，application 被替换成 BootstrapApplication：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20application.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20application.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2306,13 +2306,13 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <p>下面我们分析一下setClassLoader详细过程：<br>主要经历了以下的方法：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E8%AE%BE%E7%BD%AE%E7%88%B6classloader%E8%BF%87%E7%A8%8B.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E8%AE%BE%E7%BD%AE%E7%88%B6classloader%E8%BF%87%E7%A8%8B.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>这几个ClassLoader类定义的逻辑关系如下：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E7%9B%B8%E5%85%B3classLoader%E5%AE%9A%E4%B9%89.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%E7%9B%B8%E5%85%B3classLoader%E5%AE%9A%E4%B9%89.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure><br>findClass过程依次委托给 父ClassLoader，最后是让PathClassLoader去加载类</p>
@@ -2326,35 +2326,35 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <h3 id="代码热更新流程"><a href="#代码热更新流程" class="headerlink" title="代码热更新流程"></a>代码热更新流程</h3><p>在我们增加一行代码后，点击运行，我们来观察生成的类的变化<br>在 build 目录下，transforms 中有生成相关的代码<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%E6%9C%89%E4%BB%A3%E7%A0%81%E5%8F%98%E6%9B%B4%E6%97%B6%E6%96%B0%E7%94%9F%E6%88%90.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%E6%9C%89%E4%BB%A3%E7%A0%81%E5%8F%98%E6%9B%B4%E6%97%B6%E6%96%B0%E7%94%9F%E6%88%90.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <h4 id="几个重要类"><a href="#几个重要类" class="headerlink" title="几个重要类"></a>几个重要类</h4><p>我们来具体看看demo 中代码更改：MainActivity$override类内容的确是最新的代码内容<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%A2%9E%E5%8A%A0%E7%9A%84%E4%BB%A3%E7%A0%81override%E7%B1%BB.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E5%A2%9E%E5%8A%A0%E7%9A%84%E4%BB%A3%E7%A0%81override%E7%B1%BB.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>AppPatchesLoaderImpl类记录了更改的类，存储在一个数组中，供类加载时候，替换成最新的类的代码内容<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%20%E5%8F%98%E5%8C%96%E7%9A%84%E7%B1%BB%E6%95%B0%E7%BB%84%E5%AD%98%E5%82%A8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%20%E5%8F%98%E5%8C%96%E7%9A%84%E7%B1%BB%E6%95%B0%E7%BB%84%E5%AD%98%E5%82%A8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant-run%20patch%E7%9B%B8%E5%85%B3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant-run%20patch%E7%9B%B8%E5%85%B3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <p>在此处，我反编译了slice_0-classes.dex：<br> <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/instant%20run%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%93%E5%8C%85%E7%BB%93%E6%9E%9C.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/instant%20run%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%93%E5%8C%85%E7%BB%93%E6%9E%9C.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2475,7 +2475,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B%E5%AE%9E%E4%BE%8B%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android apk安装过程实例分析/</id>
     <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:40:53.899Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>注：本文不对apk安装之前，系统所做的复杂工作做分析，只针对普通的apk安装过程进行简单的过程理解</p>
@@ -2505,19 +2505,19 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/apk%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <p>   拷贝后，目录如下：</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/copy%20lib%E7%BB%93%E6%9E%9C.png" alt=""></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/copy%20lib%E7%BB%93%E6%9E%9C.png" alt=""></p>
 <p> dex位置：</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/dex%E4%BD%8D%E7%BD%AE.png" alt=""></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/dex%E4%BD%8D%E7%BD%AE.png" alt=""></p>
 <p>如果把此位置的 dex 删除后，且杀掉已经运行的进程后，再次点击app启动后奔溃，如图：</p>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%88%A0%E6%8E%89dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84dex%E5%90%8E%EF%BC%8C%E4%B8%94%E6%9D%80%E6%8E%89%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84%E5%BA%94%E7%94%A8%E8%BF%9B%E7%A8%8B%EF%BC%8C%E5%86%8D%E6%AC%A1%E5%90%AF%E5%8A%A8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E5%88%A0%E6%8E%89dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B%E7%9A%84dex%E5%90%8E%EF%BC%8C%E4%B8%94%E6%9D%80%E6%8E%89%E5%B7%B2%E7%BB%8F%E8%BF%90%E8%A1%8C%E7%9A%84%E5%BA%94%E7%94%A8%E8%BF%9B%E7%A8%8B%EF%BC%8C%E5%86%8D%E6%AC%A1%E5%90%AF%E5%8A%A8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2540,19 +2540,19 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/art%E5%AE%89%E8%A3%85apk%E7%9A%84log.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/art%E5%AE%89%E8%A3%85apk%E7%9A%84log.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <pre><code>可以看到，有apk的拷贝，有dex2oat的dex优化过程。再追一下相关的目录：
-</code></pre><p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/local%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt=""></p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt=""></p>
+</code></pre><p> <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/local%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt=""></p>
+<p>  <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/dalvik-cache%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt=""></p>
 <p>里面有一部分是系统框架层的相关文件。</p>
 <p>安装后的目录结构也有变化：</p>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/data_app%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/data_app%E7%9B%AE%E5%BD%95%E4%B8%8B.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2561,7 +2561,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4.4%E4%B8%8Bsystem_bin%E4%B8%8B%E7%9A%84aapt.png.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/4.4%E4%B8%8Bsystem_bin%E4%B8%8B%E7%9A%84aapt.png.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2569,7 +2569,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/multidex.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/multidex.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2599,7 +2599,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/11/17/Android%20%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%88%9D%E6%8E%A2/"/>
     <id>https://fenglincanyi.github.io/2016/11/17/Android 类加载初探/</id>
     <published>2016-11-17T13:08:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:40:04.572Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>源码路径(此版本：Android 5.0)：<br>android-5.0.0_r7\libcore\dalvik\src\main\java\dalvik\system</p>
@@ -2607,28 +2607,28 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <p>需要关注的类有：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <h3 id="一、查找类的过程"><a href="#一、查找类的过程" class="headerlink" title="一、查找类的过程"></a>一、查找类的过程</h3><p>对于一个Class，在Android中，是如何被ClassLoader查找的呢？我们先查看一下，在Android中最原始的ClassLoader: BaseDexClassLoader 中有直接的方法。直接看源码：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>再继续追， pathList 的 findClass() 方法：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>此时遍历每个dex，通过二进制名来查找类Class；若类未定义或类未找到，则将异常add至suppressed异常集合中，随后抛出。<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassLoader4.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassLoader4.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2639,7 +2639,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader5.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader5.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2649,7 +2649,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader6.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader6.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2659,7 +2659,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader7.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader7.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2670,14 +2670,14 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <p>DexPathList 构造函数：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
 <p>makeDexElements过程：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader9.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader9.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -2685,7 +2685,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader10.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader10.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2693,7 +2693,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/AndroidClassloader11.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/AndroidClassloader11.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2722,7 +2722,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/10/25/RadioGroup%E3%80%81RadioButton%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BA%E5%B9%B6%E5%AE%9A%E5%88%B6icon%E6%98%BE%E7%A4%BA/"/>
     <id>https://fenglincanyi.github.io/2016/10/25/RadioGroup、RadioButton动态创建并定制icon显示/</id>
     <published>2016-10-25T02:24:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:42:46.921Z</updated>
     
     <content type="html"><![CDATA[<p>由于原生的Radiobutton不能满足业务需求，所以需要自己定制icon图片，和默认选中某一项。需要自己代码动态实现。废话不多说，上代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setViewData</span><span class="params">()</span> </span>&#123;</div><div class="line">        radioGroup.removeAllViews();</div><div class="line"></div><div class="line">        <span class="keyword">int</span> margin = ScreenUtil.dip2px(<span class="keyword">this</span>, <span class="number">14.0f</span>);</div><div class="line">        <span class="keyword">int</span> marginLeft = ScreenUtil.dip2px(<span class="keyword">this</span>, <span class="number">20.0f</span>);</div><div class="line">        <span class="keyword">int</span> paddingLeft = ScreenUtil.dip2px(<span class="keyword">this</span>, <span class="number">3.0f</span>);</div><div class="line"></div><div class="line">        RadioGroup.LayoutParams layoutParams = </div><div class="line">            <span class="keyword">new</span> RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);</div><div class="line">        RadioGroup.LayoutParams layoutParams1 = </div><div class="line">            <span class="keyword">new</span> RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, <span class="number">1</span>);</div><div class="line">        layoutParams.setMargins(marginLeft, margin, margin, margin);</div><div class="line">        layoutParams1.setMargins(margin, <span class="number">0</span>, margin, <span class="number">0</span>);</div><div class="line"></div><div class="line">        <span class="keyword">int</span> defaultId = -<span class="number">1</span>;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; messageList.size(); i++) &#123;</div><div class="line">            RadioButton rb = <span class="keyword">new</span> RadioButton(<span class="keyword">this</span>);</div><div class="line">            rb.setMaxLines(<span class="number">2</span>);</div><div class="line">            rb.setPadding(paddingLeft, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);</div><div class="line">            rb.setText(messageList.get(i).relayMessage);</div><div class="line">            rb.setButtonDrawable(android.R.color.transparent);</div><div class="line">            rb.setTextColor(Color.parseColor(<span class="string">"#555555"</span>));</div><div class="line">            rb.setButtonDrawable(<span class="keyword">null</span>);<span class="comment">// 去掉左边默认图标</span></div><div class="line">            rb.setCompoundDrawablePadding(margin);</div><div class="line">            rb.setEllipsize(TextUtils.TruncateAt.END);<span class="comment">// 结尾处打点显示</span></div><div class="line">            Drawable drawable = getResources().getDrawable(R.drawable.relay_message_radio_selector);</div><div class="line">            drawable.setBounds(<span class="number">0</span>, <span class="number">0</span>, drawable.getMinimumWidth(), drawable.getMinimumHeight());</div><div class="line">            rb.setCompoundDrawables(drawable, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</div><div class="line">            <span class="comment">// 手动生成id</span></div><div class="line">            <span class="keyword">int</span> generateId = generateViewId();</div><div class="line">            messages.put(generateId, messageList.get(i).relayMessage);</div><div class="line">            rb.setId(generateId);</div><div class="line">            <span class="keyword">if</span> (i == <span class="number">0</span>) &#123;</div><div class="line">                defaultId = generateId;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            TextView view = <span class="keyword">new</span> TextView(<span class="keyword">this</span>);</div><div class="line">            view.setBackgroundColor(Color.parseColor(<span class="string">"#dddddd"</span>));</div><div class="line"></div><div class="line">            radioGroup.addView(rb, layoutParams);</div><div class="line">            radioGroup.addView(view, layoutParams1);</div><div class="line">        &#125;</div><div class="line">        <span class="comment">// 此处：默认选中第一个</span></div><div class="line">        radioGroup.check(defaultId);</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
 <p>R.drawable.relay_message_radio_selector 代码如下：</p>
@@ -2731,7 +2731,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%80%89%E6%8B%A9.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E9%80%89%E6%8B%A9.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>]]></content>
@@ -2754,7 +2754,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/10/06/RxJava%20%E5%88%9D%E6%8E%A2%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/10/06/RxJava 初探（一）/</id>
     <published>2016-10-05T16:45:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:43:46.151Z</updated>
     
     <content type="html"><![CDATA[<h3 id="一、几个基本概念"><a href="#一、几个基本概念" class="headerlink" title="一、几个基本概念"></a>一、几个基本概念</h3><ul>
 <li>由来<br>  Rx(Reactive Extensions)，最初是LINQ的一个扩展，后由微软团队开发，在2012年11月开源。ReactiveX.io给的定义是，Rx是一个使用可观察数据流进行异步编程的编程接口，ReactiveX结合了观察者模式、迭代器模式和函数式编程的精华。</li>
@@ -2775,7 +2775,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 </ul>
 <h3 id="二、响应式编程模式"><a href="#二、响应式编程模式" class="headerlink" title="二、响应式编程模式"></a>二、响应式编程模式</h3><ul>
 <li><p>下图采自官方文档，基本阐述了数据流和数据变换的过程：</p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/rxjava%E7%AE%80%E5%8D%95%E5%9B%BE%E8%A7%A3.png" alt="这里写图片描述"></p>
+<p>  <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/rxjava%E7%AE%80%E5%8D%95%E5%9B%BE%E8%A7%A3.png" alt="这里写图片描述"></p>
 </li>
 <li>冷热观察者<ul>
 <li>热 观察者：可能一创建完就开始发射数据，因此所有后续订阅它的观察者可能从序列中间的某个位置开始接受数据（有一些数据错过了）</li>
@@ -2861,13 +2861,13 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/09/04/%E6%BB%91%E5%8A%A8%E7%9B%B8%E5%85%B3%20ScrollView%20&amp;%20ListView/"/>
     <id>https://fenglincanyi.github.io/2016/09/04/滑动相关 ScrollView &amp; ListView/</id>
     <published>2016-09-04T03:13:00.000Z</published>
-    <updated>2017-12-01T04:56:01.560Z</updated>
+    <updated>2019-03-19T15:37:29.993Z</updated>
     
     <content type="html"><![CDATA[<h2 id="ScrollView-嵌套-ListView-问题分析"><a href="#ScrollView-嵌套-ListView-问题分析" class="headerlink" title="ScrollView 嵌套 ListView 问题分析"></a>ScrollView 嵌套 ListView 问题分析</h2><p><strong>滑动冲突的问题</strong><br>ScrollView 中嵌套 ListView，ListView 在测量时，高度不论写活还是写死，Listiew 的测量模式都是 不确定模式：unspecified</p>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2875,7 +2875,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2885,7 +2885,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2893,7 +2893,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView4.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView4.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2901,14 +2901,14 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView5.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView5.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView6.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView6.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2916,7 +2916,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView7.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView7.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2928,7 +2928,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -2938,7 +2938,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <p>类比：listview ，可以增加 一个有高度 的footer ,实现这种功能</p>
 <p><strong>滑动冲突的问题</strong></p>
 <p>解决办法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">listView.setOnTouchListener(object : View.OnTouchListener &#123;</div><div class="line">    <span class="function">override fun <span class="title">onTouch</span><span class="params">(v: View, event: MotionEvent)</span>: Boolean </span>&#123;</div><div class="line">        v.parent.parent.requestDisallowInterceptTouchEvent(<span class="keyword">true</span>)</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;</div><div class="line">&#125;)</div><div class="line"><span class="comment">// 请求 父view 不允许拦截，则交给 listview 来处理 move 事件</span></div></pre></td></tr></table></figure></p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView9.gif" width="320" height="560"></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView9.gif" width="320" height="560"></p>
 <p>另外，ScrollView嵌套RecyclerView也会存在显示不全的问题</p>
 <hr>
 <p><strong>翻开历史新篇章</strong>：</p>
@@ -2949,7 +2949,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <li>Listview 高度：200dp , 则能全部显示出来</li>
 </ol>
 <p>如图：</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView10.png" width="320" height="560">  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView11.png" width="320" height="560"></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView10.png" width="320" height="560">  <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView11.png" width="320" height="560"></p>
 <p>我们再换用<br>NestedScrollView嵌套RecyclerView不会存在显示不全的问题; google 已经帮我们处理好了</p>
 <p>继续测试：</p>
 <ol>
@@ -2957,7 +2957,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <li>recyclerView 高度：200dp</li>
 </ol>
 <p>分别如图：<br>wrap_content 时，RecycleView 会全部显示出来</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView12.png" width="320" height="560">  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/ScrollViewListView13.png" width="320" height="560"></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView12.png" width="320" height="560">  <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/ScrollViewListView13.png" width="320" height="560"></p>
 <p>实现细节，可以看看 NestedScrollView 和 RecyclerView 的 measure 的处理方式</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>ScrollView 嵌套 Listview 存在以下问题：</p>
 <ol>
@@ -3026,7 +3026,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/06/04/%E7%AE%80%E5%8D%95%E7%9A%84%E9%A1%B5%E9%9D%A2%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90/"/>
     <id>https://fenglincanyi.github.io/2016/06/04/简单的页面置换算法分析/</id>
     <published>2016-06-04T11:39:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:39:29.670Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>本文主要分析操作系统中涉及到的一些常见的置换算法，并不对涉及的操作系统内容过多介绍。这些算法在其他的计算机应用中也有体现，基本原理都是一致的，可参考理解。</p>
@@ -3038,7 +3038,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%9B%BE1.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E5%9B%BE1.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3046,7 +3046,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%9B%BE2.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E5%9B%BE2.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3057,7 +3057,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%9B%BE3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E5%9B%BE3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3114,7 +3114,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
     <link href="https://fenglincanyi.github.io/2016/05/16/Android%20SingleTask%20%E6%8E%A2%E7%A9%B6/"/>
     <id>https://fenglincanyi.github.io/2016/05/16/Android SingleTask 探究/</id>
     <published>2016-05-16T03:12:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:30:31.500Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p>Android 4种启动模式来说，用法说明此处不再提及主要介绍SingleTop，SingleTask相关的问题</p>
@@ -3134,7 +3134,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <p>&emsp;&emsp;<strong>其实事实根本不是这样的</strong>！！！</p>
 <h3 id="场景复现"><a href="#场景复现" class="headerlink" title="场景复现"></a>场景复现</h3><ul>
 <li><p>下面用代码事实说话：建立3个Activity，分别为Main1Activity、Main2Activity、Main3Activity，前两个都设定单击事件，跳转逻辑为：main1 -&gt; main2 -&gt; main3，其中 Main2Activity 为 SingleTask（AndroidManifest.xml中设置）。打印相应的生命周期方法和所在的 <strong>taskId</strong></p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%20%E5%9B%BE1.png" alt=""></p>
+<p>  <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/SingleTask%20%E5%9B%BE1.png" alt=""></p>
 </li>
 </ul>
 <p>&emsp;&emsp;这些taskid都是一样的，所以它们都是同一个Task中的。事实胜于雄辩。然后搜了一下相关问题，老罗的博客还是给力，彻彻底底的分析了这个坑。致谢老罗的开源精神！<br>&emsp;&emsp;链接：<a href="http://blog.csdn.net/luoshengyang/article/details/6714543" target="_blank" rel="external">http://blog.csdn.net/luoshengyang/article/details/6714543</a></p>
@@ -3148,7 +3148,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <li><p>点击应用图标重新进入</p>
 <p>操作结果：结果再次显示的是Main1Activity，而不是Main3Activity。</p>
 <p>先看看打印的日志：</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%E5%9B%BE2.png" alt=""></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/SingleTask%E5%9B%BE2.png" alt=""></p>
 <p>再次点击图标进入应用时，实际上是Main2Activity，Main3Activity 出栈了。<br>分析下这个过程：</p>
 <p>Main1，Main2，Main3 依次压入栈中，然后 Home 键，则整个Task处于stop状态，是一个background Task。当再次点击应用图标时，系统检测到此时已经存在一个该应用的Task的，此时就将此Background Task 移至前台，成为Foreground Task，而且由于Main1Activity是SingleTask，且位于task底部，所以，再次启动时，将前两个Activity移除，且按照启动顺序依次移除，所以打出的日志是：Main2 desotry，Main3 destory，Main1 onResume。</p>
 </li>
@@ -3165,7 +3165,7 @@ globalSession 一次登陆，任何地方都保存有登录状态
 <ul>
 <li><p>只需要在AndroidManifest.xml中配置即可</p>
 <p>  在SingleTask的基础之上，再增加设置 <strong>taskAffinify</strong> 属性即可，默认情况下，taskAffinity属性值为 包名，所以可以自定义一个taskAffinity值，便可以实现一个新的Task,新的Activity处于这个新的Task的root。如，我的 Demo 代码如下：</p>
-<p>  <img src="http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%E5%9B%BE3.png" alt=""></p>
+<p>  <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/SingleTask%E5%9B%BE3.png" alt=""></p>
 </li>
 </ul>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul>
@@ -3203,7 +3203,7 @@ adb shell dumpsys activity | grep mFocusedActivity  获取处于栈顶的Activit
     <link href="https://fenglincanyi.github.io/2016/02/28/%E5%AF%B9%E7%A7%B0%E3%80%81%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E6%8A%80%E6%9C%AF%E5%88%9D%E6%8E%A2/"/>
     <id>https://fenglincanyi.github.io/2016/02/28/对称、非对称加密技术初探/</id>
     <published>2016-02-28T09:52:00.000Z</published>
-    <updated>2017-12-01T04:56:01.560Z</updated>
+    <updated>2019-03-19T15:37:44.114Z</updated>
     
     <content type="html"><![CDATA[<h3 id="一、对称加密"><a href="#一、对称加密" class="headerlink" title="一、对称加密"></a>一、对称加密</h3><ol>
 <li><p><strong>对称加密简介</strong></p>
@@ -3225,7 +3225,7 @@ adb shell dumpsys activity | grep mFocusedActivity  获取处于栈顶的Activit
 </ul>
 </li>
 <li><p><strong>对称加密过程</strong></p>
-<p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.PNG" alt=""></p>
+<p> <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.PNG" alt=""></p>
 </li>
 <li><p><strong>常见对称加密算法</strong></p>
 <ul>
@@ -3262,7 +3262,7 @@ adb shell dumpsys activity | grep mFocusedActivity  获取处于栈顶的Activit
 * 公钥是公开的
 </code></pre></li>
 <li><p><strong>非对称加密过程</strong></p>
-<p> <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.png" alt=""></p>
+<p> <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E8%BF%87%E7%A8%8B.png" alt=""></p>
 </li>
 <li><p><strong>RSA简介</strong></p>
 <p> 第一个能用于数据加密也能用于数字签名的算法，RSA是一种分组密码</p>
@@ -3319,7 +3319,7 @@ M: 变长的消息，H(M)是定长的 Hash值
 <p>身份的正确性：可通过 使用公钥能否解开数字签名 来判断</p>
 <p>数据的完整性：可通过 对比两个消息摘要是否相同 来判断</p>
 </blockquote>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D.png" alt=""></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D.png" alt=""></p>
 </li>
 </ul>
 </li>
@@ -3455,7 +3455,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
     <link href="https://fenglincanyi.github.io/2016/02/19/Git%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
     <id>https://fenglincanyi.github.io/2016/02/19/Git学习笔记（一）/</id>
     <published>2016-02-19T07:28:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:41:52.528Z</updated>
     
     <content type="html"><![CDATA[<h3 id="一、Git特点"><a href="#一、Git特点" class="headerlink" title="一、Git特点"></a>一、Git特点</h3><h4 id="1-直接记录快照，而非差异比较"><a href="#1-直接记录快照，而非差异比较" class="headerlink" title="1. 直接记录快照，而非差异比较"></a>1. 直接记录快照，而非差异比较</h4><ul>
 <li>在 Git 中保存项目状态时，它主要对当时的全部文件制作一个快照并保存这个快照的索引。</li>
@@ -3472,7 +3472,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <h3 id="二、Git-中的文件有3种状态："><a href="#二、Git-中的文件有3种状态：" class="headerlink" title="二、Git 中的文件有3种状态："></a>二、Git 中的文件有3种状态：</h3><h4 id="1-已提交：数据已经安全的保存在本地数据库中"><a href="#1-已提交：数据已经安全的保存在本地数据库中" class="headerlink" title="1. 已提交：数据已经安全的保存在本地数据库中"></a>1. 已提交：数据已经安全的保存在本地数据库中</h4><h4 id="2-已修改：修改了文件，但未保存到数据库中"><a href="#2-已修改：修改了文件，但未保存到数据库中" class="headerlink" title="2. 已修改：修改了文件，但未保存到数据库中"></a>2. 已修改：修改了文件，但未保存到数据库中</h4><h4 id="3-已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中"><a href="#3-已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中" class="headerlink" title="3. 已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中"></a>3. 已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中</h4><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure> 
@@ -3483,7 +3483,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <h4 id="3-暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引"><a href="#3-暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引" class="headerlink" title="3. 暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引"></a>3. 暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引</h4><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/git3%E7%A7%8D%E5%B7%A5%E4%BD%9C%E5%8C%BA%E5%9F%9F.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/git3%E7%A7%8D%E5%B7%A5%E4%BD%9C%E5%8C%BA%E5%9F%9F.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure> 
@@ -3521,7 +3521,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
     <link href="https://fenglincanyi.github.io/2016/01/16/Android%20Studio%20NDK%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E5%8F%8ADemo%E7%A4%BA%E4%BE%8B/"/>
     <id>https://fenglincanyi.github.io/2016/01/16/Android Studio NDK开发环境搭建及Demo示例/</id>
     <published>2016-01-16T11:34:00.000Z</published>
-    <updated>2017-10-31T13:50:20.000Z</updated>
+    <updated>2019-03-19T15:41:10.754Z</updated>
     
     <content type="html"><![CDATA[<blockquote>
 <p> 说明：Android Studio 1.4后支持C/C++开发，1.3之前的版本坑点较多，所以使用1.4后的版本较为容易</p>
@@ -3536,7 +3536,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <li><p>cmd窗口自动关闭后，会出现 <strong>ndk</strong> 的文件夹，如图： </p>
 </li>
 </ul>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/1.jpg" alt=""><img src="http://7xr1vo.com1.z0.glb.clouddn.com/2.png" alt=""></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/1.jpg" alt=""><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/2.png" alt=""></p>
 <ul>
 <li><p>配置<strong>ndk</strong>环境变量，path 中添加即可，如我的路径如下：</p>
 <blockquote>
@@ -3553,7 +3553,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/3.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/3.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3564,21 +3564,21 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/4.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/4.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/5.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/5.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <p>点击<strong>OK</strong>， 此时，等待gradle构建，构建完成后，观察 <strong>local.properties</strong> 文件，多出来了 <strong>ndk</strong> 的路径，如图所示：<br><figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/6.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/6.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure></p>
@@ -3589,7 +3589,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 </blockquote>
 </li>
 </ul>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/7.png" alt=""></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/7.png" alt=""></p>
 <pre><code>* 此步骤，为了防止下一步修改 app/build.gradle 文件后报错
 </code></pre><ul>
 <li>打开 <strong>app/build.gradle</strong> 文件，在 <strong>defaultConfig</strong> 下加入<strong>ndk</strong>相关配置参数：</li>
@@ -3598,7 +3598,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/8.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/8.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3608,7 +3608,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 </ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">static</span> &#123;</div><div class="line">	<span class="comment">// 加载类库</span></div><div class="line">	System.loadLibrary(<span class="string">"HelloNDK"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// native方法 调用 C代码</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">native</span> String <span class="title">javaCallC</span><span class="params">()</span></span>;</div></pre></td></tr></table></figure>
 <p>如图，我这是后续的图片，过程中的未截：</p>
-<p><img src="http://7xr1vo.com1.z0.glb.clouddn.com/10.png" alt=""></p>
+<p><img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/10.png" alt=""></p>
 <ul>
 <li><p>打开左下角的 <strong>Terminal</strong>，<strong>cd</strong> 至 <strong>java</strong> 路径下，并执行命令：</p>
 <pre><code>javah -d jni [native方法所在类的全路径]
@@ -3618,7 +3618,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/11.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/11.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3626,7 +3626,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/12.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/12.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3636,7 +3636,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/13.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/13.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3644,14 +3644,14 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/9.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/9.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/14.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/14.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3668,7 +3668,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/16.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/16.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>
@@ -3682,7 +3682,7 @@ git branch -v, -vv            查看所有分支的最后一次提交
 <figure class="image-bubble">
                 <div class="img-lightbox">
                     <div class="overlay"></div>
-                    <img src="http://7xr1vo.com1.z0.glb.clouddn.com/17.png" alt="" title="">
+                    <img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/17.png" alt="" title="">
                 </div>
                 <div class="image-caption"></div>
             </figure>

@@ -24,7 +24,7 @@ tags: SingleTask
 
 * 下面用代码事实说话：建立3个Activity，分别为Main1Activity、Main2Activity、Main3Activity，前两个都设定单击事件，跳转逻辑为：main1 -> main2 -> main3，其中 Main2Activity 为 SingleTask（AndroidManifest.xml中设置）。打印相应的生命周期方法和所在的 **taskId**
 
-    ![](http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%20%E5%9B%BE1.png)
+    ![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/SingleTask%20%E5%9B%BE1.png)
 
 
 &emsp;&emsp;这些taskid都是一样的，所以它们都是同一个Task中的。事实胜于雄辩。然后搜了一下相关问题，老罗的博客还是给力，彻彻底底的分析了这个坑。致谢老罗的开源精神！
@@ -43,7 +43,7 @@ tags: SingleTask
 
     先看看打印的日志：
     
-    ![](http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%E5%9B%BE2.png)
+    ![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/SingleTask%E5%9B%BE2.png)
     
     再次点击图标进入应用时，实际上是Main2Activity，Main3Activity 出栈了。
     分析下这个过程：
@@ -62,7 +62,7 @@ tags: SingleTask
     
     在SingleTask的基础之上，再增加设置 **taskAffinify** 属性即可，默认情况下，taskAffinity属性值为 包名，所以可以自定义一个taskAffinity值，便可以实现一个新的Task,新的Activity处于这个新的Task的root。如，我的 Demo 代码如下：
     
-    ![](http://7xr1vo.com1.z0.glb.clouddn.com/SingleTask%E5%9B%BE3.png)
+    ![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/SingleTask%E5%9B%BE3.png)
 
 ### 总结
 * SingleTask的启动模式并不会启动一个新的任务栈来承载Activity，而是在原来的Task中

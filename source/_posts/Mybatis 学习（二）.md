@@ -18,7 +18,7 @@ from orders, user
 where orders.user_id=user.id
 ```
 结果集：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/0A6D42AE-B4E6-4960-8313-FAE563CBA426.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/0A6D42AE-B4E6-4960-8313-FAE563CBA426.png)
 
 主要对 结果集 进行分析，再书写 mapper.xml
 
@@ -125,7 +125,7 @@ public void setUser(User user) {
     </association>
 </resultMap>
 ```
-![](http://7xr1vo.com1.z0.glb.clouddn.com/CB9AFFD6-B061-41CC-BC0B-0376C263DC0F.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/CB9AFFD6-B061-41CC-BC0B-0376C263DC0F.png)
 
 
 ## 3张表关联查询，一对多查询
@@ -146,7 +146,7 @@ from orders, user, orderdetail
 where orders.user_id = user.id and orders_id = orders.id
 ```
 结果集：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/937F9118-45DC-4D2F-83A3-8ED359C2CD7F.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/937F9118-45DC-4D2F-83A3-8ED359C2CD7F.png)
 
 * 实现
 
@@ -205,7 +205,7 @@ FROM
 WHERE orders.user_id = user.id AND orderdetail.orders_id=orders.id AND orderdetail.items_id = items.id
 ```
 结果集：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/C9339305-3D30-4A4F-B349-73DC6B6C9D50.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/C9339305-3D30-4A4F-B349-73DC6B6C9D50.png)
 
 * 实现
 
@@ -309,7 +309,7 @@ WHERE orders.user_id = user.id AND orderdetail.orders_id=orders.id AND orderdeta
 </resultMap>
 ```
 测试：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/51C2ECFE-8AD9-4354-B9D1-3E0B7DC66FE8.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/51C2ECFE-8AD9-4354-B9D1-3E0B7DC66FE8.png)
 
 ## mybatis 缓存相关
 * mybatis默认开启一级缓存，二级缓存

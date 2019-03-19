@@ -35,7 +35,7 @@ JENKINS_PORT="8081"
 service jenkins start
 ```
 如图，启动成功
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins1.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins1.png)
 
 ## Jenkins Setting
 打开浏览器，输入服务器的域名，端口8081，go ~
@@ -50,13 +50,13 @@ tail /var/lib/jenkins/secrets/initialAdminPassword
 ### 全局配置
 侧边栏：系统管理 -> 全局工具配置
 * JDK
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins2.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins2.png)
 * Git
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins3.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins3.png)
 * Gradle
 gradle 使我们自己下载的，可以将本地的gradle zip 用 scp 直接上传至服务器，解压至相应目录
 此处，我们配置多个gradle版本，4.1 和 3.5
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins4.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins4.png)
 
 > 我们可能会忘记 以上配置的路径，在这里备用下命令
 
@@ -67,20 +67,20 @@ which git
 ## New Task
 上面配置完基本的设置后，我们开始配置Android打包的任务
 * 新建任务
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins5.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins5.png)
 * 配置项目url
 这里选择github的项目为例子：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins6.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins6.png)
 * 配置git url
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins7.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins7.png)
 * 配置gradle
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins8.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins8.png)
 * 配置构建后操作
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins9.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins9.png)
 配置结束，save, 我们执行下:
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins10.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins10.png)
 打包结果，输出apk，mapping:
-![](http://7xr1vo.com1.z0.glb.clouddn.com/jenkins11.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/jenkins11.png)
 
 参考：
 https://www.jianshu.com/p/c517f09df025

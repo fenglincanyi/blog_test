@@ -143,7 +143,7 @@ xml配置：
     </aop:config>
 </beans>
 ```
-![](http://7xr1vo.com1.z0.glb.clouddn.com/DE37AB73-E35C-4515-8EE9-377A606E3956.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/DE37AB73-E35C-4515-8EE9-377A606E3956.png)
 
 3种 切面类型同时存在时：before最先调用，after最后调用
 ## 注解实现 aop（只列出@Before，其他的相同）
@@ -172,7 +172,7 @@ public class MyOrder {
 <!-- 注解 实现 aop-->
 <aop:aspectj-autoproxy/>
 ```
-![](http://7xr1vo.com1.z0.glb.clouddn.com/83664DD4-196B-44DB-BF22-16A94F0FFA01.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/83664DD4-196B-44DB-BF22-16A94F0FFA01.png)
 
 
 # Spring 相关的 pom 配置

@@ -26,7 +26,7 @@ SHA-1 哈希看起来是这样：
 #### 1. 已提交：数据已经安全的保存在本地数据库中
 #### 2. 已修改：修改了文件，但未保存到数据库中
 #### 3. 已暂存：对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中
-![](http://7xr1vo.com1.z0.glb.clouddn.com/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png) 
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E6%96%87%E4%BB%B6%E7%9A%84%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E5%91%A8%E6%9C%9F.png) 
 
 ### 三、Git 中的3个工作区域
 #### 1. Git仓库：保存项目的元数据和对象数据库，Git中最重要的部分，供其他人clone 仓库
@@ -37,7 +37,7 @@ SHA-1 哈希看起来是这样：
 
     未跟踪：工作目录下除已跟踪文件外的其他所有文件
 #### 3. 暂存区：是一个文件，保存下次将提交的文件列表信息，一般在Git仓库目录中，有时也被叫做索引
-![](http://7xr1vo.com1.z0.glb.clouddn.com/git3%E7%A7%8D%E5%B7%A5%E4%BD%9C%E5%8C%BA%E5%9F%9F.png) 
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/git3%E7%A7%8D%E5%B7%A5%E4%BD%9C%E5%8C%BA%E5%9F%9F.png) 
 
 
 ### 四、Git 的基本工作流程

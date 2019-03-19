@@ -22,20 +22,20 @@ pom.xml 中 加入：
 </plugins>
 ```
 ## maven配置
-![](http://7xr1vo.com1.z0.glb.clouddn.com/5709477C-1A4B-4AEF-B0E6-5EBE20688677.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/5709477C-1A4B-4AEF-B0E6-5EBE20688677.png)
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/8C4EFD37-2282-4BEA-81C7-4C4E11D2A91C.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/8C4EFD37-2282-4BEA-81C7-4C4E11D2A91C.png)
 
 命名：
 mybatis-generator:generate -e
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/C97FA1F0-DEDF-4A13-9810-6029D03D97DE.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/C97FA1F0-DEDF-4A13-9810-6029D03D97DE.png)
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/4EAE9177-A8D0-411D-869D-2167D54CB026.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/4EAE9177-A8D0-411D-869D-2167D54CB026.png)
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/E3C00FBA-21F9-4B6B-80BE-74D553270C6A.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/E3C00FBA-21F9-4B6B-80BE-74D553270C6A.png)
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/D0FC7201-E1D6-4D16-90E6-87D079213CA3.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/D0FC7201-E1D6-4D16-90E6-87D079213CA3.png)
 
 注意：
 文件名必须是：generatorConfig.xml
@@ -43,7 +43,7 @@ mybatis-generator:generate -e
 
 ## mybatis config.xml 文件配置
 拷贝驱动包的绝对路径
-![](http://7xr1vo.com1.z0.glb.clouddn.com/68C3A3B3-DB05-4786-A412-C808F0A8AA17.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/68C3A3B3-DB05-4786-A412-C808F0A8AA17.png)
 
 xml 配置：
 
@@ -105,9 +105,9 @@ xml 配置：
 
 ## 运行逆向生成代码
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/90C77448-2475-4EE3-B0D3-BF49D2A79606.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/90C77448-2475-4EE3-B0D3-BF49D2A79606.png)
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/617ABCDF-11AB-45AF-BA9C-1150393FEDC9.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/617ABCDF-11AB-45AF-BA9C-1150393FEDC9.png)
 
 运行成功
 

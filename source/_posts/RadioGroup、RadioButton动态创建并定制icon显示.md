@@ -67,4 +67,4 @@ R.drawable.relay_message_radio_selector 代码如下：
 
 效果如下图：
 
-![](http://7xr1vo.com1.z0.glb.clouddn.com/%E9%80%89%E6%8B%A9.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/%E9%80%89%E6%8B%A9.png)

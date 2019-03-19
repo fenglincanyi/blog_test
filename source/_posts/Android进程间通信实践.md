@@ -258,7 +258,7 @@ int result = resolver.update(Uri.parse(s), values, "package_name = ?", new Strin
 同样的，这种通信方式，在原生系统上，极端情况下（App A进程死的），也是可以访问其provider的。经过测试，小米普遍可以；华为、oppo、vivo基本上都是不同程度的限制。都是为了防止app胡乱进行保活机制。
 ### Service
 Service 无疑是跨进程通信中用的最多的，可以通过好几种方式进行消息传递，生命周期也是和activity有所不同，优先级比activity低。
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/service_lifecycle.png" width="320" height="440" style="margin:0 auto;display:block"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/service_lifecycle.png" width="320" height="440" style="margin:0 auto;display:block"/>
 
 系统提供2种方式让我们来玩耍:
 #### startService
@@ -456,15 +456,15 @@ public class BAppService extends Service {
 }
 ```
 运行结果：
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/bindservicedemo.png" width="500" height="60" style="margin:0 auto;display:block"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/bindservicedemo.png" width="500" height="60" style="margin:0 auto;display:block"/>
 
 
 ## AIDL
 终于来到最专业干这事的地方了，AIDL：Android 接口定义语言（Android Interface Define Language）
 代码实现起来，稍显复杂，我们还是按照上面那个 demo 来做：
 建立 AIDL 文件（默认会生成一个示例方法）：
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl1.png" width="550" height="330" style="margin:0 auto;display:block"/>
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl2.png" width="320" height="200" style="margin:0 auto;display:block"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl1.png" width="550" height="330" style="margin:0 auto;display:block"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl2.png" width="320" height="200" style="margin:0 auto;display:block"/>
 
 在这个IAppAidlInterface.aidl文件中，我们加上自己的接口：
 `IAppAidlInterface.aidl`
@@ -499,7 +499,7 @@ package com.geng.aidldemo;
 parcelable PeopleBean;
 ```
 然后，我们将在APP A中AIDL相关目录 复制到App B中，PeopleBean 也是。**包名要保持一致**
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl4.png" style="margin:0 auto;display:block"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl4.png" style="margin:0 auto;display:block"/>
 
 * 注意：
 **建立aidl文件后(或有文件更改)，需要clean/rebuild, 不然在实现aidl中接口时，会报错。**
@@ -573,11 +573,11 @@ private ServiceConnection sc = new ServiceConnection() {
     };
 ```
 测试结果：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/aidl5.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl5.png)
 
 我们再看看，中间的产物：
 在 app A/B 的build中, 有IAppAidlInterface的接口文件产生。
-<img src="http://7xr1vo.com1.z0.glb.clouddn.com/aidl3.png" width="350" height="230" style="margin:0 auto;display:block"/>
+<img src="https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/aidl3.png" width="350" height="230" style="margin:0 auto;display:block"/>
 
 
 **一个内部抽象类Stub实现了外部的接口，并继承了android.os.Binder，最内部的静态类Proxy，真正实现了2个接口方法，并进行序列化的操作**

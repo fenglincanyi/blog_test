@@ -214,7 +214,7 @@ int size = array.size();
     * 调用 WXDomModule.invokeMethod()
 
 task 数据格式（json），如图：
-![](http://7xr1vo.com1.z0.glb.clouddn.com/weex%20debug%E5%9B%BE.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/weex%20debug%E5%9B%BE.png)
 
 这里只分析第一种情况（其他相似）：
 WXDomModule.callDomMethod()：
@@ -228,7 +228,7 @@ mWXDomManager.createBody(task.instanceId, (JSONObject) task.args.get(0));
 这个时候，就回到我们之前说过的 WXDomStatement 的流程了，WXDomStatement会添加dom 节点（addDomInternal() ），在 addDomInternal 过程中，对dom节点又是一通猛烈的操作：根节点（root节点的准备工作），普通节点（add到父节点下）。
 然后，对 dom 对象 进行遍历操作（递归）：domObject.traverseTree()，在dom 线程创建 component，生成 component 树（也是递归操作：通过WXRenderStatement.generateComponentTree() ）。
 对于每个dom节点都会进行 setLayout()、setExtra()、setPadding()，可以去看看compent.setLayout()，就是去使用Android的API 对view进布局和绘制，此处不再贴代码。
-![](http://7xr1vo.com1.z0.glb.clouddn.com/weex%20component%20%E6%96%B9%E6%B3%95.png)
+![](https://canyifenglin-1258849639.cos.ap-beijing.myqcloud.com/blog/files/weex%20component%20%E6%96%B9%E6%B3%95.png)
 
 
 
